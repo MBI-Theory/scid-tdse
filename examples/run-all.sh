@@ -1,8 +1,9 @@
 #!/bin/bash
 #
-# mode can be "cheap", "medium", or "all"
+# mode can be "single file_name", "cheap", "medium", or "all"
 #
 mode="${1:-"cheap"}"
+test="${2:-"hydrogen_1S_2P0_uniform.inp"}"
 #
 passed=""
 failed=""
@@ -62,6 +63,12 @@ function summary () {
   [ ! -z "$failed"   ] && echo "Tests FAILED: $failed"
   [ ! -z "$dontknow" ] && echo "Can't CHECK: $dontknow"
   }
+#
+if [ "$mode" == "single" ] ; then
+  run_test "$test"
+  summary "Singe-test run"
+  exit 0
+fi
 #
 echo "Cheap tests (expected runtime < 1 minute each)"
 for inp in hydrogen_1S_2P0_uniform.inp hydrogen_1S_2P0_uniform_restart.inp hydrogen_1S_2P0.inp \

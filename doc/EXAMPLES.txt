@@ -1,0 +1,458 @@
+Last updated: 2016 May 27
+------------
+
+Test runs and examples
+
+All tests and examples are in the ./examples/ directory. The expected run times
+are on a 3.6 GHz i7-3820 CPU (4 cores, 8 harware threads), using all available 
+CPU cores [Not all examples benefit from parallel execution on this CPU]. 
+
+Please keep in mind that the default configuration file (vanilla.mak) supplied
+with the distribution emphasizes portability and robustness of the executable
+over its performance. In particular, it enables neither the parallel (OpenMP) 
+execution, nor advanced vectorization. All times shown below were obtained with
+an optimized, OpenMP build (configuration file: configs/shelob-ifort_opt.mak).
+An unoptimized, single-core build may result in execution wall-times longer
+by a factor of 10x on the same hardware.
+
+Sample inputs are in the the files with the *.inp extension; reference outputs 
+are in matching *.out_ref files. For some of the examples, reference radial 
+wavefunctions are in wfn/*.ref files.
+
+Some of the examples involving angle-resolved photoelectron spectra require
+visualization of large 3D data sets. Example visualization scripts using
+OpenDX (http://www.opendx.org/) are includes in the ./dx/ subdirectory.
+If OpenDX is installed, a visualization script can be started with the
+command (assuming ./examples/ is the current working directory):
+
+  dx -menubar -execute_on_change -program network-name.net
+
+To re-run all tests, use "run-all.sh". To clean up test results, use "clean.sh".
+(Both scripts are in the ./examples/ subdirectory.)
+
+Energy-resolved photoelectron spectra are calculated in two different ways:
+from the projection on stationary states within the simulation volume (main
+output file) and from the projection on spherical scattering waves (output 
+file specified by STS_COULOMB_WAVES). These can be visualized using 
+"./examples/plot-pes.sh" and "./examples/plot-spherical-waves.sh" scripts,
+respectively.
+
+The examples are:
+
+* [E1] Resonant 1-photon 1S->2P_0 bound transition in atomic hydrogen, using 
+  linearly polarized 1.45 fs Gaussian pulse at 0.1 TW/cm^2 (peak); uniform
+  300-point radial grid.
+
+  Input:      hydrogen_1S_2P0_uniform.inp
+  Cores used: 4
+  Run time:   2 seconds (double); 1 second (single); 1 minute (quad)
+  Reference:  hydrogen_1S_2P0_uniform.out_ref (main output)
+              hydrogen_1S_2P0_uniform.out_refquad (main output, quad precision)
+              wfn/H-1S-2Pz-WU-* (radial wavefunction)
+
+  This example uses a uniform 300-point radial grid at 0.2 Bohr resolution.
+  Relatively coarse uniform grid allows large time steps, so that the entire
+  simulation takes 500 time steps. The accuracy is still quite good, with
+  the H ground state computed at -0.500018 Hartree. 1S->2P0 excitation
+  probability is 0.3098E-02. Single-precision version of the example gives
+  a result accurate to 4 significant digits. Quad- and double-precision
+  results agree to 12 digits.
+
+  This example should be compared to [E2], which uses a much tighter grid.
+
+* [E1a] Restart of [E1]
+
+  Input:      hydrogen_1S_2P0_uniform_restart.inp
+  Cores used: 4
+  Run time:   2 seconds (double); 1 second (single); 1 minute (quad)
+  Reference:  hydrogen_1S_2P0_uniform_restart.out_ref (main output)
+              hydrogen_1S_2P0_uniform_restart.out_refquad (main output, quad precision)
+
+  Please note that the results from the restarted run will not be bit-for-bit identical 
+  to the checkpointed run, due to caching of intermediate results and differences in
+  round-off errors between parallel runs.
+
+* [E2] Resonant 1-photon 1S->2P_0 bound transition in atomic hydrogen, using 
+  linearly polarized 1.45 fs Gaussian pulse at 0.1 TW/cm^2 (peak); log-uniform
+  1000-point grid, grid spacing varies from 0.02 to 0.2 Bohr.
+
+  Input:      hydrogen_1S_2P0.inp
+  Cores used: 4
+  Run time:   1 minute (double); 40 seconds (single); 40 minutes (quad)
+  Reference:  hydrogen_1S_2P0.out_ref (main output)
+              hydrogen_1S_2P0.out_refquad (main output, quad precision)
+              wfn/H-1S-2Pz-WL-* (radial wavefunction)
+
+  Log-uniform grid leads to a less well-behaved Hamiltonian, necessitating
+  a larger number of time steps (20000) to maintain numerical stability.
+  The numerical accuracy is also higher, with the ground state at -0.4999933.
+  1S->2P0 excitation probability is 0.30988E-02. Single-precision version
+  of the example is accurate to 3 significant digits. Quad- and double-precision
+  results agree to 12 digits.
+
+* [E3] 1-photon ionization of hydrogen 2P_0 state, using Z-polarized 1.45 fs 
+  pulse at 1TW/cm^2 (peak) and 13.6 eV central energy; log-uniform 1000-point 
+  grid, spacing varies from 0.02 to 0.2 Bohr.
+
+  Input:      hydrogen_2P0_ion.inp
+  Cores used: 4
+  Run time:   1 minute (double); 50 seconds (single); 1 hour (quad)
+  Reference:  hydrogen_2P0_ion.out_ref (main output)
+              hydrogen_2P0_ion.out_refquad (main output, quad precision)
+              hydrogen_2P0_ion_waves.table_ref (Photoelectron spectrum, Coulomb spherical waves)
+              hydrogen_2P0_ion_pes_volkov.dx_ref (Photoelectron spectrum, plane waves)
+              hydrogen_2P0_ion_pes_coulomb.dx_ref (Photoelectron spectrum, Coulomb plane waves)
+              hydrogen_2P0_ion.net (OpenDX visualization network)
+              wfn/H-2Pz-WL-* (radial wavefunction)
+
+  Total ionization probability in the S channel is 0.2023E-04; in the D channel
+  0.1139E-03. Single-precision version of the example gives 3 significant digits
+  in ionization probability. A weak 2-photon peak is also seen in P channel 
+  (0.2657E-08 probability) and F channel (0.1318E-08 probability). Single-
+  precision run reproduces these peaks, but also produces spurious peaks at the
+  same probability level at higher energies. Quad- and double-precision
+  results agree to 12 digits.
+
+  This example also calculates photoelectron spectra (both angle- and energy-resolved). 
+  Note how the (approximate) energy-resolved PES calculated from box states misses
+  some of the interference structures and exaggerates the zero-energy structure. Also
+  note how projection on the asymptotic planewaves introduces spurious inerferences
+  and distorts the low-energy structure, compared to the scattering-state projection.
+  In single precision, the angle-resolved PES shows noise floor at 1e-4 amplitude
+  level, but is otherwise OK.
+
+* [E3a] Restart of [E3]
+
+  Input:      hydrogen_2P0_ion_restart.inp
+  Cores used: 4
+  Run time:   1 minute (double); 50 seconds (single); 1 hour (quad)
+  Reference:  hydrogen_2P0_ion_restart.out_ref (main output)
+              hydrogen_2P0_ion_waves.table_ref (Photoelectron spectrum, Coulomb spherical waves)
+              hydrogen_2P0_ion_pes_volkov.dx_ref (Photoelectron spectrum, plane waves)
+              hydrogen_2P0_ion_pes_coulomb.dx_ref (Photoelectron spectrum, Coulomb plane waves)
+              hydrogen_2P0_ion.net (OpenDX visualization network)
+
+  Please note that the results from the restarted run will not be bit-for-bit identical 
+  to the checkpointed run, due to caching of intermediate results and differences in
+  round-off errors between parallel runs.
+
+* [E4] 1-photon ionization of 3P_1 state of model Ar potential in the vicinity of
+  Cooper minimum, using Z-polarized 1.45 fs pulse at 1TW/cm^2 (peak) and 46.3 eV;
+  log-uniform 2000-point grid, spacing varies from 0.005 to 0.15 Bohr.
+
+  Input:      argon_3P1_cooper.inp
+  Cores used: 4
+  Run time:   4 minutes (double); 3.5 minutes (single); 6 hours (quad)
+  Reference:  argon_3P1_cooper.out_ref (main output)
+              argon_3P1_cooper.out_refquad (main output, quad precision)
+              argon_3P1_cooper_waves.table_ref (Photoelectron spectrum, Coulomb spherical waves)
+              argon_3P1_cooper_pes_volkov.dx_ref (Photoelectron spectrum, plane waves)
+              argon_3P1_cooper_pes_coulomb.dx_ref (Photoelectron spectrum, Coulomb plane waves)
+              argon_3P1_cooper.net (OpenDX visualization network)
+              wfn/Ar-2P1-Cooper-* (radial wavefunction)
+
+  This example uses an effective potential designed to reproduce experimental
+  one-electron removal energies in Argon atom. The 3P state of this potential
+  is at -0.581373 Hartree; current grid gives -0.581416 Hartree. The photon
+  energy is chosen near the Cooper minimum of this potential. The total ionization
+  probability is 0.2875E-06 (all in the D channel). Note the characteristic 
+  twinned profile of the 1-photon peak in the photoelectron spectrum.
+  Single-precision version gives about 2 significant digits for the ionization 
+  probability. Quad- and double-precision results agree to 12 digits.
+
+  We also calculate energy- and angle-resolved photoelectron spectra for this
+  example. Note how the twinned main ionization peak is fully resolved in the
+  spherical-wave expansion, but is smeared-out in the box-decomposition spectrum
+  (which neglectes interference effects). Note also that a fraction of the wavefunction
+  has escaped the simulation box by the time simulation ends (final norm 0.999999999739).
+  This causes artifacts in the spectrum at the 1e-10 level in amplitude, clearly 
+  visible for photoelectron energies above 2 Hartree. These artifacts can be eliminated 
+  by either increasing the size of the simulation both (both for STS_COULOMB_ATEND
+  and STS_VOLKOV_ATEND), or by activating in-TDSE projection on Volkov states
+  (STS_VOLKOV=.TRUE.; affects only the spectrum calculated by STS_VOLKOV_ATEND;
+  see example [E5] below). 
+
+  The single-precision PES looks superficially very similar, but contains a spurious 
+  peak at 1.7 Hartree (the photon energy). Switching to a more accurate linear solver 
+  (M3D_SOLVER='refined'/M3D_ITERATIONS=2) eliminates the spurious peak, and brings
+  out the noise floor at the expected 1e-4 amplitude level.
+
+  This example should be compared to [E5] below.
+
+* [E5] 1-photon ionization of 3P_1 state of model Ar potential away from the Cooper
+  minimum, using Z-polarized 1.45 fs pulse at 1TW/cm^2 (peak) and 55.0 eV
+
+  Input:      argon_3P1_offcooper.inp
+  Cores used: 4
+  Run time:   4 minutes (double); 4 minutes (single); 6 hours (quad)
+  Reference:  argon_3P1_offcooper.out_ref (main output)
+              argon_3P1_offcooper.out_refquad (quadruple precision)
+              argon_3P1_offcooper_waves.table_ref (Photoelectron spectrum, Coulomb spherical waves)
+              argon_3P1_offcooper_waves.table_refquad (Ditto, quad precision)
+              argon_3P1_offcooper_pes_volkov.dx_ref (Photoelectron spectrum, plane waves)
+              argon_3P1_offcooper_pes_coulomb.dx_ref (Photoelectron spectrum, Coulomb plane waves)
+              argon_3P1_offcooper.net (OpenDX visualization network)
+              wfn/Ar-2P1-Off-Cooper-* (radial wavefunction)
+
+  This example is the same as [E4], except for the photon energy chosen about
+  9 eV above the Cooper minimum. The total ionization probability is now
+  3.3060E-06 (D channel). Single-precision version gives 3 significant digits
+  in ionization probability. Double- and quad-precision results agree to 12 digits.
+
+  In the energy-resolved photoelectron spectrum calculated from the Coulomb 
+  spherical-wave expansion (argon_3P1_offcooper_waves.table), the two-photon
+  peak at 3.4H is nearly obscured by the leakage noise from the population
+  leaving the box (final norm 0.999999981976). This peak is clearly visible 
+  in the approximate spectrum calculated from the energy decomposition.
+  The leakage artifacts are absent in the Volkov-state projection, which 
+  used a combination of STS_VOLKOV=.T. and STS_VOLKOV_ATEND=.T. to capture
+  the entire population. The single-precision PES is essentially identical to
+  the double-precision result, with a slightly higher noise floor.
+
+  This example should be compared to [E4] above.
+
+* [E6] 1-photon ionization of 3P_{-1} state of model Ar potential by left circularly
+  polarized (XY polarization plane) 1.45 fs pulse at 30 eV and 2TW/cm^2;
+  log-uniform 1400-point grid, spacing varies from 0.005 to 0.15 Bohr.
+
+  Input:      argon_3P1m_circ_l.inp
+  Cores used: 4
+  Run time:   5 minutes (double); 4 minutes (single); 6 hours (quad)
+  Reference:  argon_3P1m_circ_l.out_ref (main output)
+              argon_3P1m_circ_l.out_refquad (quadruple precision)
+              argon_3P1m_circ_l_waves.table_ref (Photoelectron spectrum, Coulomb spherical waves)
+              argon_3P1m_circ_l_pes_volkov.dx_ref (Photoelectron spectrum, plane waves)
+              argon_3P1m_circ_l_pes_coulomb.dx_ref (Photoelectron spectrum, Coulomb plane waves)
+              argon_3P1m_circ_l.net (OpenDX visualization network)
+              wfn/Ar-2P1m-circ_l-* (radial wavefunction, partial)
+
+  This is a non-axially-symmetric weak-field example. The only open ionization
+  channel is to L=2/M=-2 continuum. Calculated 1-photon ionization probability is 
+  7.3674E-04. The 2-photon peak (in L=3/M=-3 continuum) is barely visible, with 
+  ionization probability 3.460E-8.
+
+  Single precision version is accurate to 2 significant digits for the 1-photon
+  probability. The double and quad-precision values agree to 10 significant digits.
+
+  Note that angle-resolved scattering-wave photoelectron spectra (argon_3P1m_circ_l_waves.table
+  and argon_3P1m_circ_l_pes_coulomb.dx) show a noise floor at approximately 1e-7 amplitude,
+  arising due to the wavefunction leackage from the simulation volume (final norm 0.999999574668). 
+  This problem is not present for the Volkov-state projection, where both STS_VOLKOV and 
+  STS_VOLKOV_ATEND are activated. However, the maximum of the main ionization peak is shifted
+  to approximately 88-degree azimuphal angle, compared to approximately 85 degrees for the
+  Coulomb-wave spectrum. The single-precision PES is essentially identical, except for a
+  slightly higher noise floor. 
+
+  The scattering-state projections agree to 1e-10 amplitude for the double- and quad-precision 
+  runs. The Volkov state projections aftree to 1e-3 for low final momenta (<0.05 Bohr/jiffy
+  aka 30meV energy), to 1e-5 for final momenta above 0.5 Bohr/jiffy (3.5 eV).
+
+  This example should be compared to [E7] below.
+
+* [E7] 1-photon ionization of 3P_{-1} state of model Ar potential by right circularly
+  polarized (XY polarization plane) 1.45 fs pulse at 30 eV and 2TW/cm^2;
+  log-uniform 1400-point grid, spacing varies from 0.005 to 0.15 Bohr.
+
+  Input:      argon_3P1m_circ_r.inp
+  Cores used: 4
+  Run time:   5 minutes (double); 3 minutes (single); 6 hours (quad)
+  Reference:  argon_3P1m_circ_r.out_ref (main output)
+              argon_3P1m_circ_r.out_refquad (quadruple precision)
+              argon_3P1m_circ_r_waves.table_ref (Photoelectron spectrum, Coulomb spherical waves)
+              argon_3P1m_circ_r_pes_volkov.dx_ref (Photoelectron spectrum, plane waves)
+              argon_3P1m_circ_r_pes_coulomb.dx_ref (Photoelectron spectrum, Coulomb plane waves)
+              argon_3P1m_circ_r.net (OpenDX visualization network)
+              wfn/Ar-2P1m-circ_r-* (radial wavefunction, partial)
+
+  This example is nearly identical to [E6], except the laser pulse is now right
+  circular-polarized. Now, the L=0/M=0 (3.4722E-4 probability) and L=2/M=0 
+  (1.2282E-4 probability) channels are open for 1-photon ionization. 2-photon
+  channels to L=1/M=1 (1.5152E-9 probability) and L=3/M=1 (2.3072E-9) are
+  also visible. 
+
+  Single-precision version gives 1-photon channels to 2-3 significant digits. 
+  The 2-photon channel probability is not well reproduced. Double and quad-precision
+  results agree to 9 significant digits
+
+  The scattering-wave spectra (argon_3P1m_circ_r_waves.table and argon_3P1m_circ_r_pes_coulomb.dx)
+  have a noise pedestal at the 1e-7 amplitude level, due to the wavefunction leakage from
+  the simulation volume (final norm 0.999999636965). Single-precision PES are essentially
+  identical, except for the slightly higher noise floor. Quad- and double-precision PES
+  agree to 9 significant digits (Coulomb-wave spectra) or 5 (for p<0.05) to 7 (for p>0.5)
+  digits (Volkov-state spectra).
+
+* [E8] High-harmonics generation from 1S state of hydrogen atom by linearly-polarized
+  4.84 fs 100 TW 800 nm pulse. Log-uniform 300-point grid, grid spacing varies from 
+  0.04 to 0.4 Bohr. The simulation continues to 24.2 fs to let residual dipole ring 
+  down.
+
+  Input:      hydrogen_1S_hhg_linear.inp
+              hydrogen_1S_hhg_linear.dhr (requires dyson_harmonics.x, not part of this package)
+  Cores used: 8 (logical) / 4 (physical)
+  Run time:   4 minutes (double); 4 hours (quad)
+  Reference:  hydrogen_1S_hhg_linear.out_ref (main output)
+              hydrogen_1S_hhg_linear.out_refquad (quadruple precision)
+              hydrogen_1S_hhg_elliptical_spec.pdf (HHG power spectrum)
+
+  This example illustrates simulation of a high-harmonics spectrum for a hydrogen
+  atom subject to an linearly polarized field. The free-oscillation radius in this 
+  field is about 17 Bohr. Because the absorbing boundary starts at 78 Bohr, 
+  contributions from both short and long trajectories are included.
+  The expected harmonic cut-off is at 1.20 Hartree (32.7 eV; H21). 
+  The final population within the box is 0.99166. Remaining population 
+  of the 1S ground state is 0.98923. The HHG power spectrum can be derived by 
+  Fourier-transforming the real part of the time-dependent dipole 
+  [in hydrogen_1S_hhg_linear.detail]. The reference spectrum, showing 
+  \omega^4 |d_\omega|^2, is in hydrogen_1S_hhg_elliptical_spec.pdf.
+
+  This example experiences a nearly complete loss of significance in single precision.
+  The double- and quad-precion results agree to 10 significant digits.
+
+  This example should be compared to [E11]
+
+* [E9] Strong-field ionization of hydrogen 2P_0 state by 4.84 fs pulse at 800 nm and
+  100 TW/cm^2 (peak); log-uniform 2200-point grid, spacing varies from 0.04 to 0.4 Bohr.
+
+  Input:      hydrogen_2P0_sfi.inp
+  Cores used: 4
+  Run time:   2 hours (double); 1.5 hours (single); 4 days (quad)
+  Reference:  hydrogen_2P0_sfi.out_ref (main output)
+              hydrogen_2P0_sfi.out_refquad (quadruple precision)
+              hydrogen_2P0_sfi.pdf (ATI spectrum)
+              hydrogen_2P0_sfi_waves.table_ref (Photoelectron spectrum, Coulomb spherical waves)
+              hydrogen_2P0_sfi_pes_volkov.dx_ref (Photoelectron spectrum, plane waves)
+              hydrogen_2P0_sfi_pes_coulomb.dx_ref (Photoelectron spectrum, Coulomb plane waves)
+              hydrogen_2P0_sfi.net (DX visualisation script)
+
+  This example calculates an ATI spectrum due to strong-field ionization by a short
+  near-IR pulse. Due to the high field intensity, an extended angular grid is
+  necessary to reach convergence (Lmax = 30 in this example). Because an extended
+  radial grid is needed to prevent electron density reaching the boundary, the 
+  radial grid is relatively coarse, and the initial 2P state has energy of
+  -0.1250013. The 1S ground state is at -0.4999884H on this grid. The simulation 
+  is still axially symmetric. 
+
+  The pulse is sufficiently intense to nearly fully ionize the atom; the final 
+  energy is 0.70073E-01 Hartree. Only 2.69% of the initial population is left
+  in L=1 bound states; the most populated bound channel is L=3 (10.55%). The
+  maximum of the continuum population is in L=4 channel (21.05%), with significant
+  population (3.02E-04 probability) still present in L=15 continuum. The Up in
+  this system is about 6 eV; the ATI peaks are seen up to 55 eV, consistent
+  with the 10Up recollision plateau cut-off. The electron free-oscillation radius 
+  in this example is 16.5 Bohr. To reduce boundary artifacts in the PES, we place
+  the t-SURF boundary 33 Bohr away from the absorber (this only affects the
+  in-TDSE term in STS_VOLKOV=.T.). The total wavefunction is nearly completely 
+  contained within the simulation volume (final population 0.999999999996), so
+  that the scattering-state projected spectrum is essentially artifact-free
+  (hydrogen_2P0_sfi_waves.table, hydrogen_2P0_sfi_pes_coulomb.dx). The leakage
+  noise floor is at 1e-13 amplitude. Large differences between the Coulomb and
+  Volkov-state spectra are seen for the low-energy structure.
+
+  In single precision, the results agree to 2 significant digits for ionization
+  probabilities and energies. The noise floor is the PES is at 1e-2 amplitude
+  - still sufficiently low to resolve the entire ATI progression. The double-
+  and quadruple-precision results agree to 12 digits.
+
+  We use a pivoted linear solver with iterative refinement of the solutions.
+  With the default unpivoted solver, this example experiences a nearly complete 
+  loss of significance in single precision.
+
+* [E10] Strong-field ionization of hydrogen 2P_0 state by 4.84 fs pulse at 800 nm and
+  100 TW/cm^2 (peak); log-uniform 400-point grid, spacing varies from 0.04 to 0.4 Bohr.
+
+  Input:      hydrogen_2P0_sfi_tsurf.inp
+  Cores used: 4
+  Run time:   18 minutes (double); 13 minutes (single); 24 hours (quad)
+  Reference:  hydrogen_2P0_sfi_tsurf.out_ref (main output)
+              hydrogen_2P0_sfi_tsurf.out_refquad (main output, quadruple precision)
+              hydrogen_2P0_sfi_tsurf_pes_volkov.dx_ref (Photoelectron spectrum, plane waves)
+              hydrogen_2P0_sfi.net (DX visualisation script)
+
+
+  This example calculates an ATI spectrum due to strong-field ionization by a short
+  near-IR pulse, using projection on Volkov states (the "t-SURF" method). We use
+  the same radial grid as in the example [E9], but terminate the grid at 150 Bohr.
+  As before, we place the t-SURF boundary 33 Bohr (twice the free-oscillation radius)
+  away from the absorber. 
+
+  Because the matching sphere is quite close to the origin (85 Bohr away), Volkov states
+  are no longer a good approximation to the asymptotic wavefunction. For an undamped
+  Coulomb potential, this leads to artifactual floor in amplitudes, at about 1e-3 level.
+  Instead, we choose to force the potential to zero at a finite range (POT_MASK). This
+  modification reduces the level of artifacts to about 1e-5. However, the change in the
+  potential cause considerable changes in the dynamics. For example, the survival
+  probability for the initial state is now 2.606e-4, compared to 2.855e-3 for the original
+  potential; the total ionization probability is 74.5%, compared to 76.5% for the unmodified
+  potential. There is still a fair agreement between the two angle-resolved photoelectron
+  spectra, except at the near-zero photoelectron momenta.
+
+  Single-precision calculation agrees to 2-3 digits in energies and ionization probabilities.
+  The single-precision angle-resolved PES is essentially identical to the double-precision
+  result, with the noise floor at 1e-3 amplitude. Larger deviations are seen for momenta
+  below 0.5 Bohr/jiffy. Double- and quadruple-precision results agree to 11 significant digits
+
+* [E11] High-harmonics generation from 1S state of hydrogen atom by elliptically-polarized
+  (Ey/Ez = 0.1) 4.84 fs 100 TW 800 nm pulse. Log-uniform 300-point grid, grid spacing
+  varies from 0.04 to 0.4 Bohr. The simulation continues to 24.2 fs to let residual
+  dipole ring down.
+
+  Input:      hydrogen_1S_hhg_elliptical.inp
+              hydrogen_1S_hhg_elliptical.dhr (requires dyson_harmonics.x, not part of the package)
+  Cores used: 8 (logical) / 4 (physical)
+  Run time:   1 hour (double); 3 days (quad)
+  Reference:  hydrogen_1S_hhg_elliptical.out_ref (main output)
+              hydrogen_1S_hhg_elliptical.out_refquad (quadruple precision)
+              hydrogen_1S_hhg_elliptical_spec.pdf (HHG power spectrum)
+
+  This example illustrates simulation of a high-harmonics spectrum for a hydrogen
+  atom subject to an elliptically polarized field (ellipticity 0.1). The free-oscillation
+  radius in this field is about 17 Bohr. Because the absorbing boundary starts at
+  78 Bohr, contributions from both short and long trajectories are included.
+  The expected harmonic cut-off is at 1.20 Hartree (32.7 eV; H21). 
+  The final population within the box is 0.99177. Remaining population 
+  of the 1S ground state is 0.98964. The HHG power spectrum can be derived by 
+  Fourier-transforming the real part of the time-dependent dipole [in H-1S-hhg-ell.detail].
+  The reference spectrum, showing \omega^4 |d_\omega|^2, is in hydrogen_1S_hhg_elliptical.pdf.
+
+  This example experiences a nearly complete loss of significance in single precision.
+  Double and quadruple-precision results agree to 10 significant digits.
+
+  This example should be compared to [E8]
+
+* [E12] High-harmonics generation from 1S state of hydrogen atom by elliptically-polarized
+  (Ey/Ez = 0.1) 4.84 fs 100 TW 800 nm pulse. Log-uniform 300-point grid, grid spacing
+  varies from 0.04 to 0.4 Bohr. The simulation continues to 24.2 fs to let residual
+  dipole ring down.
+
+  Input:      hydrogen_1S_hhg_ell_refsol.inp
+              hydrogen_1S_hhg_ell_refsol.dhr (requires dyson_harmonics.x, not part of the package)
+  Cores used: 8 (logical) / 4 (physical)
+  Run time:   3 hours (double); 2.5 hours (single)
+  Reference:  hydrogen_1S_hhg_ell_refsol.out_ref (main output)
+              hydrogen_1S_hhg_ell_refsol_pes_volkov.dx_ref (Photoelectron spectrum, plane waves)
+              hydrogen_1S_hhg_ell_refsol.net (OpenDX visualization network)
+
+  This example illustrates simulation of a high-harmonics spectrum for a hydrogen
+  atom subject to an elliptically polarized field (ellipticity 0.1), together with
+  the photoelectron spectrum using projection on Volkov states (the "t-SURF" method).
+  The pulse and grid are identical to the [E11] example. We use pivoted linear solver 
+  with iterative refinement to improve numerical stability of the simulation. In
+  double precision, the more accurate solver produces results essentially identical
+  to the unpivoted solver in [E11]. The final total norm is 0.9917738744*73* (vs.
+  0.991773874*41* for unpivoted). The final total energy is -0.4948682573*87*H (vs.
+  -0.4948682573*71* for unpivoted). There are similar differences for the 
+  individual state populations, eg. 1S is 0.9896392146*892* vs. 0.9896392146*568*.
+
+  In single precision, the energies and populations agree to 2-3 significant digits.
+  The dipole power spectrum is visually indictinguishable from the double-precision
+  result.
+
+  The photoelectron spectrum is of very low quality due to the close proximity of the 
+  matching sphere to the origin (R=45.1 Bohr). The artifacts can be somewhat reduced
+  by forcing the long-range potential to zero before it reaches the matching sphere
+  (POT_MASK), at the cost of introducing other artifacts in the PES and the HHG spectrum.
+
+  The single-precision angle-resolved PES agrees to the double-precision result to
+  1e-2 in amplitudes.
+
+  This example should be compared to [E11]

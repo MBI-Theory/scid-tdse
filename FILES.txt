@@ -1,0 +1,85 @@
+exit 1;
+
+Last updated: 2015 July 11
+------------
+
+Included files
+
+ 1 Configuration and build control
+
+   MANIFEST         - File manifest; use "sha256sum -c MANIFEST" to verify
+   FILES.txt        - This file
+   README.txt       - Basic installation instructions
+   Makefile         - Main makefile
+   vanilla.mak      - Default, minimal build configuration file
+   make-depend.sh   - Generates dependency list for the makefile
+
+   doc/
+
+     README-quad.txt  - (Advanced!) Instructions for building quadruple-precision 
+                        versions of LAPACK and BLAS libraries.
+     INPUT.txt        - Description of the input keywords.
+     EXAMPLES.txt     - Descruption of the examples in examples/ subdirectory
+     PROGRAMMING.txt  - Hints on modifying SCID-TDSE
+     TROUBLE.txt      - Troubleshooting hints
+
+   configs/         - Contains advanced system-specific make settings; see README.txt
+     shelob-gfortran_dbg.mak
+     shelob-gfortran_noquad_dbg.mak
+     shelob-gfortran_noquad_opt.mak
+     shelob-gfortran_opt.mak
+     shelob-ifort_noquad_opt.mak
+     shelob-ifort_opt.mak
+
+   extras/          - Contains settings and scripts for building
+                      non-standard versions of external libraries;
+                      See section 0 ("Installation pre-requisites") above.
+     make_gfortran_quad.inc
+     make_gfortran_vanilla_quad.inc
+     make_ifort_quad.inc
+     rename-lapack-syms_gfortran.lst
+     rename-lapack-syms_intel.lst
+
+ 2 Source code
+
+   accuracy.f90              - Basic numerical type definitions; this module
+                               is included by every other module in the code.
+                               The default real and integer types are chosen here.
+   bicg_tools.f90            - Bi-conjugate gradient iterative linear system
+                               solver.
+   build_pes.f90             - Separate utility program for constructing photoelectron
+                               spectrum from the energy decomposition analysis.
+   cap_tools.f90             - Complex absorbing potential implementation.
+   composition_analysis.f90  - Wavefunction analysis in terms of field-free 
+                               solutions.
+   constants.f90             - Mathematical and physical constants and conversion
+                               factors.
+   coulomb_functions.f90     - Evaluation of Coulomb scattering functions
+   dgedi.f                   - Linpack determinant/inverse routine
+   dgefa.f                   - Linpack Gaussian elimination routine, hacked
+                               to only compute factors needed for the determinant
+   lapack.f90                - Interface to selected linpack and lapack routines
+   math.f90                  - Miscellaneous mathematical functions
+   potential_tools.f90       - Implementation of radial potentials
+   propagator_tools.f90      - Propagator components: atomic and laser field 
+                               (linear polarization)
+   rotation_tools.f90        - Propagator components: frame rotation
+   spherical_bessel.f90      - Evaluation of spherical Bessel functions
+   sort_tools.f90            - Simple sorting tools
+   spherical_data.f90        - Definition of radial grids, derivative operators,
+                               and general initialization routines
+   spherical_tdse.f90        - Main program driver
+   spherical_tsurf.f90       - Calculation of energy- and angle-resolved 
+                               photoelectron spectrum
+   test_tools.f90            - Routines used for debugging radial grids and
+                               propagators; includes tests of derivative operators
+                               and an imaginary-time propagator
+   timer.f90                 - Timing routines
+   tridiagonal_pivoted.f90   - Pivoted tridiagonal solver routines
+   tridiagonal_tools.f90     - Routines for manipulating tri-diagonal matrices
+                               and solving tri-diagonal linear systems
+   vectorpotential_tools.f90 - Definition of laser field vector-potential
+   versions.f90              - Prints versions of all linked-in modules
+   wavefunction_tools.f90    - Calculation of atomic solutions and expectation
+                               values of selected operators (energy & dipole)
+

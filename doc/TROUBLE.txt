@@ -1,0 +1,179 @@
+Last updated: 2017 Mar 24
+------------
+
+Potential pitfalls and trouble-shooting
+
+0 Seeking assistance
+
+   Unfortunately, we do not have the resources or the manpower to offer any
+   official support for SCID-TDSE. However, if you run into a problem you
+   cannot resolve yourself, or believe that you have found a bug in SCID-TDSE,
+   you are welcome to contact one of the developers. Before asking for help,
+   please make sure that:
+
+   - You have red the *complete* documentation in the doc/ subdirectory.
+
+   - If you are using a locally modified version of SCID-TDSE, it still
+     completes *all* test cases in the examples/ subdirectory correctly.
+
+   When requesting assistance, please include the following information:
+
+   - The name and version of the O/S you are using. In case of Linux, please
+     include the version of the kernel.
+
+   - The name and version of the Fortran compiler you are using, as well as
+     the versions of all libraries you are linking against. Please also include
+     the relevant configuration (.mak) file, even if you have not modified it.
+
+   - All relevant architecture parameters and resource limits. In case of Linux 
+     and bash login shell, please include the complete output of the commands 
+     "ulimit -a", "ulimit -aH", "env", "free", and "cat /proc/cpuinfo".
+
+   - The *complete* input and output (including the error messages if any) of
+     an example which causes the problem. If the problem is not obvious (ie 
+     this is not a crash or an internal error condition), please also describe
+     why do you think the results are wrong.
+
+   - If you experience the problem with a locally modified version of SCID-TDSE,
+     but not with the version we originally provided, please also include the
+     *complete* source code (not a context diff!) of *all* routines you have 
+     modified. Please keep in mind that debugging somebody else's code is a
+     major undertaking for us; if at all possible try to find an example which
+     illustrates the problem using the unmodified version.
+
+   Please understand that we have other duties and responsibilities, and cannot
+   offer any guarantees on when or even whether we have enough time to look into
+   your problem. While we'll do our best to help, we do ask you to be patient
+   and considerate.
+
+1 Choosing the radial grid
+
+   The appropriate choice of the radial grids is highly dependent on the 
+   atomic potential and the laser pulse, with no generally useful default.
+   When choosing grid parameters, keep in mind the following factors:
+
+   - Away from the origin, the grid should be able to support the highest
+     photoelectron kinetic energy which will be encountered in the simulation.
+     For weak-field processes, the maximum energy is (n*h*nu-IP), where n is 
+     the desired photon order of the process. For strong-field processes, 
+     it is 10*Up, where Up is the ponderomotive energy. The corresponding 
+     de Broglie wavelength is 2*pi/sqrt(2*Emax); you will need at least 
+     four grid points per de Broglie wavelength to resolve the oscillation; 
+     more if accurate results are desired.
+
+   - Close to the origin, the grid should be able to support atomic solutions.
+     Rapidly-changing potentials (especially the attractive potentials)
+     require higher grid densities near the origin.
+
+   - Avoid rapid changes in grid density. Such changes decrease the accuracy
+     of the derivative operators. They also typically require smaller time
+     steps to achieve stable propagation.
+
+   - Monitor grid quality by examining the -left- wavefunctions. Rapid 
+     oscillations in the left wavefunctions often indicate a poor grid
+     choice. Use "initial_wf_dump_prefix" and "final_wf_dump_prefix"
+     to generate ASCII dumps of the radial wavefunctions, respectively
+     at the beginning and the end of the simulation.
+
+2 Choosing the time step
+
+   The time step is sensitive to the details of the grid, atomic potential,
+   and the laser pulse. As the result, it is not possible to set a generally-
+   safe default. Here are some hints for spotting trouble:
+
+   - Monitor the wavefunction norm ("<l|r>=" in the main output). As long as
+     the wavefunction is not touching the absorbing boundary, the real part
+     of the overlap must stay close to one. The imaginary part should always
+     be close to zero; values substantially different from zero indicate 
+     an excessively large time step and/or a poor choice of the radial grid.
+
+   - Monitor expectation of the total Hamiltonian ("<l|h|r>=" in the main
+     output). The real part must remain sensible; in the absence of the
+     laser field, it should be above the ground-state energy. As long as
+     the wavefunction is not touching the absorbing boundary, the imaginary
+     part must be close to zero. For problems where substantial wavefunction
+     absorption is expected, expectation of the Hamiltonian excluding the 
+     absorbing boundary is available in the detailed output (see input
+     keyword "detail_output").
+
+   - If any observables are computed during the simulation (e.g. the dipole),
+     monitor the imaginary part of the observables. It must be close to zero.
+     The imaginary part of the dipole is available through the detailed output.
+
+   - When using a non-uniform grid, pay close attention to the form of the 
+     wavefunction in the densest part of the grid (typically at the origin).
+     Presence of excessive, seemingly random noise in this area indicates
+     an excessively large time step, especially if the initial wavefunction
+     appears smooth in this region. Use input keywords INITIAL_WF_DUMP_PREFIX
+     and FINAL_WF_DUMP_PREFIX to save radial wavefunctions. Use a script
+     ./examples/plot-density.sh to visualize them.
+
+3 Other parameters affecting accuracy of the simulation
+
+   - Atomic propagator pre-computes and caches some terms which depend on the
+     time step. The decision to recompute these terms is affected by (pt_eps_dt)
+     parameter.
+
+   - A large number of tri-diagonal systems of linear equations are solved
+     in the course of the simulation. By default, these equations are solved
+     using a simple (and very fast) unpivoted LU decomposition. The unpivoted
+     algorithm may become numerically unstable for variable-density radial
+     grids and large values of the peak vector-potential. To deal with these
+     situations, a pivoted solver, with optional iterative refinement of the
+     solutions is also available. These are accessed using M3D_SOLVER and
+     M3D_ITERATIONS input variables. It is generally a good idea to check the
+     stability of a few simulations with a pivoted solver even when the 
+     default, unpivoted solver is adequate.
+
+   - Laser propagator needs to solve a system of non-tridiagonal linear 
+     equations when propagating the L=0+1 sub-block. If PT_MIX_SOLVER
+     is 'bi-CG' (this is NOT the default), the accuracy of the solution 
+     is affected by (bicg_epsilon). The default is sufficient to achieve 
+     machine accuracy in the solutions. Reducing bicg_epsilon below 1e-12 
+     will likely result in a very unstable propagator. Using 'bi-CG'
+     solver is not recommended; the default ('SM' is usually more accurate
+     and is always faster).
+
+   - Propagation for non-linearly-polarized fields requires repeated
+     wavefunction rotation. The accuracy of the rotation is affected
+     by the (rt_max_rot) parameter. The default (1e-3) should be sufficient
+     to maintain at least 10 significant digits in the results. If more
+     accurate results are required, rt_max_rot should be decreased further.
+
+4 Segmentation faults
+
+  We have tried to program SCID-TDSE defensively, so that most error conditions
+  and internal problems should result in a (hopefully) informative error message,
+  rather than a crash. Nonetheless, no computer program is perfect, and you may
+  encounter crashes - such as a segmentation fault. In our experience, many of
+  these crashes are due to compilation problems and resource constraints, rather
+  than due to bugs in SCID-TDSE itself. The most common problems are:
+
+  - Compiling for an unsupported CPU feature or an instruction set. Please make
+    sure your build configuration file (.mak included in the Makefile) only 
+    specified hardware features supported by your CPU. If you are using a 
+    cluster, please make sure *all* nodes do support CPU features you are 
+    compiling for.
+
+  - Inadequate resource limits, especially the main and per-thread stack. Many
+    Linux distributions impose unrealistically low stack size limits by default
+    (sometimes as little as 8K bytes). Furthermore, some implementations of
+    OpenMP interpret the "unlimited" main stack limit as a very low (a few 
+    kilobytes) limit on the per-thread stack. We recommend both the main and
+    per-thread stack size to be at least a few megabytes in size; some compilers
+    may generate code which uses much larger stacks. If you use Linux and bash
+    shell, we recommend the following commands to be issued:
+
+    export HUGETLB_MORECORE=thp
+    export OMP_STACKSIZE=500M
+    ulimit -s 1024000
+
+    before starting SCID-TDSE executable. Again, if you are using a cluster, please
+    make sure that all nodes have adequate stack size limits.
+
+  - Broken external libraries, especially when multi-threaded execution (OpenMP)
+    is involved. The most common culprits are BLAS, LAPACK (or a combined library
+    providing both BLAS and LAPACK - such as ATLAS or MKL) and pthreads (Posix 
+    threading library). If you are experiencing mysterious crashes, please try
+    compiling SCID-TDSE with the OpenMP support disabled. If this helps, ask your
+    local system administrator for help in tracking down the broken library.

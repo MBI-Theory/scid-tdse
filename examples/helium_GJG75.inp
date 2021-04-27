@@ -1,0 +1,27 @@
+ &sph_tdse
+   comment                = "Helium effective potential from GJG75. 2-photon transition 2s<-1s; 10TW/cm2"
+   verbose                = 1,
+   omp_num_threads        = 4,
+   initial_wfn            = 'single',
+   initial_wfn_index      = 0, 0, 1,
+   initial_wfn_energy     = (-0.900,0.0)
+   sd_nradial             =1000,
+   sd_lmax                =  10,
+   sd_rgrid               = 'uniform',
+   sd_rgrid_zeta          = 2.0,
+   sd_rgrid_dr            = 0.10,
+   pot_name               = '[GJG75]'
+   pot_param(1:2)         = 2, 2
+   task                   = 'real time',
+   dt                     = 0.02
+   timesteps              = 20000,
+   vp_shape               = 'z Sin2',
+   vp_scale               = 4.4476e-2,
+   vp_param(1:4)          = 0.3795, 0.000000, 200.000, 400.0
+   skip_tests             = .T.
+   output_each            = 20,
+   composition_threshold  = 1e-8,
+   field_preview          = ' ',
+   detail_frequency       = 10,
+   detail_output          = 'helium_GJG75.detail',
+ /

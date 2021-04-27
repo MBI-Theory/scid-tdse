@@ -1,0 +1,204 @@
+Last updated: 2021 Apr 26
+------------
+
+Change log
+----------
+
+2020 Apr 26
+
+ - Added vp_shape='zero'
+
+2020 Dec 17
+
+ - Added cubic-spline field input (vp_shape="spline")
+
+2020 Jul 17
+
+ - Added support for infinitely-high repulsive barrier at the origin, 
+   through SD_RGRID_RMIN input parameter.
+
+2020 Jul 13
+
+ - Added effective potentials from Garvey, Jackman, and Green, PRA 12, 1144 
+   (1975), and a generalized input form inspired by these potentials.
+
+2020 Feb 04
+
+ - Added support for reading channel-dependent effective potentials in the
+   general exponential form.
+
+2019 Dec 23
+
+ - Added support for reading channel-dependent effective potentials in the
+   extended Tong-Lin form.
+
+2019 Nov 13
+
+ - Minor fixes to allow building with AOCC 2.0. There appears to be no 
+   performance advantage to using it - both gfortran (7.0+) and ifort
+   are always faster.
+
+2018 Oct 08
+
+ - Changed the sematics of sd_tolerance_r and sd_tolerance_l to have separate
+   cut-offs for the left and right wavefunctions.
+
+2018 Aug 21
+
+ - Broadcast results of NINT(), MINLOC() and MAXLOC() intrinsics where
+   otherwise inconsistent state may arise in heterogeneous multi-none
+   runs. The problem affected two of the test cases.
+
+2018 Jul 30
+
+ - Added electric field to the detailed output. Tweaked time-step subdivision
+   again to reduce high-frequency artifacts.
+
+2018 Jul 10
+
+ - Changed the semantics and the default of the DT_MAX_LA parameter. The
+   revised version seems to yield better results at very high intensities.
+
+2018 Jun 20
+
+ - Added support for distributed-memory parallelization with MPI. Please
+   make sure to read "README-MPI.txt" before using!
+
+2018 Jun 08
+
+ - Fixed execssive memory usage for large-angle rotations
+
+2018 Feb 08
+
+ - Added [neon 3/2] and [neon 1/2] special-purpose potentials.
+
+2017 Oct 10
+
+ - Full implementation of adaptive NRADIAL. Incremented checkpoint
+   version once again.
+
+2017 Oct 09
+
+ - Partially implemented adaptive NRADIAL, which marginally improves the
+   performance. Incremented the checkpoint file format version again.
+
+2017 Oct 07
+
+ - Implemented adaptive LMAX, which should improve performance somewhat.
+   Incremented the checkpoint file format version, to accommodate the changes.
+
+2017 Oct 02
+
+ - Added 'Gauss-Coulomb' interaction potential.
+
+2017 Sep 15
+
+ - Added 'direct' form of the infinite-time correction to the photoelectron
+   spectrum. This is the new default.
+
+2017 Sep 07
+
+ - Added 'zz Gaussian' pulse form
+
+2017 Aug 29
+
+ - Added 'xenon 3/2' and 'xenon 1/2' effective potentials
+
+2017 Jun 13
+
+ - Suppress excessive biorthogonality warnings in wavefunction_tools.f90
+
+2017 Mar 24
+
+ - Added sections on dealing with segmentation faults and on seeking 
+   assistance in doc/TROUBLE.txt
+
+2016 Dec 31
+
+ - Global rearrangement of the memory layout, leading to an across-the-board
+   speedup of 10-15%. Intel Fortran is recommended for best results.
+
+2016 Dec 27
+
+ - Added automatic results checking for the test set.
+
+2016 Dec 23
+
+ - Added a cyclic-decomposition linear solver, which may speed up things on
+   vector architectures. 
+
+2016 Jun 16
+
+ - Added selected effective potentials from Tong and Lin, J Phys B 38, 2593 (2005)
+
+2016 Jun 12
+
+ - Added timestep subdivision. This dramaticaly improves the efficiency and
+   numerical stability for intense, low-frequency fields. Automatic timestep
+   subdivision is now the default; it can be turned off using DT_SUBDIVISION
+   input keyword.
+
+2016 May 27
+
+ - Added limited checkpoint/restart support.
+
+2016 May 23
+
+ - SD_LMAX was assumed to never exceed 999 in parts of the code (mostly the
+   output, but also caching code for the atomic solutions). Increased the 
+   limit to 99999, which should be sufficient for a while. The change means
+   that atomic wavefunction cached with all previous versions will be recomputed!
+
+2016 May 01
+
+ - Fixed an embarassing bug in rotation_tools.f90, where the azimuphal angle phi 
+   was taken with a wrong sign. As the result, all calculations using "xy *" 
+   polarization were rotating in the direction opposite to the intended. The 
+   linear and "zx *" polarizations were not affected. 
+
+2016 Mar 09
+
+ - Added calculation of photoelectron spectra, using projection on Volkov
+   or scattering states. Projection on Volkov states can be performed with
+   population reaching the absorbing boundary during the simulation (the
+   "t-SURF" method). Projection on scattering states requires that the
+   sumulation is finished while all population is still in the box. Note
+   that the absorbing boundary is still required in this case. The code
+   is in spherical_tsurf.f90.
+
+ - Added more accurate linear solvers (pivoted and pivoted with iterative
+   refinement) to improve numerical stability for non-uniform grids and
+   very intense fields. The code is in tridiagonal_pivoted.f90.
+
+ - Fixed a bug where a non-zero polar angle theta of the vector-potential
+   at time zero will cause the initial wavefunction to be wrong.
+
+ - Fixed a bug in printing the radial grid summary for SD_RGRID='log-uniform'.
+   The internally-used grid was still correct.
+
+ - Added calculation of dipole acceleration in wt_dipole (wavefunction_tools.f90). 
+   The result is available through the detailed output file.
+
+ - Fixed a bug in the definition of the 'zy *' vector-potentials (which were
+   in fact polarized in the ZX plane.
+
+ - Bi-conjugate and brute-force solvers in the mixing propagator have been 
+   removed. The Sherman-Morrison solver combined with the pivoted linear solver
+   is always superiour
+
+ - A special, quadruple-precision build of LAPACK is no longer required for a
+   quadruple-precision build of SCID-TDSE.
+
+ - Quadruple-precision runs are now much faster.
+
+2015 Jul 30
+
+ - Added evaluation of the dipole-acceleration expectation value for
+   multiplicative effective potentials.
+
+   The implementation of dipole acceleration (subroutine wt_dipole in
+   wavefunction_tools.f90) requires gradient of the effective interation
+   potential. The gradient is calculated in initialize_channel_potentials
+   (spherical_data.f90) by numerical differentiation of the user-supplied
+   potential. Numerical differentiation step is controlled by the parameter
+   SD_RGRID_GRAD_DELTA.

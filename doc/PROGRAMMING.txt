@@ -1,0 +1,97 @@
+Last updated: 2015 July 11
+------------
+
+Incorporating new potentials, laser pulse shapes, and observables
+
+  It is very likely you'll need to add a new effective potential, new laser pulse
+  shape, or a new observable to the code. Here is how:
+
+1 Potentials.
+
+  You will need to edit the file potential_tools.f90. The name of the potential
+  is passed in the global variable "pot_name". All parameters defining the potential
+  are passed in the global array "pot_param"; if you require more than 5 parameters,
+  simply increase the dimensions of the array.
+
+  Function pt_initialize() will be called once, before the first evaluation of the
+  potential. Print a descriptive message here, and do whatever initialization necessary.
+
+  Function pt_evaluate_potential() will be called for each angular momentum L and
+  radial position R. Although the J argument is present for future expansion, the
+  upstream code currently does not support J-dependent potentials.
+
+2 Laser pulses.
+
+  Laser pulses are defined by their 3-dimensional vector-potential by the function
+  vp_apot() in file "vectorpotential_tools.f90". Given the time, this function is 
+  expected to return the magnitude of the vector-potential and (optionally) its 
+  direction in the laboratory polar spherical coordinates. It is not necessary to
+  unwrap the polar angles - this will be done by the calling routine.
+
+  If possible, you should try to use the existing parameters to communicate to the
+  vp_apot() section implementing your potentials. These parameters are:
+
+   vp_shape   - Name of the potential
+   vp_scale   - Overall magnitude
+   vp_param   - Additional parameters; parameters 1 through 10 have a fixed meaning;
+                parameters 11 through 20 can be used as needed. See source for further
+                details.
+   vp_scale_x - Same as vp_scale/vp_param, but used to define a "secondary" field
+   vp_param_x - components, if required.
+
+  Use of field_preview= input parameter is highly recommended for debugging. Other
+  parameters affecting treatment of the laser field are field_unwrap and
+  unwrap_threshold.
+
+  Note that all arithmetics involving vector-potential should be done using the
+  auxiliary real kind (xk) rather than the default real kind (rk). This helps
+  avoiding premature loss of accuracy, especially when working in single precision.
+
+3 Observables.
+
+  Because of the non-Hermitian representation of the Hamiltonian used in SCID-TDSE,
+  the left wavefunction is not the complex conjugate of the right wavefunction.
+  Instead, matrix elements must be evaluated by explicitly contracting the operators
+  with the left and right wavefunctions. The left wavefunction should be used as is,
+  with no conjugation. All necessary weight factors are already included in the left
+  wavefunction, so that multiplicative operators can be evaluated simply by point-wise
+  summing up the product of the left wavefunction, operator value on a spatial grid,
+  and the right wavefunction. Operators involving radial derivatives of the wavefunction
+  must be evaluated using the idiomatic sequences:
+
+  Gradient:
+
+    if (lval==0) then
+      call m3d_multiply(sd_d1n_l0,wfn_r%wfn(:,1,lval,mval),tmp)
+      call m3d_solve(sd_m1nf_l0,tmp,gradient_psi)
+    else
+      call m3d_multiply(sd_d1n_lx,wfn_r%wfn(:,1,lval,mval),tmp)
+      call m3d_solve(sd_m1nf_lx,tmp,gradient_psi)
+    end if
+
+  Second derivative:
+
+    if (lval==0) then
+      call m3d_multiply(sd_d2n_l0,wfn_r%wfn(:,1,lval,mval),tmp)
+      call m3d_solve(sd_m2nf_l0,tmp,laplacian_psi)
+    else
+      call m3d_multiply(sd_d2n_lx,wfn_r%wfn(:,1,lval,mval),tmp)
+      call m3d_solve(sd_m2nf_lx,tmp,laplacian_psi)
+    end if
+
+  Note that the derivative operators are l-dependent. All necessary matrices are
+  provided by spherical_data module.
+
+  A number of the examples is available in wavefunctions_tools.f90, namely:
+  
+    wt_normalize - Wavefunction norm
+    wt_energy    - Expectation value of the Hamiltonian matrix
+    wt_dipole    - Expectation value of the spatial dipole operator
+  
+  For the vectorial and tensorial properties, the result may need to be transformed
+  into the space-fixed laboratory coordinate system. An example for polar vectors
+  is available in function lab_dipole() [in spherical_tdse.f90]. For spherical 
+  tensors, a routine MathYJMRotationMatrix() [in math.f90] may be useful for the
+  transformation; however please heed the comments in rt_finite_rotation_matrix()
+  [in rotation_tools.f90] if you decide to use it.
+

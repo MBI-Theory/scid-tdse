@@ -1,0 +1,44 @@
+MODULE SCID
+CATEGORY QMECH
+DESCRIPTION "Import wavefunction(s) from SCID-TDSE"
+FLAGS PERSISTENT
+LOADABLE "./scid-dx.so" ;
+INPUT  FileName  ; string       ; (none)       ; "File name of the SCID-TDSE wavefunction data (See visualize_prefix)"
+INPUT  PlotGrid  ; field        ; (no default) ; "Grid on which wavefunctions must be evaluated"
+OUTPUT PlotData  ; field        ; "PlotGrid, with left and right orbitals (complex) added to it"
+#
+MODULE FLATTEN
+CATEGORY QMECH
+DESCRIPTION "Integrate a regular 3D field along a given dimension"
+FLAGS PERSISTENT
+LOADABLE "./scid-dx.so" ;
+INPUT  Field     ; field        ; (no default)     ; "Field to flatten"
+INPUT  Axis      ; integer      ;      0           ; "Array index to flatten over"
+INPUT  Position  ; integer      ; (data dependent) ; "Residual point chosen for the flattened axis"
+OUTPUT FlatField ; field        ; "Field integrated over the specified axis"
+#
+MODULE NORM1
+CATEGORY QMECH
+DESCRIPTION "Compute 1-norm of a given field"
+FLAGS PERSISTENT
+LOADABLE "./scid-dx.so" ;
+INPUT  Field     ; field        ; (no default)     ; "Regular field to compute the norm for"
+OUTPUT Norm      ; scalar       ; "1-norm of the field, including volume element"
+#
+MODULE UNWRAP
+CATEGORY QMECH
+DESCRIPTION "Unwrap phase argument, initially in the -Pi:+Pi range"
+FLAGS PERSISTENT
+LOADABLE "./scid-dx.so" ;
+INPUT  Phase       ; field        ; (no default)     ; "Field to unwrap"
+INPUT  Magnitude   ; field        ; (no default)     ; "Magnitude of the data"
+INPUT  Fancy       ; integer      ;      0           ; "Unwrap style; currently ignored"
+OUTPUT UnwrapPhase ; field        ; "Unwrapped field"
+#
+MODULE WRAP
+CATEGORY QMECH
+DESCRIPTION "Re-wrap phase argument into the -Pi:+Pi range"
+FLAGS PERSISTENT
+LOADABLE "./scid-dx.so" ;
+INPUT  Phase       ; field        ; (no default)     ; "Field to re-wrap"
+OUTPUT WrapPhase   ; field        ; "Re-wrapped field"

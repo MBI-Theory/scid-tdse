@@ -1,0 +1,60 @@
+ &sph_tdse
+   ! WARNING: This example is intended to test the correctness of MPI routines
+   ! WARNING: It is _not_ a realistic example for production calculations.
+   ! WARNING: In particular, the radial grid is much too small to run sts_coulomb_atend=.true.
+   comment                = "Argon 3P(-1) SFI and HHG, elliptical polatization - checkpoint"
+   verbose                = 1,
+   omp_num_threads        = 4,
+   initial_wfn            = 'single',
+   initial_wfn_index      = 1, -1, 1,
+   initial_wfn_energy     = (-0.581,0.0)
+   sd_nradial             = 300,
+   sd_lmax                =  20,
+   sd_mmin                = -20,
+   sd_mmax                =  20,
+   field_unwrap           = .true.
+   rotation_mode          = 'auto',
+   sd_rgrid               = 'uniform',
+   sd_rgrid_zeta          = 0.0
+   sd_rgrid_dr            = 0.30,
+   pot_name               = 'argon 2P',
+   task                   = 'real time',
+   dt_subdivision         = 'off'
+   dt                     = 0.02
+   timesteps              = 22064
+   vp_shape               = 'xy Gaussian',
+   vp_scale               = 0.749740   ! 0.8 * 0.937175 = 100 TW/cm2
+   vp_scale_x             = 0.562305   ! 0.6 * 0.937175
+   vp_param(1:4)          = 0.0569542, 0.0000000000, 220.64, 110.32
+   vp_param_x(1:4)        = 0.0569542, 1.5707963268, 220.64, 110.32
+   vp_param(11:12)        = 165.48, 220.64
+   vp_param_x(11:12)      = 165.48, 220.64
+   skip_tests             = .T.
+   output_each            = 100
+   composition_threshold  = 1e-3,
+   initial_wf_dump_prefix = ' ',
+   final_wf_dump_prefix   = ' ',
+   field_preview          = 'argon_3P1m_ell_ckpt_mpi_field.table'
+   wt_atomic_cache_prefix = ' ',
+   detail_output          = 'argon_3P1m_ell_ckpt_mpi_detail.table'
+   nt_node_output         = 'argon_3P1m_ell_ckpt_mpi_node'
+   sts_volkov             = .true.
+   sts_volkov_atend       = .true.
+   sts_coulomb_atend      = .true.
+   sts_verbose            = 0
+   sts_kgrid              = 'uniform'
+   sts_kgrid_max          = 3.0
+   sts_kgrid_count        = 200
+   sts_dgrid              = 'product'
+   sts_dgrid_nphi         = 12
+   sts_dgrid_ntheta       = 40
+   sts_coulomb_table      = 'argon_3P1m_ell_ckpt_mpi_pes_coulomb.table'
+   sts_coulomb_opendx     = 'argon_3P1m_ell_ckpt_mpi_pes_coulomb.dx'
+   sts_coulomb_waves      = 'argon_3P1m_ell_ckpt_mpi_waves.table'
+   sts_volkov_table       = 'argon_3P1m_ell_ckpt_mpi_pes_volkov.table'
+   sts_volkov_opendx      = 'argon_3P1m_ell_ckpt_mpi_pes_volkov.dx'
+   !
+   ckpt_save_basename     = 'argon_3P1m_ell_ckpt_mpi'
+   ckpt_load_filename     = ' '
+   ckpt_interval          = 4000
+ /

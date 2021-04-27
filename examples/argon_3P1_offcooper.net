@@ -1,0 +1,1544 @@
+//
+// time: Mon Mar  7 11:57:13 2016
+//
+// version: 3.2.0 (format), 4.4.4 (DX)
+//
+//
+// MODULE main
+//
+// comment: 
+// page assignment: Massage	order=3, windowed=0, showing=0
+// page assignment: Massage 2D	order=4, windowed=0, showing=0
+// page assignment: ionization	order=2, windowed=0, showing=1
+// workspace: width = 568, height = 816
+// layout: snap = 0, width = 50, height = 50, align = NN
+//
+macro main(
+) -> (
+) {
+    // 
+    // node String[7]: x = 404, y = 333, inputs = 0, label = String
+    // output[1]: visible = 1, type = 32, value = "log10(abs(y)+1e-15)"
+    // page group: ionization
+    //
+    // 
+    // node String[8]: x = 21, y = 191, inputs = 0, label = String
+    // output[1]: visible = 1, type = 32, value = "(abs(i2)-1*abs(i1))"
+    // page group: ionization
+    //
+    // 
+    // node FileSelector[3]: x = 109, y = 27, inputs = 0, label = FileSelector
+    // output[1]: visible = 1, type = 32, value = "./argon_3P1_offcooper_pes_volkov.dx"
+    // output[2]: visible = 1, type = 32, value = "argon_3P1_offcooper_pes_volkov.dx"
+    // page group: ionization
+    //
+    // 
+    // node Import[5]: x = 119, y = 137, inputs = 6, label = Import
+    // input[1]: defaulting = 1, visible = 1, type = 32, value = "butadiene-D0.map"
+    // input[3]: defaulting = 0, visible = 1, type = 32, value = "dx text"
+    // page group: ionization
+    //
+main_Import_5_out_1 = 
+    Import(
+    main_FileSelector_3_out_1,
+    main_Import_5_in_2,
+    main_Import_5_in_3,
+    main_Import_5_in_4,
+    main_Import_5_in_5,
+    main_Import_5_in_6
+    ) [instance: 5, cache: 1];
+    // 
+    // node FileSelector[4]: x = 242, y = 27, inputs = 0, label = FileSelector
+    // output[1]: visible = 1, type = 32, value = "./argon_3P1_offcooper_pes_coulomb.dx"
+    // output[2]: visible = 1, type = 32, value = "argon_3P1_offcooper_pes_coulomb.dx"
+    // page group: ionization
+    //
+    // 
+    // node Import[6]: x = 252, y = 137, inputs = 6, label = Import
+    // input[1]: defaulting = 1, visible = 1, type = 32, value = "butadiene-D0.map"
+    // input[3]: defaulting = 0, visible = 1, type = 32, value = "dx text"
+    // page group: ionization
+    //
+main_Import_6_out_1 = 
+    Import(
+    main_FileSelector_4_out_1,
+    main_Import_6_in_2,
+    main_Import_6_in_3,
+    main_Import_6_in_4,
+    main_Import_6_in_5,
+    main_Import_6_in_6
+    ) [instance: 6, cache: 1];
+    // 
+    // node Compute2[7]: x = 95, y = 275, inputs = 9, label = Compute2
+    // input[2]: defaulting = 0, visible = 1, type = 32, value = "i1"
+    // input[4]: defaulting = 0, visible = 1, type = 32, value = "i2"
+    // input[6]: defaulting = 0, visible = 1, type = 32, value = "i3"
+    // input[8]: defaulting = 0, visible = 1, type = 32, value = "i4"
+    // page group: ionization
+    //
+main_Compute2_7_out_1 = 
+    Compute2(
+    main_String_8_out_1,
+    main_Compute2_7_in_2,
+    main_Import_5_out_1,
+    main_Compute2_7_in_4,
+    main_Import_6_out_1,
+    main_Compute2_7_in_6,
+    main_Compute2_7_in_7,
+    main_Compute2_7_in_8,
+    main_Compute2_7_in_9
+    ) [instance: 7, cache: 1];
+    // 
+    // node Transmitter[52]: x = 158, y = 353, inputs = 1, label = ion_data_flat
+    // page group: ionization
+    //
+ion_data_flat = main_Compute2_7_out_1;
+    // 
+    // node Receiver[46]: x = 432, y = 19, inputs = 1, label = ion_data_flat
+    // page group: ionization
+    //
+main_Receiver_46_out_1[cache: 0] = ion_data_flat;
+    // 
+    // node Mark[6]: x = 421, y = 109, inputs = 2, label = Mark
+    // input[2]: defaulting = 0, visible = 1, type = 32, value = "positions"
+    // page group: ionization
+    //
+main_Mark_6_out_1 = 
+    Mark(
+    main_Receiver_46_out_1,
+    main_Mark_6_in_2
+    ) [instance: 6, cache: 1];
+    // 
+    // node Compute[4]: x = 441, y = 186, inputs = 4, label = Compute--warping into the shape of a sphere
+    // input[1]: defaulting = 0, visible = 0, type = 32, value = "$0.2*[sin($0.0)*cos($0.1), sin($0.0)*sin($0.1), cos($0.0)]"
+    // page group: ionization
+    // expression: value = pos.2*[sin(pos.0)*cos(pos.1), sin(pos.0)*sin(pos.1), cos(pos.0)]
+    // name[2]: value = pos
+    // name[3]: value = r
+    // name[4]: value = r0
+    //
+main_Compute_4_out_1 = 
+    Compute(
+    main_Compute_4_in_1,
+    main_Mark_6_out_1,
+    main_Receiver_46_out_1,
+    main_Compute_4_in_4
+    ) [instance: 4, cache: 1];
+    // 
+    // node Unmark[1]: x = 462, y = 258, inputs = 2, label = Unmark
+    // input[2]: defaulting = 0, visible = 1, type = 32, value = "positions"
+    // page group: ionization
+    //
+main_Unmark_1_out_1 = 
+    Unmark(
+    main_Compute_4_out_1,
+    main_Unmark_1_in_2
+    ) [instance: 1, cache: 1];
+    // 
+    // node Normals[1]: x = 476, y = 337, inputs = 2, label = Normals
+    // page group: ionization
+    //
+main_Normals_1_out_1 = 
+    Normals(
+    main_Unmark_1_out_1,
+    main_Normals_1_in_2
+    ) [instance: 1, cache: 1];
+    // 
+    // node Compute2[6]: x = 448, y = 414, inputs = 5, label = Compute2
+    // input[2]: defaulting = 0, visible = 1, type = 32, value = "y"
+    // page group: ionization
+    //
+main_Compute2_6_out_1 = 
+    Compute2(
+    main_String_7_out_1,
+    main_Compute2_6_in_2,
+    main_Normals_1_out_1,
+    main_Compute2_6_in_4,
+    main_Compute2_6_in_5
+    ) [instance: 6, cache: 1];
+    // 
+    // node Transmitter[49]: x = 462, y = 489, inputs = 1, label = ion_data_raw
+    // page group: ionization
+    //
+ion_data_raw = main_Compute2_6_out_1;
+    // 
+    // node Receiver[45]: x = 44, y = 520, inputs = 1, label = ion_data_raw
+    // page group: ionization
+    //
+main_Receiver_45_out_1[cache: 0] = ion_data_raw;
+    // 
+    // node Value[2]: x = 149, y = 513, inputs = 0, label = Value
+    // output[1]: visible = 1, type = 29, value = 1.0
+    // page group: ionization
+    //
+    // 
+    // node Value[11]: x = 208, y = 536, inputs = 0, label = Value
+    // output[1]: visible = 1, type = 29, value = -7
+    // page group: ionization
+    //
+    // 
+    // node Value[12]: x = 264, y = 563, inputs = 0, label = Value
+    // output[1]: visible = 1, type = 29, value = -3.1
+    // page group: ionization
+    //
+    // 
+    // node AutoColor[5]: x = 78, y = 648, inputs = 10, label = AutoColor
+    // input[2]: defaulting = 1, visible = 1, type = 5, value = 0.6
+    // input[8]: visible = 1
+    // page group: ionization
+    //
+main_AutoColor_5_out_1,
+main_AutoColor_5_out_2 = 
+    AutoColor(
+    main_Receiver_45_out_1,
+    main_Value_2_out_1,
+    main_AutoColor_5_in_3,
+    main_AutoColor_5_in_4,
+    main_AutoColor_5_in_5,
+    main_AutoColor_5_in_6,
+    main_Value_11_out_1,
+    main_Value_12_out_1,
+    main_AutoColor_5_in_9,
+    main_AutoColor_5_in_10
+    ) [instance: 5, cache: 1];
+    // 
+    // node Toggle[29]: x = 750, y = 365, inputs = 6, label = Toggle
+    // input[1]: defaulting = 0, visible = 0, type = 32, value = "Toggle_29"
+    // input[2]: defaulting = 0, visible = 0, type = 29, value = 1
+    // input[3]: defaulting = 0, visible = 0, type = 3, value = 1
+    // input[4]: defaulting = 1, visible = 1, type = 29, value = 1
+    // input[5]: defaulting = 0, visible = 1, type = 29, value =  2  
+    // output[1]: visible = 1, type = 29, value = 1
+    // page group: Massage
+    // toggle : 1
+    //
+main_Toggle_29_out_1[cache: 2] = 
+    Toggle(
+    main_Toggle_29_in_1,
+    main_Toggle_29_in_2,
+    main_Toggle_29_in_3,
+    main_Toggle_29_in_4,
+    main_Toggle_29_in_5,
+    main_Toggle_29_in_6
+    ) [instance: 29, cache: 1];
+    // 
+    // node Transmitter[50]: x = 71, y = 753, inputs = 1, label = ion_data
+    // page group: ionization
+    //
+ion_data = main_AutoColor_5_out_1;
+    // 
+    // node Receiver[51]: x = 721, y = 110, inputs = 1, label = ion_data
+    // page group: Massage
+    //
+main_Receiver_51_out_1[cache: 0] = ion_data;
+    // 
+    // node ValueList[5]: x = 847, y = 130, inputs = 0, label = ValueList
+    // output[1]: visible = 1, type = 16777245, value = { -3.5, -4.8, -5.9 }
+    // page group: Massage
+    //
+    // 
+    // node Isosurface[5]: x = 803, y = 208, inputs = 6, label = Isosurface
+    // input[2]: defaulting = 1, visible = 1, type = 16777221, value = { -1.0 -2.0 -3.0 }
+    // input[3]: visible = 0
+    // page group: Massage
+    //
+main_Isosurface_5_out_1 = 
+    Isosurface(
+    main_Receiver_51_out_1,
+    main_ValueList_5_out_1,
+    main_Isosurface_5_in_3,
+    main_Isosurface_5_in_4,
+    main_Isosurface_5_in_5,
+    main_Isosurface_5_in_6
+    ) [instance: 5, cache: 1];
+    // 
+    // node Transmitter[51]: x = 170, y = 754, inputs = 1, label = ion_colormap
+    // page group: ionization
+    //
+ion_colormap = main_AutoColor_5_out_2;
+    // 
+    // node Receiver[52]: x = 895, y = 229, inputs = 1, label = ion_colormap
+    // page group: Massage
+    //
+main_Receiver_52_out_1[cache: 0] = ion_colormap;
+    // 
+    // node Value[14]: x = 1013, y = 263, inputs = 0, label = Value
+    // output[1]: visible = 1, type = 29, value = 1.0
+    // page group: Massage
+    //
+    // 
+    // node Color[8]: x = 830, y = 338, inputs = 5, label = Color
+    // input[3]: defaulting = 1, visible = 1, type = 5, value = 0.3
+    // page group: Massage
+    //
+main_Color_8_out_1 = 
+    Color(
+    main_Isosurface_5_out_1,
+    main_Receiver_52_out_1,
+    main_Value_14_out_1,
+    main_Color_8_in_4,
+    main_Color_8_in_5
+    ) [instance: 8, cache: 1];
+    // 
+    // node Route[20]: x = 830, y = 434, inputs = 2, outputs = 2, label = Route
+    // page group: Massage
+    //
+main_Route_20_out_1,
+main_Route_20_out_2 = 
+    Route(
+    main_Toggle_29_out_1,
+    main_Color_8_out_1
+    ) [instance: 20, cache: 1];
+    // 
+    // node Transmitter[54]: x = 792, y = 540, inputs = 1, label = ion_isosurface
+    // page group: Massage
+    //
+ion_isosurface = main_Route_20_out_1;
+    // 
+    // node Receiver[53]: x = 61, y = 144, inputs = 1, label = ion_isosurface
+    // page group: Massage
+    //
+main_Receiver_53_out_1[cache: 0] = ion_isosurface;
+    // 
+    // node Toggle[26]: x = 228, y = 115, inputs = 6, label = Toggle
+    // input[1]: defaulting = 0, visible = 0, type = 32, value = "Toggle_26"
+    // input[2]: defaulting = 0, visible = 0, type = 29, value =  2  
+    // input[3]: defaulting = 0, visible = 0, type = 3, value = 0
+    // input[4]: defaulting = 1, visible = 1, type = 29, value = 1
+    // input[5]: defaulting = 0, visible = 1, type = 29, value =  2  
+    // output[1]: visible = 1, type = 29, value =  2  
+    // page group: Massage
+    // toggle : 0
+    //
+main_Toggle_26_out_1[cache: 2] = 
+    Toggle(
+    main_Toggle_26_in_1,
+    main_Toggle_26_in_2,
+    main_Toggle_26_in_3,
+    main_Toggle_26_in_4,
+    main_Toggle_26_in_5,
+    main_Toggle_26_in_6
+    ) [instance: 26, cache: 1];
+    // 
+    // node Receiver[47]: x = 299, y = 72, inputs = 1, label = ion_data
+    // page group: Massage
+    //
+main_Receiver_47_out_1[cache: 0] = ion_data;
+    // 
+    // node Route[17]: x = 294, y = 183, inputs = 2, outputs = 2, label = Route
+    // page group: Massage
+    //
+main_Route_17_out_1,
+main_Route_17_out_2 = 
+    Route(
+    main_Toggle_26_out_1,
+    main_Receiver_47_out_1
+    ) [instance: 17, cache: 1];
+    // 
+    // node Collect[20]: x = 153, y = 317, inputs = 3, label = Collect
+    // page group: Massage
+    //
+main_Collect_20_out_1 = 
+    Collect(
+    main_Receiver_53_out_1,
+    main_Collect_20_in_2,
+    main_Route_17_out_1
+    ) [instance: 20, cache: 1];
+    // 
+    // node Vector[2]: x = 414, y = 335, inputs = 11, label = Vector
+    // input[1]: defaulting = 0, visible = 0, type = 32, value = "Vector_2"
+    // input[3]: defaulting = 0, visible = 0, type = 8, value = [0 0 0 ]
+    // input[5]: defaulting = 1, visible = 0, type = 8, value = [ -1000000.0 -1000000.0 -1000000.0 ]
+    // input[6]: defaulting = 1, visible = 0, type = 8, value = [ 1000000.0 1000000.0 1000000.0 ]
+    // input[7]: defaulting = 1, visible = 0, type = 8, value = [       1        1        1]
+    // input[9]: defaulting = 1, visible = 0, type = 8, value = [ 5.0 5.0 5.0 ]
+    // input[11]: defaulting = 0, visible = 0, type = 32, value = "ClipC(X)"
+    // output[1]: visible = 1, type = 8, value = [0 0 0 ]
+    // page group: Massage
+    //
+main_Vector_2_out_1[cache: 2] = 
+    Vector(
+    main_Vector_2_in_1,
+    main_Vector_2_in_2,
+    main_Vector_2_in_3,
+    main_Vector_2_in_4,
+    main_Vector_2_in_5,
+    main_Vector_2_in_6,
+    main_Vector_2_in_7,
+    main_Vector_2_in_8,
+    main_Vector_2_in_9,
+    main_Vector_2_in_10,
+    main_Vector_2_in_11
+    ) [instance: 2, cache: 1];
+    // 
+    // node Vector[3]: x = 474, y = 357, inputs = 11, label = Vector
+    // input[1]: defaulting = 0, visible = 0, type = 32, value = "Vector_3"
+    // input[3]: defaulting = 0, visible = 0, type = 8, value = [0 1 0 ]
+    // input[5]: defaulting = 1, visible = 0, type = 8, value = [ -1000000.0 -1000000.0 -1000000.0 ]
+    // input[6]: defaulting = 1, visible = 0, type = 8, value = [ 1000000.0 1000000.0 1000000.0 ]
+    // input[7]: defaulting = 1, visible = 0, type = 8, value = [       1        1        1]
+    // input[9]: defaulting = 1, visible = 0, type = 8, value = [ 5.0 5.0 5.0 ]
+    // input[11]: defaulting = 0, visible = 0, type = 32, value = "ClipD(X)"
+    // output[1]: visible = 1, type = 8, value = [0 1 0 ]
+    // page group: Massage
+    //
+main_Vector_3_out_1[cache: 2] = 
+    Vector(
+    main_Vector_3_in_1,
+    main_Vector_3_in_2,
+    main_Vector_3_in_3,
+    main_Vector_3_in_4,
+    main_Vector_3_in_5,
+    main_Vector_3_in_6,
+    main_Vector_3_in_7,
+    main_Vector_3_in_8,
+    main_Vector_3_in_9,
+    main_Vector_3_in_10,
+    main_Vector_3_in_11
+    ) [instance: 3, cache: 1];
+    // 
+    // node ClipPlane[1]: x = 368, y = 437, inputs = 3, label = ClipPlane
+    // page group: Massage
+    //
+main_ClipPlane_1_out_1 = 
+    ClipPlane(
+    main_Collect_20_out_1,
+    main_Vector_2_out_1,
+    main_Vector_3_out_1
+    ) [instance: 1, cache: 1];
+    // 
+    // node Toggle[10]: x = 79, y = 434, inputs = 6, label = Toggle
+    // input[1]: defaulting = 0, visible = 0, type = 32, value = "Toggle_10"
+    // input[2]: defaulting = 0, visible = 0, type = 29, value =  2  
+    // input[3]: defaulting = 0, visible = 0, type = 3, value = 1
+    // input[4]: defaulting = 0, visible = 1, type = 29, value =  2  
+    // input[5]: defaulting = 0, visible = 1, type = 29, value =  1  
+    // output[1]: visible = 1, type = 29, value =  2  
+    // page group: Massage
+    // toggle : 1
+    //
+main_Toggle_10_out_1[cache: 2] = 
+    Toggle(
+    main_Toggle_10_in_1,
+    main_Toggle_10_in_2,
+    main_Toggle_10_in_3,
+    main_Toggle_10_in_4,
+    main_Toggle_10_in_5,
+    main_Toggle_10_in_6
+    ) [instance: 10, cache: 1];
+    // 
+    // node Switch[6]: x = 153, y = 508, inputs = 3, label = Switch
+    // page group: Massage
+    //
+main_Switch_6_out_1 = 
+    Switch(
+    main_Toggle_10_out_1,
+    main_Collect_20_out_1,
+    main_ClipPlane_1_out_1
+    ) [instance: 6, cache: 1];
+    // 
+    // node Transmitter[34]: x = 162, y = 591, inputs = 1, label = OrbPlot
+    // page group: Massage
+    //
+OrbPlot = main_Switch_6_out_1;
+    // 
+    // node Receiver[5]: x = 382, y = 656, inputs = 1, label = OrbPlot
+    // page group: Massage
+    //
+main_Receiver_5_out_1[cache: 0] = OrbPlot;
+    // 
+    // node Toggle[27]: x = 505, y = 623, inputs = 6, label = Toggle
+    // input[1]: defaulting = 0, visible = 0, type = 32, value = "Toggle_27"
+    // input[2]: defaulting = 0, visible = 0, type = 29, value = 1
+    // input[3]: defaulting = 0, visible = 0, type = 3, value = 1
+    // input[4]: defaulting = 1, visible = 1, type = 29, value = 1
+    // input[5]: defaulting = 0, visible = 1, type = 29, value =  2  
+    // output[1]: visible = 1, type = 29, value = 1
+    // page group: Massage
+    // toggle : 1
+    //
+main_Toggle_27_out_1[cache: 2] = 
+    Toggle(
+    main_Toggle_27_in_1,
+    main_Toggle_27_in_2,
+    main_Toggle_27_in_3,
+    main_Toggle_27_in_4,
+    main_Toggle_27_in_5,
+    main_Toggle_27_in_6
+    ) [instance: 27, cache: 1];
+    // 
+    // node Receiver[48]: x = 527, y = 549, inputs = 1, label = ion_colormap
+    // page group: Massage
+    //
+main_Receiver_48_out_1[cache: 0] = ion_colormap;
+    // 
+    // node ColorBar[5]: x = 561, y = 630, inputs = 16, label = ColorBar
+    // input[2]: defaulting = 0, visible = 1, type = 8, value = [0.50 0.97]
+    // input[3]: defaulting = 0, visible = 1, type = 8, value = [300 25]
+    // input[4]: defaulting = 0, visible = 1, type = 3, value = 1
+    // input[9]: defaulting = 0, visible = 0, type = 16777248, value = {"gray"}
+    // input[11]: defaulting = 0, visible = 0, type = 5, value = 1.75
+    // input[12]: defaulting = 0, visible = 0, type = 32, value = "area"
+    // input[15]: defaulting = 0, visible = 0, type = 3, value = 0
+    // input[16]: defaulting = 0, visible = 0, type = 1, value = 250
+    // page group: Massage
+    //
+main_ColorBar_5_out_1 = 
+    ColorBar(
+    main_Receiver_48_out_1,
+    main_ColorBar_5_in_2,
+    main_ColorBar_5_in_3,
+    main_ColorBar_5_in_4,
+    main_ColorBar_5_in_5,
+    main_ColorBar_5_in_6,
+    main_ColorBar_5_in_7,
+    main_ColorBar_5_in_8,
+    main_ColorBar_5_in_9,
+    main_ColorBar_5_in_10,
+    main_ColorBar_5_in_11,
+    main_ColorBar_5_in_12,
+    main_ColorBar_5_in_13,
+    main_ColorBar_5_in_14,
+    main_ColorBar_5_in_15,
+    main_ColorBar_5_in_16
+    ) [instance: 5, cache: 1];
+    // 
+    // node Route[18]: x = 585, y = 701, inputs = 2, outputs = 2, label = Route
+    // page group: Massage
+    //
+main_Route_18_out_1,
+main_Route_18_out_2 = 
+    Route(
+    main_Toggle_27_out_1,
+    main_ColorBar_5_out_1
+    ) [instance: 18, cache: 1];
+    // 
+    // node Collect[18]: x = 384, y = 818, inputs = 9, label = Collect
+    // page group: Massage
+    //
+main_Collect_18_out_1 = 
+    Collect(
+    main_Collect_18_in_1,
+    main_Receiver_5_out_1,
+    main_Collect_18_in_3,
+    main_Collect_18_in_4,
+    main_Collect_18_in_5,
+    main_Collect_18_in_6,
+    main_Collect_18_in_7,
+    main_Collect_18_in_8,
+    main_Route_18_out_1
+    ) [instance: 18, cache: 1];
+    // 
+    // node Receiver[55]: x = 55, y = 79, inputs = 1, label = ion_data_raw
+    // page group: Massage 2D
+    //
+main_Receiver_55_out_1[cache: 0] = ion_data_raw;
+    // 
+    // node Normals[2]: x = 20, y = 294, inputs = 2, label = Normals
+    // page group: Massage 2D
+    //
+main_Normals_2_out_1 = 
+    Normals(
+    main_Receiver_55_out_1,
+    main_Normals_2_in_2
+    ) [instance: 2, cache: 1];
+    // 
+    // node Vector[5]: x = 202, y = 84, inputs = 11, label = Vector
+    // input[1]: defaulting = 0, visible = 0, type = 32, value = "Vector_5"
+    // input[3]: defaulting = 0, visible = 0, type = 8, value = [ 0 0.0 0.00 ]
+    // input[5]: defaulting = 1, visible = 0, type = 8, value = [ -1000000.0 -1000000.0 -1000000.0 ]
+    // input[6]: defaulting = 1, visible = 0, type = 8, value = [ 1000000.0 1000000.0 1000000.0 ]
+    // input[7]: defaulting = 1, visible = 0, type = 8, value = [       1        1        1]
+    // input[9]: defaulting = 1, visible = 0, type = 8, value = [ 5.0 5.0 5.0 ]
+    // output[1]: visible = 1, type = 8, value = [ 0 0.0 0.00 ]
+    // page group: Massage 2D
+    //
+    // 
+    // node Vector[6]: x = 279, y = 149, inputs = 11, label = Vector
+    // input[1]: defaulting = 0, visible = 0, type = 32, value = "Vector_6"
+    // input[3]: defaulting = 0, visible = 0, type = 8, value = [ 0 -1 0 ]
+    // input[5]: defaulting = 1, visible = 0, type = 8, value = [ -1000000.0 -1000000.0 -1000000.0 ]
+    // input[6]: defaulting = 1, visible = 0, type = 8, value = [ 1000000.0 1000000.0 1000000.0 ]
+    // input[7]: defaulting = 1, visible = 0, type = 8, value = [       1        1        1]
+    // input[9]: defaulting = 1, visible = 0, type = 8, value = [ 5.0 5.0 5.0 ]
+    // output[1]: visible = 1, type = 8, value = [ 0 -1 0 ]
+    // page group: Massage 2D
+    //
+    // 
+    // node MapToPlane[1]: x = 114, y = 235, inputs = 3, label = MapToPlane
+    // page group: Massage 2D
+    //
+main_MapToPlane_1_out_1 = 
+    MapToPlane(
+    main_Normals_2_out_1,
+    main_Vector_5_out_1,
+    main_Vector_6_out_1
+    ) [instance: 1, cache: 1];
+    // 
+    // node Value[15]: x = 257, y = 275, inputs = 0, label = Value
+    // output[1]: visible = 1, type = 29, value = 0.2
+    // page group: Massage 2D
+    //
+    // 
+    // node RubberSheet[1]: x = 110, y = 355, inputs = 4, label = RubberSheet
+    // page group: Massage 2D
+    //
+main_RubberSheet_1_out_1 = 
+    RubberSheet(
+    main_MapToPlane_1_out_1,
+    main_Value_15_out_1,
+    main_RubberSheet_1_in_3,
+    main_RubberSheet_1_in_4
+    ) [instance: 1, cache: 1];
+    // 
+    // node Receiver[56]: x = 266, y = 365, inputs = 1, label = ion_colormap
+    // page group: Massage 2D
+    //
+main_Receiver_56_out_1[cache: 0] = ion_colormap;
+    // 
+    // node Color[9]: x = 145, y = 447, inputs = 5, label = Color
+    // input[3]: defaulting = 1, visible = 1, type = 5, value = 0.3
+    // page group: Massage 2D
+    //
+main_Color_9_out_1 = 
+    Color(
+    main_RubberSheet_1_out_1,
+    main_Receiver_56_out_1,
+    main_Color_9_in_3,
+    main_Color_9_in_4,
+    main_Color_9_in_5
+    ) [instance: 9, cache: 1];
+    // 
+    // node Shade[1]: x = 171, y = 531, inputs = 8, label = Shade
+    // page group: Massage 2D
+    //
+main_Shade_1_out_1 = 
+    Shade(
+    main_Color_9_out_1,
+    main_Shade_1_in_2,
+    main_Shade_1_in_3,
+    main_Shade_1_in_4,
+    main_Shade_1_in_5,
+    main_Shade_1_in_6,
+    main_Shade_1_in_7,
+    main_Shade_1_in_8
+    ) [instance: 1, cache: 1];
+    // 
+    // node Toggle[30]: x = 388, y = 472, inputs = 6, label = Toggle
+    // input[1]: defaulting = 0, visible = 0, type = 32, value = "Toggle_30"
+    // input[2]: defaulting = 0, visible = 0, type = 29, value = 1
+    // input[3]: defaulting = 0, visible = 0, type = 3, value = 1
+    // input[4]: defaulting = 1, visible = 1, type = 29, value = 1
+    // input[5]: defaulting = 0, visible = 1, type = 29, value =  2  
+    // output[1]: visible = 1, type = 29, value = 1
+    // page group: Massage 2D
+    // toggle : 1
+    //
+main_Toggle_30_out_1[cache: 2] = 
+    Toggle(
+    main_Toggle_30_in_1,
+    main_Toggle_30_in_2,
+    main_Toggle_30_in_3,
+    main_Toggle_30_in_4,
+    main_Toggle_30_in_5,
+    main_Toggle_30_in_6
+    ) [instance: 30, cache: 1];
+    // 
+    // node Receiver[57]: x = 410, y = 398, inputs = 1, label = ion_colormap
+    // page group: Massage 2D
+    //
+main_Receiver_57_out_1[cache: 0] = ion_colormap;
+    // 
+    // node ColorBar[6]: x = 444, y = 479, inputs = 16, label = ColorBar
+    // input[2]: defaulting = 0, visible = 1, type = 8, value = [0.50 0.97]
+    // input[3]: defaulting = 0, visible = 1, type = 8, value = [300 25]
+    // input[4]: defaulting = 0, visible = 1, type = 3, value = 1
+    // input[9]: defaulting = 0, visible = 0, type = 16777248, value = {"gray"}
+    // input[11]: defaulting = 0, visible = 0, type = 5, value = 1.75
+    // input[12]: defaulting = 0, visible = 0, type = 32, value = "area"
+    // input[15]: defaulting = 0, visible = 0, type = 3, value = 0
+    // input[16]: defaulting = 0, visible = 0, type = 1, value = 250
+    // page group: Massage 2D
+    //
+main_ColorBar_6_out_1 = 
+    ColorBar(
+    main_Receiver_57_out_1,
+    main_ColorBar_6_in_2,
+    main_ColorBar_6_in_3,
+    main_ColorBar_6_in_4,
+    main_ColorBar_6_in_5,
+    main_ColorBar_6_in_6,
+    main_ColorBar_6_in_7,
+    main_ColorBar_6_in_8,
+    main_ColorBar_6_in_9,
+    main_ColorBar_6_in_10,
+    main_ColorBar_6_in_11,
+    main_ColorBar_6_in_12,
+    main_ColorBar_6_in_13,
+    main_ColorBar_6_in_14,
+    main_ColorBar_6_in_15,
+    main_ColorBar_6_in_16
+    ) [instance: 6, cache: 1];
+    // 
+    // node Route[21]: x = 468, y = 550, inputs = 2, outputs = 2, label = Route
+    // page group: Massage 2D
+    //
+main_Route_21_out_1,
+main_Route_21_out_2 = 
+    Route(
+    main_Toggle_30_out_1,
+    main_ColorBar_6_out_1
+    ) [instance: 21, cache: 1];
+    // 
+    // node Collect[21]: x = 209, y = 628, inputs = 9, label = Collect
+    // page group: Massage 2D
+    //
+main_Collect_21_out_1 = 
+    Collect(
+    main_Shade_1_out_1,
+    main_Collect_21_in_2,
+    main_Collect_21_in_3,
+    main_Collect_21_in_4,
+    main_Collect_21_in_5,
+    main_Collect_21_in_6,
+    main_Collect_21_in_7,
+    main_Collect_21_in_8,
+    main_Route_21_out_1
+    ) [instance: 21, cache: 1];
+    // 
+    // node Image[1]: x = 456, y = 890, inputs = 49, label = Image
+    // input[1]: defaulting = 0, visible = 0, type = 67108863, value = "Image_1"
+    // input[4]: defaulting = 0, visible = 0, type = 1, value = 1
+    // input[5]: defaulting = 0, visible = 0, type = 8, value = [-4.76837e-07 -4.76837e-07 0.000125885]
+    // input[6]: defaulting = 0, visible = 0, type = 8, value = [-7.13732 15.6695 -2.8095]
+    // input[7]: defaulting = 0, visible = 0, type = 5, value = 9.34935
+    // input[8]: defaulting = 0, visible = 0, type = 1, value = 975
+    // input[9]: defaulting = 0, visible = 0, type = 5, value = 0.873
+    // input[10]: defaulting = 0, visible = 0, type = 8, value = [0.0906215 -0.135627 -0.986607]
+    // input[11]: defaulting = 1, visible = 0, type = 5, value = 29.9999
+    // input[12]: defaulting = 0, visible = 0, type = 1, value = 0
+    // input[14]: defaulting = 0, visible = 0, type = 1, value = 1
+    // input[15]: defaulting = 0, visible = 0, type = 32, value = "none"
+    // input[16]: defaulting = 0, visible = 0, type = 32, value = "none"
+    // input[17]: defaulting = 1, visible = 0, type = 1, value = 1
+    // input[18]: defaulting = 1, visible = 0, type = 1, value = 1
+    // input[19]: defaulting = 0, visible = 0, type = 1, value = 0
+    // input[22]: defaulting = 0, visible = 0, type = 32, value = "black"
+    // input[25]: defaulting = 0, visible = 0, type = 32, value = "./xxx.tiff"
+    // input[26]: defaulting = 0, visible = 0, type = 32, value = "tiff"
+    // input[27]: defaulting = 1, visible = 0, type = 1, value = 2048
+    // input[28]: defaulting = 1, visible = 0, type = 5, value = 1.0
+    // input[29]: defaulting = 0, visible = 0, type = 3, value = 0
+    // input[30]: defaulting = 0, visible = 0, type = 16777248, value = {"X", "Y", "Z"}
+    // input[31]: defaulting = 1, visible = 0, type = 1, value = 15
+    // input[32]: defaulting = 0, visible = 0, type = 16777224, value = {[-2 -4 -5.5] [2 4 5.5]}
+    // input[33]: defaulting = 0, visible = 0, type = 3, value = 1
+    // input[34]: defaulting = 0, visible = 0, type = 3, value = 0
+    // input[36]: defaulting = 0, visible = 0, type = 3, value = 1
+    // input[37]: defaulting = 0, visible = 0, type = 16777248, value = {"clear", "gray", "gray", "gray"}
+    // input[38]: defaulting = 0, visible = 0, type = 16777248, value = {"background", "grid", "ticks", "labels"}
+    // input[39]: defaulting = 0, visible = 0, type = 5, value = 1.0
+    // input[40]: defaulting = 0, visible = 0, type = 32, value = "area"
+    // input[41]: defaulting = 0, visible = 0, type = 32, value = "none"
+    // input[42]: defaulting = 0, visible = 0, type = 32, value = "PES: 3D"
+    // page group: Massage
+    // title: value = PES: 3D
+    // depth: value = 24
+    // window: position = (0.2830,0.2448), size = 0.3170x0.4651
+    // internal caching: 1
+    //
+main_Image_1_out_1,
+main_Image_1_out_2,
+main_Image_1_out_3 = 
+    Image(
+    main_Image_1_in_1,
+    main_Collect_18_out_1,
+    main_Image_1_in_3,
+    main_Image_1_in_4,
+    main_Image_1_in_5,
+    main_Image_1_in_6,
+    main_Image_1_in_7,
+    main_Image_1_in_8,
+    main_Image_1_in_9,
+    main_Image_1_in_10,
+    main_Image_1_in_11,
+    main_Image_1_in_12,
+    main_Image_1_in_13,
+    main_Image_1_in_14,
+    main_Image_1_in_15,
+    main_Image_1_in_16,
+    main_Image_1_in_17,
+    main_Image_1_in_18,
+    main_Image_1_in_19,
+    main_Image_1_in_20,
+    main_Image_1_in_21,
+    main_Image_1_in_22,
+    main_Image_1_in_23,
+    main_Image_1_in_24,
+    main_Image_1_in_25,
+    main_Image_1_in_26,
+    main_Image_1_in_27,
+    main_Image_1_in_28,
+    main_Image_1_in_29,
+    main_Image_1_in_30,
+    main_Image_1_in_31,
+    main_Image_1_in_32,
+    main_Image_1_in_33,
+    main_Image_1_in_34,
+    main_Image_1_in_35,
+    main_Image_1_in_36,
+    main_Image_1_in_37,
+    main_Image_1_in_38,
+    main_Image_1_in_39,
+    main_Image_1_in_40,
+    main_Image_1_in_41,
+    main_Image_1_in_42,
+    main_Image_1_in_43,
+    main_Image_1_in_44,
+    main_Image_1_in_45,
+    main_Image_1_in_46,
+    main_Image_1_in_47,
+    main_Image_1_in_48,
+    main_Image_1_in_49
+    ) [instance: 1, cache: 1];
+    // 
+    // node Image[2]: x = 282, y = 711, inputs = 49, label = Image
+    // input[1]: defaulting = 0, visible = 0, type = 67108863, value = "Image_2"
+    // input[4]: defaulting = 0, visible = 0, type = 1, value = 1
+    // input[5]: defaulting = 0, visible = 0, type = 8, value = [0 -1.21838 0]
+    // input[6]: defaulting = 0, visible = 0, type = 8, value = [0 17.1623 0]
+    // input[7]: defaulting = 0, visible = 0, type = 5, value = 9.85019
+    // input[8]: defaulting = 0, visible = 0, type = 1, value = 975
+    // input[9]: defaulting = 0, visible = 0, type = 5, value = 0.873
+    // input[10]: defaulting = 0, visible = 0, type = 8, value = [0 0 -1]
+    // input[11]: defaulting = 1, visible = 0, type = 5, value = 30.0
+    // input[12]: defaulting = 0, visible = 0, type = 1, value = 0
+    // input[14]: defaulting = 0, visible = 0, type = 1, value = 1
+    // input[15]: defaulting = 0, visible = 0, type = 32, value = "none"
+    // input[16]: defaulting = 0, visible = 0, type = 32, value = "none"
+    // input[17]: defaulting = 1, visible = 0, type = 1, value = 1
+    // input[18]: defaulting = 1, visible = 0, type = 1, value = 1
+    // input[19]: defaulting = 0, visible = 0, type = 1, value = 0
+    // input[22]: defaulting = 0, visible = 0, type = 32, value = "black"
+    // input[25]: defaulting = 0, visible = 0, type = 32, value = "./image.tiff"
+    // input[26]: defaulting = 0, visible = 0, type = 32, value = "tiff"
+    // input[27]: defaulting = 1, visible = 0, type = 1, value = 2048
+    // input[28]: defaulting = 1, visible = 0, type = 5, value = 1.0
+    // input[29]: defaulting = 0, visible = 0, type = 3, value = 1
+    // input[30]: defaulting = 0, visible = 0, type = 16777248, value = {"X", "Y", "Z"}
+    // input[31]: defaulting = 1, visible = 0, type = 1, value = 15
+    // input[32]: defaulting = 1, visible = 0, type = 16777224, value = {[-1 -1 -1] [1 1 1]}
+    // input[33]: defaulting = 0, visible = 0, type = 3, value = 1
+    // input[34]: defaulting = 0, visible = 0, type = 3, value = 0
+    // input[36]: defaulting = 0, visible = 0, type = 3, value = 1
+    // input[37]: defaulting = 0, visible = 0, type = 16777248, value = {"clear", "gray", "gray", "gray"}
+    // input[38]: defaulting = 0, visible = 0, type = 16777248, value = {"background", "grid", "ticks", "labels"}
+    // input[39]: defaulting = 0, visible = 0, type = 5, value = 1.0
+    // input[40]: defaulting = 0, visible = 0, type = 32, value = "area"
+    // input[41]: defaulting = 0, visible = 0, type = 32, value = "none"
+    // input[42]: defaulting = 0, visible = 0, type = 32, value = "PES: 3D"
+    // page group: Massage 2D
+    // title: value = PES: 3D
+    // depth: value = 24
+    // window: position = (0.6154,0.3714), size = 0.3170x0.4651
+    // internal caching: 1
+    //
+main_Image_2_out_1,
+main_Image_2_out_2,
+main_Image_2_out_3 = 
+    Image(
+    main_Image_2_in_1,
+    main_Collect_21_out_1,
+    main_Image_2_in_3,
+    main_Image_2_in_4,
+    main_Image_2_in_5,
+    main_Image_2_in_6,
+    main_Image_2_in_7,
+    main_Image_2_in_8,
+    main_Image_2_in_9,
+    main_Image_2_in_10,
+    main_Image_2_in_11,
+    main_Image_2_in_12,
+    main_Image_2_in_13,
+    main_Image_2_in_14,
+    main_Image_2_in_15,
+    main_Image_2_in_16,
+    main_Image_2_in_17,
+    main_Image_2_in_18,
+    main_Image_2_in_19,
+    main_Image_2_in_20,
+    main_Image_2_in_21,
+    main_Image_2_in_22,
+    main_Image_2_in_23,
+    main_Image_2_in_24,
+    main_Image_2_in_25,
+    main_Image_2_in_26,
+    main_Image_2_in_27,
+    main_Image_2_in_28,
+    main_Image_2_in_29,
+    main_Image_2_in_30,
+    main_Image_2_in_31,
+    main_Image_2_in_32,
+    main_Image_2_in_33,
+    main_Image_2_in_34,
+    main_Image_2_in_35,
+    main_Image_2_in_36,
+    main_Image_2_in_37,
+    main_Image_2_in_38,
+    main_Image_2_in_39,
+    main_Image_2_in_40,
+    main_Image_2_in_41,
+    main_Image_2_in_42,
+    main_Image_2_in_43,
+    main_Image_2_in_44,
+    main_Image_2_in_45,
+    main_Image_2_in_46,
+    main_Image_2_in_47,
+    main_Image_2_in_48,
+    main_Image_2_in_49
+    ) [instance: 2, cache: 1];
+// network: end of macro body
+CacheScene(main_Image_1_in_1, main_Image_1_out_1, main_Image_1_out_2);
+CacheScene(main_Image_2_in_1, main_Image_2_out_1, main_Image_2_out_2);
+}
+main_String_7_out_1 = "log10(abs(y)+1e-15)";
+main_String_8_out_1 = "(abs(i2)-1*abs(i1))";
+main_FileSelector_3_out_1 = "./argon_3P1_offcooper_pes_volkov.dx";
+main_Import_5_in_2 = NULL;
+main_Import_5_in_3 = "dx text";
+main_Import_5_in_4 = NULL;
+main_Import_5_in_5 = NULL;
+main_Import_5_in_6 = NULL;
+main_Import_5_out_1 = NULL;
+main_FileSelector_4_out_1 = "./argon_3P1_offcooper_pes_coulomb.dx";
+main_Import_6_in_2 = NULL;
+main_Import_6_in_3 = "dx text";
+main_Import_6_in_4 = NULL;
+main_Import_6_in_5 = NULL;
+main_Import_6_in_6 = NULL;
+main_Import_6_out_1 = NULL;
+main_Compute2_7_in_2 = "i1";
+main_Compute2_7_in_4 = "i2";
+main_Compute2_7_in_6 = "i3";
+main_Compute2_7_in_7 = NULL;
+main_Compute2_7_in_8 = "i4";
+main_Compute2_7_in_9 = NULL;
+main_Compute2_7_out_1 = NULL;
+main_Transmitter_52_out_1 = NULL;
+main_Receiver_46_out_1 = NULL;
+main_Mark_6_in_2 = "positions";
+main_Mark_6_out_1 = NULL;
+main_Compute_4_in_1 = "$0.2*[sin($0.0)*cos($0.1), sin($0.0)*sin($0.1), cos($0.0)]";
+main_Compute_4_in_4 = NULL;
+main_Compute_4_out_1 = NULL;
+main_Unmark_1_in_2 = "positions";
+main_Unmark_1_out_1 = NULL;
+main_Normals_1_in_2 = NULL;
+main_Normals_1_out_1 = NULL;
+main_Compute2_6_in_2 = "y";
+main_Compute2_6_in_4 = NULL;
+main_Compute2_6_in_5 = NULL;
+main_Compute2_6_out_1 = NULL;
+main_Transmitter_49_out_1 = NULL;
+main_Receiver_45_out_1 = NULL;
+main_Value_2_out_1 = 1.0;
+main_Value_11_out_1 = -7;
+main_Value_12_out_1 = -3.1;
+main_AutoColor_5_in_3 = NULL;
+main_AutoColor_5_in_4 = NULL;
+main_AutoColor_5_in_5 = NULL;
+main_AutoColor_5_in_6 = NULL;
+main_AutoColor_5_in_9 = NULL;
+main_AutoColor_5_in_10 = NULL;
+main_AutoColor_5_out_1 = NULL;
+main_AutoColor_5_out_2 = NULL;
+main_Toggle_29_in_1 = "Toggle_29";
+main_Toggle_29_in_2 = 1;
+main_Toggle_29_in_3 = 1;
+main_Toggle_29_in_4 = NULL;
+main_Toggle_29_in_5 =  2  ;
+main_Toggle_29_in_6 = NULL;
+main_Toggle_29_out_1 = 1;
+main_Transmitter_50_out_1 = NULL;
+main_Receiver_51_out_1 = NULL;
+main_ValueList_5_out_1 = { -3.5, -4.8, -5.9 };
+main_Isosurface_5_in_3 = NULL;
+main_Isosurface_5_in_4 = NULL;
+main_Isosurface_5_in_5 = NULL;
+main_Isosurface_5_in_6 = NULL;
+main_Isosurface_5_out_1 = NULL;
+main_Transmitter_51_out_1 = NULL;
+main_Receiver_52_out_1 = NULL;
+main_Value_14_out_1 = 1.0;
+main_Color_8_in_4 = NULL;
+main_Color_8_in_5 = NULL;
+main_Color_8_out_1 = NULL;
+main_Route_20_out_1 = NULL;
+main_Transmitter_54_out_1 = NULL;
+main_Receiver_53_out_1 = NULL;
+main_Toggle_26_in_1 = "Toggle_26";
+main_Toggle_26_in_2 =  2  ;
+main_Toggle_26_in_3 = 0;
+main_Toggle_26_in_4 = NULL;
+main_Toggle_26_in_5 =  2  ;
+main_Toggle_26_in_6 = NULL;
+main_Toggle_26_out_1 =  2  ;
+main_Receiver_47_out_1 = NULL;
+main_Route_17_out_1 = NULL;
+main_Collect_20_in_2 = NULL;
+main_Collect_20_out_1 = NULL;
+main_Vector_2_in_1 = "Vector_2";
+main_Vector_2_in_2 = NULL;
+main_Vector_2_in_3 = [0 0 0 ];
+main_Vector_2_in_4 = NULL;
+main_Vector_2_in_5 = NULL;
+main_Vector_2_in_6 = NULL;
+main_Vector_2_in_7 = NULL;
+main_Vector_2_in_8 = NULL;
+main_Vector_2_in_9 = NULL;
+main_Vector_2_in_10 = NULL;
+main_Vector_2_in_11 = "ClipC(X)";
+main_Vector_2_out_1 = [0 0 0 ];
+main_Vector_3_in_1 = "Vector_3";
+main_Vector_3_in_2 = NULL;
+main_Vector_3_in_3 = [0 1 0 ];
+main_Vector_3_in_4 = NULL;
+main_Vector_3_in_5 = NULL;
+main_Vector_3_in_6 = NULL;
+main_Vector_3_in_7 = NULL;
+main_Vector_3_in_8 = NULL;
+main_Vector_3_in_9 = NULL;
+main_Vector_3_in_10 = NULL;
+main_Vector_3_in_11 = "ClipD(X)";
+main_Vector_3_out_1 = [0 1 0 ];
+main_ClipPlane_1_out_1 = NULL;
+main_Toggle_10_in_1 = "Toggle_10";
+main_Toggle_10_in_2 =  2  ;
+main_Toggle_10_in_3 = 1;
+main_Toggle_10_in_4 =  2  ;
+main_Toggle_10_in_5 =  1  ;
+main_Toggle_10_in_6 = NULL;
+main_Toggle_10_out_1 =  2  ;
+main_Switch_6_out_1 = NULL;
+main_Transmitter_34_out_1 = NULL;
+main_Receiver_5_out_1 = NULL;
+main_Toggle_27_in_1 = "Toggle_27";
+main_Toggle_27_in_2 = 1;
+main_Toggle_27_in_3 = 1;
+main_Toggle_27_in_4 = NULL;
+main_Toggle_27_in_5 =  2  ;
+main_Toggle_27_in_6 = NULL;
+main_Toggle_27_out_1 = 1;
+main_Receiver_48_out_1 = NULL;
+main_ColorBar_5_in_2 = [0.50 0.97];
+main_ColorBar_5_in_3 = [300 25];
+main_ColorBar_5_in_4 = 1;
+main_ColorBar_5_in_5 = NULL;
+main_ColorBar_5_in_6 = NULL;
+main_ColorBar_5_in_7 = NULL;
+main_ColorBar_5_in_8 = NULL;
+main_ColorBar_5_in_9 = {"gray"};
+main_ColorBar_5_in_10 = NULL;
+main_ColorBar_5_in_11 = 1.75;
+main_ColorBar_5_in_12 = "area";
+main_ColorBar_5_in_13 = NULL;
+main_ColorBar_5_in_14 = NULL;
+main_ColorBar_5_in_15 = 0;
+main_ColorBar_5_in_16 = 250;
+main_ColorBar_5_out_1 = NULL;
+main_Route_18_out_1 = NULL;
+main_Collect_18_in_1 = NULL;
+main_Collect_18_in_3 = NULL;
+main_Collect_18_in_4 = NULL;
+main_Collect_18_in_5 = NULL;
+main_Collect_18_in_6 = NULL;
+main_Collect_18_in_7 = NULL;
+main_Collect_18_in_8 = NULL;
+main_Collect_18_out_1 = NULL;
+main_Receiver_55_out_1 = NULL;
+main_Normals_2_in_2 = NULL;
+main_Normals_2_out_1 = NULL;
+main_Vector_5_in_1 = "Vector_5";
+main_Vector_5_in_2 = NULL;
+main_Vector_5_in_3 = [ 0 0.0 0.00 ];
+main_Vector_5_in_4 = NULL;
+main_Vector_5_in_5 = NULL;
+main_Vector_5_in_6 = NULL;
+main_Vector_5_in_7 = NULL;
+main_Vector_5_in_8 = NULL;
+main_Vector_5_in_9 = NULL;
+main_Vector_5_in_10 = NULL;
+main_Vector_5_in_11 = NULL;
+main_Vector_5_out_1 = [ 0 0.0 0.00 ];
+main_Vector_6_in_1 = "Vector_6";
+main_Vector_6_in_2 = NULL;
+main_Vector_6_in_3 = [ 0 -1 0 ];
+main_Vector_6_in_4 = NULL;
+main_Vector_6_in_5 = NULL;
+main_Vector_6_in_6 = NULL;
+main_Vector_6_in_7 = NULL;
+main_Vector_6_in_8 = NULL;
+main_Vector_6_in_9 = NULL;
+main_Vector_6_in_10 = NULL;
+main_Vector_6_in_11 = NULL;
+main_Vector_6_out_1 = [ 0 -1 0 ];
+main_MapToPlane_1_out_1 = NULL;
+main_Value_15_out_1 = 0.2;
+main_RubberSheet_1_in_3 = NULL;
+main_RubberSheet_1_in_4 = NULL;
+main_RubberSheet_1_out_1 = NULL;
+main_Receiver_56_out_1 = NULL;
+main_Color_9_in_3 = NULL;
+main_Color_9_in_4 = NULL;
+main_Color_9_in_5 = NULL;
+main_Color_9_out_1 = NULL;
+main_Shade_1_in_2 = NULL;
+main_Shade_1_in_3 = NULL;
+main_Shade_1_in_4 = NULL;
+main_Shade_1_in_5 = NULL;
+main_Shade_1_in_6 = NULL;
+main_Shade_1_in_7 = NULL;
+main_Shade_1_in_8 = NULL;
+main_Shade_1_out_1 = NULL;
+main_Toggle_30_in_1 = "Toggle_30";
+main_Toggle_30_in_2 = 1;
+main_Toggle_30_in_3 = 1;
+main_Toggle_30_in_4 = NULL;
+main_Toggle_30_in_5 =  2  ;
+main_Toggle_30_in_6 = NULL;
+main_Toggle_30_out_1 = 1;
+main_Receiver_57_out_1 = NULL;
+main_ColorBar_6_in_2 = [0.50 0.97];
+main_ColorBar_6_in_3 = [300 25];
+main_ColorBar_6_in_4 = 1;
+main_ColorBar_6_in_5 = NULL;
+main_ColorBar_6_in_6 = NULL;
+main_ColorBar_6_in_7 = NULL;
+main_ColorBar_6_in_8 = NULL;
+main_ColorBar_6_in_9 = {"gray"};
+main_ColorBar_6_in_10 = NULL;
+main_ColorBar_6_in_11 = 1.75;
+main_ColorBar_6_in_12 = "area";
+main_ColorBar_6_in_13 = NULL;
+main_ColorBar_6_in_14 = NULL;
+main_ColorBar_6_in_15 = 0;
+main_ColorBar_6_in_16 = 250;
+main_ColorBar_6_out_1 = NULL;
+main_Route_21_out_1 = NULL;
+main_Collect_21_in_2 = NULL;
+main_Collect_21_in_3 = NULL;
+main_Collect_21_in_4 = NULL;
+main_Collect_21_in_5 = NULL;
+main_Collect_21_in_6 = NULL;
+main_Collect_21_in_7 = NULL;
+main_Collect_21_in_8 = NULL;
+main_Collect_21_out_1 = NULL;
+macro Image(
+        id,
+        object,
+        where,
+        useVector,
+        to,
+        from,
+        width,
+        resolution,
+        aspect,
+        up,
+        viewAngle,
+        perspective,
+        options,
+        buttonState = 1,
+        buttonUpApprox = "none",
+        buttonDownApprox = "none",
+        buttonUpDensity = 1,
+        buttonDownDensity = 1,
+        renderMode = 0,
+        defaultCamera,
+        reset,
+        backgroundColor,
+        throttle,
+        RECenable = 0,
+        RECfile,
+        RECformat,
+        RECresolution,
+        RECaspect,
+        AAenable = 0,
+        AAlabels,
+        AAticks,
+        AAcorners,
+        AAframe,
+        AAadjust,
+        AAcursor,
+        AAgrid,
+        AAcolors,
+        AAannotation,
+        AAlabelscale,
+        AAfont,
+        interactionMode,
+        title,
+        AAxTickLocs,
+        AAyTickLocs,
+        AAzTickLocs,
+        AAxTickLabels,
+        AAyTickLabels,
+        AAzTickLabels,
+        webOptions) -> (
+        object,
+        camera,
+        where)
+{
+    ImageMessage(
+        id,
+        backgroundColor,
+        throttle,
+        RECenable,
+        RECfile,
+        RECformat,
+        RECresolution,
+        RECaspect,
+        AAenable,
+        AAlabels,
+        AAticks,
+        AAcorners,
+        AAframe,
+        AAadjust,
+        AAcursor,
+        AAgrid,
+        AAcolors,
+        AAannotation,
+        AAlabelscale,
+        AAfont,
+        AAxTickLocs,
+        AAyTickLocs,
+        AAzTickLocs,
+        AAxTickLabels,
+        AAyTickLabels,
+        AAzTickLabels,
+        interactionMode,
+        title,
+        renderMode,
+        buttonUpApprox,
+        buttonDownApprox,
+        buttonUpDensity,
+        buttonDownDensity) [instance: 1, cache: 1];
+    autoCamera =
+        AutoCamera(
+            object,
+            "front",
+            object,
+            resolution,
+            aspect,
+            [0,1,0],
+            perspective,
+            viewAngle,
+            backgroundColor) [instance: 1, cache: 1];
+    realCamera =
+        Camera(
+            to,
+            from,
+            width,
+            resolution,
+            aspect,
+            up,
+            perspective,
+            viewAngle,
+            backgroundColor) [instance: 1, cache: 1];
+    coloredDefaultCamera = 
+	 UpdateCamera(defaultCamera,
+            background=backgroundColor) [instance: 1, cache: 1];
+    nullDefaultCamera =
+        Inquire(defaultCamera,
+            "is null + 1") [instance: 1, cache: 1];
+    resetCamera =
+        Switch(
+            nullDefaultCamera,
+            coloredDefaultCamera,
+            autoCamera) [instance: 1, cache: 1];
+    resetNull = 
+        Inquire(
+            reset,
+            "is null + 1") [instance: 2, cache: 1];
+    reset =
+        Switch(
+            resetNull,
+            reset,
+            0) [instance: 2, cache: 1];
+    whichCamera =
+        Compute(
+            "($0 != 0 || $1 == 0) ? 1 : 2",
+            reset,
+            useVector) [instance: 1, cache: 1];
+    camera = Switch(
+            whichCamera,
+            resetCamera,
+            realCamera) [instance: 3, cache: 1];
+    AAobject =
+        AutoAxes(
+            object,
+            camera,
+            AAlabels,
+            AAticks,
+            AAcorners,
+            AAframe,
+            AAadjust,
+            AAcursor,
+            AAgrid,
+            AAcolors,
+            AAannotation,
+            AAlabelscale,
+            AAfont,
+            AAxTickLocs,
+            AAyTickLocs,
+            AAzTickLocs,
+            AAxTickLabels,
+            AAyTickLabels,
+            AAzTickLabels) [instance: 1, cache: 1];
+    switchAAenable = Compute("$0+1",
+	     AAenable) [instance: 2, cache: 1];
+    object = Switch(
+	     switchAAenable,
+	     object,
+	     AAobject) [instance:4, cache: 1];
+    SWapproximation_options =
+        Switch(
+            buttonState,
+            buttonUpApprox,
+            buttonDownApprox) [instance: 5, cache: 1];
+    SWdensity_options =
+        Switch(
+            buttonState,
+            buttonUpDensity,
+            buttonDownDensity) [instance: 6, cache: 1];
+    HWapproximation_options =
+        Format(
+            "%s,%s",
+            buttonDownApprox,
+            buttonUpApprox) [instance: 1, cache: 1];
+    HWdensity_options =
+        Format(
+            "%d,%d",
+            buttonDownDensity,
+            buttonUpDensity) [instance: 2, cache: 1];
+    switchRenderMode = Compute(
+	     "$0+1",
+	     renderMode) [instance: 3, cache: 1];
+    approximation_options = Switch(
+	     switchRenderMode,
+            SWapproximation_options,
+	     HWapproximation_options) [instance: 7, cache: 1];
+    density_options = Switch(
+	     switchRenderMode,
+            SWdensity_options,
+            HWdensity_options) [instance: 8, cache: 1];
+    renderModeString = Switch(
+            switchRenderMode,
+            "software",
+            "hardware")[instance: 9, cache: 1];
+    object_tag = Inquire(
+            object,
+            "object tag")[instance: 3, cache: 1];
+    annoted_object =
+        Options(
+            object,
+            "send boxes",
+            0,
+            "cache",
+            1,
+            "object tag",
+            object_tag,
+            "ddcamera",
+            whichCamera,
+            "rendering approximation",
+            approximation_options,
+            "render every",
+            density_options,
+            "button state",
+            buttonState,
+            "rendering mode",
+            renderModeString) [instance: 1, cache: 1];
+    RECresNull =
+        Inquire(
+            RECresolution,
+            "is null + 1") [instance: 4, cache: 1];
+    ImageResolution =
+        Inquire(
+            camera,
+            "camera resolution") [instance: 5, cache: 1];
+    RECresolution =
+        Switch(
+            RECresNull,
+            RECresolution,
+            ImageResolution) [instance: 10, cache: 1];
+    RECaspectNull =
+        Inquire(
+            RECaspect,
+            "is null + 1") [instance: 6, cache: 1];
+    ImageAspect =
+        Inquire(
+            camera,
+            "camera aspect") [instance: 7, cache: 1];
+    RECaspect =
+        Switch(
+            RECaspectNull,
+            RECaspect,
+            ImageAspect) [instance: 11, cache: 1];
+    switchRECenable = Compute(
+          "$0 == 0 ? 1 : (($2 == $3) && ($4 == $5)) ? ($1 == 1 ? 2 : 3) : 4",
+            RECenable,
+            switchRenderMode,
+            RECresolution,
+            ImageResolution,
+            RECaspect,
+	     ImageAspect) [instance: 4, cache: 1];
+    NoRECobject, RECNoRerenderObject, RECNoRerHW, RECRerenderObject = Route(switchRECenable, annoted_object);
+    Display(
+        NoRECobject,
+        camera,
+        where,
+        throttle) [instance: 1, cache: 1];
+    image =
+        Render(
+            RECNoRerenderObject,
+            camera) [instance: 1, cache: 1];
+    Display(
+        image,
+        NULL,
+        where,
+        throttle) [instance: 2, cache: 1];
+    WriteImage(
+        image,
+        RECfile,
+        RECformat) [instance: 1, cache: 1];
+    rec_where = Display(
+        RECNoRerHW,
+        camera,
+        where,
+        throttle) [instance: 1, cache: 0];
+    rec_image = ReadImageWindow(
+        rec_where) [instance: 1, cache: 1];
+    WriteImage(
+        rec_image,
+        RECfile,
+        RECformat) [instance: 1, cache: 1];
+    RECupdateCamera =
+	UpdateCamera(
+	    camera,
+	    resolution=RECresolution,
+	    aspect=RECaspect) [instance: 2, cache: 1];
+    Display(
+        RECRerenderObject,
+        camera,
+        where,
+        throttle) [instance: 1, cache: 1];
+    RECRerenderObject =
+	ScaleScreen(
+	    RECRerenderObject,
+	    NULL,
+	    RECresolution,
+	    camera) [instance: 1, cache: 1];
+    image =
+        Render(
+            RECRerenderObject,
+            RECupdateCamera) [instance: 2, cache: 1];
+    WriteImage(
+        image,
+        RECfile,
+        RECformat) [instance: 2, cache: 1];
+}
+main_Image_1_in_1 = "Image_1";
+main_Image_1_in_3 = "X24,,PES: 3D";
+main_Image_1_in_4 = 1;
+main_Image_1_in_5 = [-4.76837e-07 -4.76837e-07 0.000125885];
+main_Image_1_in_6 = [-7.13732 15.6695 -2.8095];
+main_Image_1_in_7 = 9.34935;
+main_Image_1_in_8 = 975;
+main_Image_1_in_9 = 0.873;
+main_Image_1_in_10 = [0.0906215 -0.135627 -0.986607];
+main_Image_1_in_11 = NULL;
+main_Image_1_in_12 = 0;
+main_Image_1_in_13 = NULL;
+main_Image_1_in_14 = 1;
+main_Image_1_in_15 = "none";
+main_Image_1_in_16 = "none";
+main_Image_1_in_17 = NULL;
+main_Image_1_in_18 = NULL;
+main_Image_1_in_19 = 0;
+main_Image_1_in_20 = NULL;
+main_Image_1_in_21 = NULL;
+main_Image_1_in_22 = "black";
+main_Image_1_in_23 = NULL;
+main_Image_1_in_25 = "./xxx.tiff";
+main_Image_1_in_26 = "tiff";
+main_Image_1_in_27 = NULL;
+main_Image_1_in_28 = NULL;
+main_Image_1_in_29 = 0;
+main_Image_1_in_30 = {"X", "Y", "Z"};
+main_Image_1_in_31 = NULL;
+main_Image_1_in_32 = {[-2 -4 -5.5] [2 4 5.5]};
+main_Image_1_in_33 = 1;
+main_Image_1_in_34 = 0;
+main_Image_1_in_35 = NULL;
+main_Image_1_in_36 = 1;
+main_Image_1_in_37 = {"clear", "gray", "gray", "gray"};
+main_Image_1_in_38 = {"background", "grid", "ticks", "labels"};
+main_Image_1_in_39 = 1.0;
+main_Image_1_in_40 = "area";
+main_Image_1_in_41 = "none";
+main_Image_1_in_42 = "PES: 3D";
+main_Image_1_in_43 = NULL;
+main_Image_1_in_44 = NULL;
+main_Image_1_in_45 = NULL;
+main_Image_1_in_46 = NULL;
+main_Image_1_in_47 = NULL;
+main_Image_1_in_48 = NULL;
+main_Image_1_in_49 = NULL;
+main_Image_2_in_1 = "Image_2";
+main_Image_2_in_3 = "X24,,PES: 3D";
+main_Image_2_in_4 = 1;
+main_Image_2_in_5 = [0 -1.21838 0];
+main_Image_2_in_6 = [0 17.1623 0];
+main_Image_2_in_7 = 9.85019;
+main_Image_2_in_8 = 975;
+main_Image_2_in_9 = 0.873;
+main_Image_2_in_10 = [0 0 -1];
+main_Image_2_in_11 = NULL;
+main_Image_2_in_12 = 0;
+main_Image_2_in_13 = NULL;
+main_Image_2_in_14 = 1;
+main_Image_2_in_15 = "none";
+main_Image_2_in_16 = "none";
+main_Image_2_in_17 = NULL;
+main_Image_2_in_18 = NULL;
+main_Image_2_in_19 = 0;
+main_Image_2_in_20 = NULL;
+main_Image_2_in_21 = NULL;
+main_Image_2_in_22 = "black";
+main_Image_2_in_23 = NULL;
+main_Image_2_in_25 = "./image.tiff";
+main_Image_2_in_26 = "tiff";
+main_Image_2_in_27 = NULL;
+main_Image_2_in_28 = NULL;
+main_Image_2_in_29 = 1;
+main_Image_2_in_30 = {"X", "Y", "Z"};
+main_Image_2_in_31 = NULL;
+main_Image_2_in_32 = NULL;
+main_Image_2_in_33 = 1;
+main_Image_2_in_34 = 0;
+main_Image_2_in_35 = NULL;
+main_Image_2_in_36 = 1;
+main_Image_2_in_37 = {"clear", "gray", "gray", "gray"};
+main_Image_2_in_38 = {"background", "grid", "ticks", "labels"};
+main_Image_2_in_39 = 1.0;
+main_Image_2_in_40 = "area";
+main_Image_2_in_41 = "none";
+main_Image_2_in_42 = "PES: 3D";
+main_Image_2_in_43 = NULL;
+main_Image_2_in_44 = NULL;
+main_Image_2_in_45 = NULL;
+main_Image_2_in_46 = NULL;
+main_Image_2_in_47 = NULL;
+main_Image_2_in_48 = NULL;
+main_Image_2_in_49 = NULL;
+Executive("product version 4 4 4");
+$sync
+main();

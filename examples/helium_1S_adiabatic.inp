@@ -1,0 +1,34 @@
+ &sph_tdse
+   comment                = "Gauge transformation of the ground state of He in weak 8-micron field. The L cut-off may be inappropriate for quad precision"
+   verbose                = 1,
+   omp_num_threads        = 4,
+   initial_wfn            = 'single',
+   initial_wfn_index      = 0, 0, 1,
+   initial_wfn_energy     = (-0.900,0.0)
+   sd_nradial             = 400,
+   sd_lmax                =  10,
+   sd_adaptive_l          = .true.
+   sd_tolerance_l         = 1e-8
+   field_unwrap           = .true.
+   rotation_mode          = 'auto',
+   sd_rgrid               = 'uniform',
+   sd_rgrid_zeta          = 2.0,
+   sd_rgrid_dr            = 0.15,
+   pot_name               = '[Tong05] He'
+   task                   = 'real time',
+   dt                     = 0.02
+   dt_subdivision         = 'off'
+   timesteps              = 180000
+   vp_shape               = 'z Gaussian',
+   vp_scale               = 0.2,
+   vp_param(1:4)          = 0.005, 0.0, 1800,  1260.0,
+   vp_param(11:12)        = 1200, 1800
+   pt_mix_solver          = 'default',
+   bicg_epsilon           = 0
+   skip_tests             = .T.
+   output_each            = 20,
+   composition_threshold  = 1e-10,
+   field_preview          = ' ', ! 'helium_1S_adiabatic.field',
+   detail_output          = 'helium_1S_adiabatic.detail',
+   detail_frequency       = 2
+ /

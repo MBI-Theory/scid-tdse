@@ -1,0 +1,38 @@
+#
+#  Calculate harmonic spectrum - requires a separate tool (dyson_harmonics.x from multigrid)
+#
+verbose             2
+dipole_components   3
+subtract_baseline   .True.
+window_function     'Welch'
+#window_function     'Square'
+frequency_cut       50.
+frequency_tolerance 1e-3
+in_prefix           ' '
+in_time_c           15
+in_time_e           46
+timesteps 400001
+#
+harmonic_operator   'dipole'
+in_dipole_c         345 411 477
+in_dipole_e         376 442 508
+clear
+load      'hydrogen_1S_hhg_elliptical.detail'
+accumulate
+report    'hydrogen_1S_hhg_elliptical-dipole.table'
+#
+harmonic_operator   'velocity'
+in_dipole_c         741 807 873
+in_dipole_e         772 838 904
+clear
+load      'hydrogen_1S_hhg_elliptical.detail'
+accumulate
+report    'hydrogen_1S_hhg_elliptical-velocity.table'
+#
+harmonic_operator   'acceleration'
+in_dipole_c         543 609 675
+in_dipole_e         574 640 706
+clear
+load      'hydrogen_1S_hhg_elliptical.detail'
+accumulate
+report    'hydrogen_1S_hhg_elliptical-acceleration.table'

@@ -1,0 +1,37 @@
+ &sph_tdse
+   comment                = "Quick test: Helium triplet manifold, 5fs 605 nm pulse (spline, Gaussian-like), 5 TW/cm^2"
+   verbose                = 1,
+   omp_num_threads        = 0,
+   initial_wfn            = 'single',
+   initial_wfn_index      = 0, 0, 1,
+   initial_wfn_energy     = (-0.175,0.0)
+   sd_nradial             = 600,
+   sd_lmax                =   7,
+   sd_mmin                =   0,
+   sd_mmax                =   0,
+   sd_rgrid               = 'uniform',
+   sd_rgrid_zeta          = 2.2407,
+   sd_rgrid_dr            = 0.150,
+   pot_name               = 'input',
+   pot_input(0:12,0)      = 1.0, -1.0, -1.2407, 1.6527 ! v(r)=-(1/r)*(1+1.2407*exp(-1.6527*r))
+   task                   = 'real time',
+   dt                     = 0.0500
+   dt_subdivision         = "off"
+   timesteps              = 16000
+   vp_scale               = 1.5847879e-01, ! 05.0000 TW/cm2
+!  vp_shape               = 'z Gaussian',
+!  vp_param(1:4)          = 7.5311326e-02, 0.000000, 400.000, 206.71,
+!  vp_param(11:12)        =  300.0, 400.0
+   rotation_mode          = 'none'
+   vp_shape               = 'spline'
+   vp_table               = 'helium_triplet_spline_linear.field_spline'
+   skip_tests             = .T.
+   output_each            = 20,
+   composition_threshold  = 1e-6,
+   initial_wf_dump_prefix = ' ',
+   final_wf_dump_prefix   = ' ',
+   field_preview          = 'helium_triplet_spline_linear_field.table',
+   wt_atomic_cache_prefix = ' ',
+   detail_output          = 'helium_triplet_spline_linear_detail.table',
+   detail_frequency       = 10
+ /

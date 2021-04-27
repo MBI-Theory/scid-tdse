@@ -1,0 +1,1101 @@
+Last updated: 2020 Dec 17
+------------
+
+  All input to scid-tdse is provided through the sph_tdse namelist, with one
+  exception. In order to sipport some MPI implementations, scid-tdse will
+  accept input redirection through a command-line argument, in the form:
+
+    --scid-stdin input.inp
+
+  where "input.inp" is the desired file to be red on the standard input.
+
+Input keywords
+
+  All input keywords are collected in sph_tdse namelist, which should be prepared
+  using the usual Fortran rules. The keywords, in alphabetical order, are listed
+  below; the source file defining the keyword is given in parentheses. The source
+  should be consulted for further information. The default value for each keyword
+  is given following the equals sign.
+
+  BICG_EPSILON=0 (bicg_tools.f90)  [OBSOLETE]
+    Relative accuracy required from bi-CG iterative linear solver (used in the
+    laser-field propagator). Zero value (the default) will use smaller of 1e-12 
+    and spacing(1._rk). Note that bicg_epsilon values greater than 1e-12 will 
+    likely produce incorrect results. Single-precision builds may experience
+    problems converging to the default accuracy.
+
+  BICG_FAILTRACE=.true. (bicg_tools.f90) [OBSOLETE]
+    Produce a verbose report when iterative solution fails. The default value
+    of .true. will (very slightly) increase the execution time.
+
+  BICG_MAXITER=8 (bicg_tools.f90) [OBSOLETE]
+    Maximum number of iterations and restarts of bi-CG solver. if bi-CG iterations 
+    fail to converge after pt_bicg_maxiter restarts, each with pt_bicg_maxiter 
+    iterations, laser propagator will fall back to a (much slower) explicit solver
+    in LAPACK (cgesv/zgesv/quad_zgesv, depending on the build precision).
+
+  CA_MAXRAM=0 (composition_analysis.f90)
+    Maximum amount of memory in megabytes, which can be used during the composition 
+    analysis step (including the STS_*_ATEND version of the photoelectron spectrum).
+    This limit does NOT include the memory needed to compute atomic solutions on the 
+    fly, so please treat it conservatively. This option is useful for systems with
+    a lot of cores, but only a limited amount of RAM. Zero (which is the default) 
+    means no limit.
+
+  CAP_NAME='manolopoulos' (cap_tools.f90)
+    Complex absorbing potential, applied near the outer boundary of the radial
+    grid. The two possible choices are:
+      'manolopoulos' - Transmission-free absorber of D.E. Manolopoulos, 
+                       see: JCP 117, 90552 (2002)
+      'none'         - Do not apply the absorbing potential (reflecting outer boundary)
+
+  CAP_PARAM=(0.2,0.2) (cap_tools.f90)
+    Additional parameters specifying the absorber. The meaning depends on the 
+    choice of CAP_NAME. For CAP_NAME='manolopoulos', the values are:
+      CAP_PARAM(1) is kmin, the lowest momentum to be absorbed with the guaranteed
+                   efficiency. All higher momenta will be absorbed more efficiently.
+                   Smaller values of kmin result in thicker absorbing boundary.
+      CAP_PARAM(2) is delta, the JWKB scaling parameter. The default is 0.2, 
+                   corresponding to 1% reflection probability for k=kmin. Smaller
+                   values of delta decrease the reflection probability, at the cost
+                   of a thicker absorbing boundary. For further discussion of the
+                   kmin and delta parameters, see the original publication.
+    The value of CAP_PARAM is ignored for CAP_NAME='none'.
+
+  CKPT_SAVE_BASENAME=' ' (checkpoint_tools.f90)
+    Set to non-black value to enable checkpointing. The names of checkpoint files
+    will be derived by appending a minus sign ('-'), the time-step index, and an
+    extension '.ckpt'. Only the wavefunction and the tSURFF/iSURF data will be
+    included in a checkpoint file. No attempt is made to preserve any of the 
+    results written to the standard output file and to the DETAIL_OUTPUT file.
+    Checkpoint files are specific to the computer architecture, compiler, and
+    datatypes used in the binary. They are not intended for data interchange or
+    archival. The default value is blank (no checkpointing).
+
+    Please keep in mind that restarting from a checkpoint does not guarantee
+    bit-identical results to the original calculation. Caching of the intermediate
+    results and differences in round-off accumulation in parallel runs may lead
+    to numerically slightly different results.
+
+  CKPT_LOAD_FILENAME=' ' (checkpoint_tools.f90)
+    Name of a checkpoint to restart from. Blank means no restart; this is the default.
+
+  CKPT_MAX_CHECKPOINTS=3 (checkpoint_tools.f90)
+    Maximum number of checkpoints to keep. Older checkpoints will be removed.
+
+  CKPT_INTERVAL=10000 (checkpoint_tools.f90)
+    Number of timesteps between checkpoints.
+    
+  COMMENT=' ' (spherical_tdse.f90)
+    A brief description of the input; will be copied close to the top of the
+    output file, but is otherwise ignored.
+
+  COMPOSITION_THRESHOLD=1e-4 (spherical_tdse.f90)
+    Threshold for reporting the field-free amplitudes of the field-free
+    solutions in the final wavefunction. Set to a negative number to disable 
+    composition analysis. Composition analysis requires diagonalization of
+    (SD_LMAX+1) dense non-Hermitian matrices of dimension (SD_NRADIAL,SD_NRADIAL),
+    which can be expensive. For repeated runs with the same grid and Hamiltonian
+    choice, these atomic solutions can be cached, see WT_ATOMIC_CACHE_PREFIX.
+    The actual analysis is performed in wavefunction_tools.f90. Note that 
+    composition analysis is expensive (cubic in the number of radial points)
+    and requires large amounts of memory (quadratic in the the number of
+    radial points). For multi-threaded runs, the amount of memory can be
+    controlled by CA_MAXRAM.
+
+  DETAIL_FREQUENCY=1 (spherical_tdse.f90)
+    Frequency of the detailed output. The default is to produce output on
+    each time step, which may generate very large output files.
+
+  DETAIL_OUTPUT='detail.table' (spherical_tdse.f90)
+    A more detailed output from the simulation, mostly intended for computer
+    post-processing. The output contains time, vector-potential, wavefunction
+    norm, expectation of the Hamiltonian (with and without the CAP), 
+    expectation of the dipole moment operator and dipole acceleration. 
+    (Note that calculation of dipole acceleration requires atomic potential 
+    to be multiplicative. Some of the terms needed to evaluate dipole
+    acceleration in the presence of a non-multiplicative potential are not
+    currently impelemented.)
+    Setting DETAIL_OUTPUT=' ' suppresses the output.
+
+  DO_DIPOLE=(/.T.,.T.,.T./) (spherical_tdse.f90)
+    Calculate dipole expectation and its derivatives during time propagation. 
+    The full dipole is stored in file specified by DETAIL_OUTPUT. Disabling 
+    calculation of each term will (slightly) reduce the cost of the calculation.
+      DO_DIPOLE(1) = .T. if the expectation of dipole moment should be calculated
+      DO_DIPOLE(2) = .T. if the dipole velocity should be calculated
+      DO_DIPOLE(3) = .T. if the dipole acceleration should be calculated
+
+  DO_DIPOLE_PLASMA=.T. (spherical_tdse.f90)
+    Includes "plasma" term in the dipole velocity and acceleration. For the part
+    of the electron density which left the box, we will add free-electron dipole 
+    velocity and acceleration to the total. 
+    Setting DO_DIPOLE_PLASMA=.T. improves convergence of harmonic spectra
+    with simulation box size. Note that the resulting dipole acceleration no 
+    longer coincides with the time derivative of the dipole expectation (which 
+    is calculated strictly for the part of the wavefunction still in the 
+    simulation volume). The correction is only partial for the dipole velocity 
+    term. If you ever are in the situation where contribution from outside of 
+    the box become important, it is advisable to calculate dipole acceleration 
+    (including the plasma correction), then recover dipole velocity and the 
+    dipole through time integration.
+
+  DT=0.01 (spherical_tdse.f90)
+    Time step, in atomic units of time (1fs \approx 41.34137 au[t]). The 
+    appropriate choice of the time step is highly problem-dependent.
+    Generally, dense and non-uniform radial grids require small time steps.
+    So so large angular momenta, large vector-potential amplitudes, and 
+    fields with rapidly-varying vector-potential direction. See Section
+    4 and examples above for some hints on choosing the time step.
+
+  DT_INTERPOLANT_WIDTH=5 (spherical_tdse.f90)
+    Number of points in the polynomial interpolant used to estimate the 
+    vector-potential at subdivided time points. Prior to Jul 30, 2018,
+    linear interpolation was used, introducing high-frequency transients
+    and spoiling the accuracy. There should be no reason to change this
+    parameter from the default value.
+
+  DT_SUBDIVISION='on' (spherical_tdse.f90)
+    Time step subdivision conrol. Can be one of:
+      'off'     - Do not subdivide time steps
+      'on'      - Activate time step subdivision, using the default
+                  choice for the subdivision criterion. Currently the same
+                  as 'lmax'.
+      'lmax'    - Keep (DT_EFF*(LMAX+1)<DT_MAX_LA). This is the most 
+                  conservative choice. It does not make any sense unless 
+                  SD_ADAPTIVE=.T.
+      'lmax-a'  - Keep (DT_EFF*(LMAX+1)*APOT<DT_MAX_LA)
+      'lmax-a2' - Keep (DT_EFF*(LMAX+1)*APOT**2<DT_MAX_LA)
+    Subdivide the time steps when angular momentum and vector-potential become 
+    large. Subdivision may help avoid blowup in the wavefunctions due to 
+    non-commuting terms in the propagator, without having to use small time 
+    steps all the time. It is not obvious what is the appropriate choice of 
+    DT_SUBDIVISION and DT_MAX_LA, so you may need to experiment.
+    Also see DT_MAX_LA, DT_INTERPOLANT_WIDTH, and SD_ADAPTIVE
+
+  DT_MAX_LA=2.00 (spherical_tdse.f90)
+     Maximum acceptable value of ((sd_lmax+1)*vector_potential**2*dt) after the 
+     step subdivision. To guarantee stable propagation, smaller thresholds are 
+     needed for small grid spacings close to the origin. This value has no effect 
+     unless dt_subdivision=='on'. Please note that this parameter had a different
+     meaning (and a different default value) for spherical_tdse.f90 versions less
+     than 1.114 (Jul 10, 2018). The appropriate value of DT_MAX_LA is also 
+     sensitive to the grid structure at the origin. Dense grids may require
+     smaller DT_MAX_LA values for stable propagation. Also see DT_INTERPOLANT_WIDTH
+
+  FIELD_PREVIEW='field.table' (spherical_tdse.f90)
+    Reports the laser field used in the simulation, before simulation
+    actually starts. Useful for debugging pulse shapes. For each time
+    step, the output contains the time, vector potential (spherical
+    coordinates) and electric field (Cartesian coordinates). To suppress
+    the output, use FIELD_PREVIEW=' '.
+
+  FIELD_UNWRAP=.true. (spherical_tdse.f90)
+    Attempts to make laser vector-potential smooth in time, minimizing
+    rotation of the local reference frame. All simulations should still
+    run correctly with FIELD_UNWRAP=.false., but may run (sometimes much)
+    slower, and experience (slightly) larger numerical errors.
+
+  FINAL_WF_DUMP_PREFIX=' ' (spherical_tdse.f90)
+    At the end of the simulation, save the wavefunction in ASCII files with
+    L and M labels appended to the prefix specified by FINAL_WF_DUMP_PREFIX.
+    See routine dump_wavefunctions() in spherical_tdse.f90 for more details.
+    FINAL_WF_DUMP_PREFIX=' ' suppresses the output. This wavefunction can be
+    read back in using INITIAL_WFN='read' (see below).
+
+  INITIAL_WF_DUMP_PREFIX=' ' (spherical_tdse.f90)
+    Save wavefunction before time propagation starts. See FINAL_WF_DUMP_PREFIX.
+
+  INITIAL_WFN='atomic' (spherical_tdse.f90)
+    Choice of the initial wavefunction for propagation. Can be one of:
+      'random' - Start with a random wavefunction
+      'unit'   - Start with a unit wavefunction
+      'atomic' - Start with a field-free atomic solution; see INITIAL_WFN_INDEX
+                 Uses full-matrix eigenvalue solver
+      'single' - Start with a field-free atomic solution; see INITIAL_WFN_ENERGY
+                 Uses inverse-iteration eigenvector solver
+      'read'   - Read wavefunction from a file specified by INITIAL_WFN_FILE.
+                 Files produced by FINAL_WF_DUMP_PREFIX= are accepted as input.
+
+  INITIAL_WFN_FILE=' ' (spherical_tdse.f90)
+    Required for INITIAL_WFN='read'. 
+    
+  INITIAL_WFN_INDEX=(/0,0,1/) (spherical_tdse.f90)
+    Required for INITIAL_WFN='atomic' or 'single'. Specifies the initial atomic state:
+      INITIAL_WFN_INDEX(1)=L angular momentum
+      INITIAL_WFN_INDEX(2)=M angular momentum projection on the laboratory Z axis
+      INITIAL_WFN_INDEX(3)=I sequential index within the (L,M) set; ground state is 1
+    The sequential index is ignored for INITIAL_WFN='single'
+
+  INITIAL_WFN_ENERGY=(-1.,0.) (spherical_tdse.f90)
+    Specifies initial guess for the energy of the desired atomic eigenstate.
+
+  M3D_ITERATIONS=2 (tridiagonal_tools.f90)
+    Number of refinement iterations for M3D_SOLVER='refined'
+
+  M3D_SOLVER='unpivoted' (tridiagonal_tools.f90)
+    Choice of the linear solver for tridiagonal linear systems. Can be one of:
+      'unpivoted' = use a simple, unpivoted solver. This is the fastest choice, and
+                    is the default.
+      'cyclic'    = use an unpivoted cyclic reduction solver. This solver has the same
+                    numerical properties as 'unpivoted', but is amenable to vectorization
+                    and may be faster on vector systems. It requires about 2.7x the number
+                    of floating-point operators compared to 'unpivoted', and will likely
+                    be slower on scalar or short-vector systems. Due to the larger overhead
+                    and cache pressure, it is also likely to be slower on small and medium
+                    problems. If you consider using this solver, please make sure to time 
+                    your specific input on your target system!
+      'pivoted'   = use a pivoted solver, based on LAPACK's _GTTRF/_DTTS2. This choice
+                    may improve numerical stability for non-uniform radial grids and
+                    very intense fields.
+      'refined'   = use a pivoted solver with iterative refinement of the solutions.
+                    The number of refinement iterations is controlled by M3D_ITERATIONS.
+                    This is the most accurate, and the most expensive choice.
+    The choice of the tridiagonal solver is global; it is currently not possible to
+    activate it for the selected parts of the simulation.
+
+  NT_MAX_REQUESTS=128 (node_tools.f90)
+    The maximum number of simultaneously active asynchronous MPI operations. Larger
+    values may increase the multi-node performance, at the cost of increased
+    resource usage. 
+
+  NT_NODE_OUTPUT="node_" (node_tools.f90)
+    For nodes other than the master node, the standard output is redirected to
+    a file with the name formed by appending the sequential node number and ".out"
+    suffix to NT_NODE_OUTPUT.
+
+  NT_REBALANCE_INTERVAL=500 (node_tools.f90)
+    Number of time steps between successive attempts to rebalance the workload
+    on the nodes. Rebalancing requires global synchronization of the wavefunction,
+    and is relatively expensive.
+
+  NT_USE_MULTINODE=.TRUE. (node_tools.f90)
+    Allow (NT_USE_MULTINODE=.TRUE.) or disable (NT_USE_MULTINODE=.FALSE.)
+    distributed-memory parallelization. The default is .TRUE. if compiled
+    with MPI, and .FALSE. otherwise. 
+
+  NT_VERBOSE=2 (node_tools.f90)
+    Level of output in distributed-memory parallelization support routines.
+    Any value above 2 is likely only useful for debugging.
+
+  OMP_NUM_THREADS=0 (spherical_tdse.f90)
+    Sets the number of OpenMP threads. OMP_NUM_THREADS=0 lets OpenMP runtime 
+    decide on the number of threads.
+
+  OUTPUT_EACH=100 (spherical_tdse.f90)
+    Produce output on the standard output each (OUTPUT_EACH) time steps. The 
+    detailed output file (see DETAIL_OUTPUT) is not affected by this setting.
+
+  POT_INPUT(0:15,0:4) = 0 (potential_tools.f90)
+    Parameters of the general-exponential or generalized GJG forms. 
+
+    For the general-exponential (POT_NAME=='input'), the potential is:
+ 
+     u = -Z/r + Sum_{i=0}^4 C_i * r**N_i * exp(-A_i*r)
+
+    The second index of POT_INPUT is the channel L (0 for a multiplicative 
+    potential). POT_INPUT(0,L) gives the Z for this channel. The remaining
+    entries are N_i = POT_INPUT(3*i+1,L), C_i = POT_INPUT(3*i+2,L), and
+    A_i = POT_INPUT(3*i+3,L). Please note that channel-dependent potentials
+    (POT_LMAX/=0) will break certain parts of the program, are poorly tested,
+    and are physically problematic in the velocity gauge.
+
+    For POT_NAME='input', SD_RGRID_ZETA should be equal to the sum of -Z, 
+    plus the sum of all C_i where N_i=-1. However, if any of the terms have
+    N_i=-2, and C_i>0, the correct choice is zero. The effects of having 
+    terms with N_i<=-2 and C_i<0 are potentially unphysical (eigenspectrum 
+    potentially unbound from below).
+
+    For the generalized GJG form (POT_NAME=='input GJG75'), the potential is:
+
+     u = -Z/r + (1/r) Sum_{i=0}^4 C_i/( 1+(eta_i/xi_i)*(exp(xi_i*r)-1) )
+
+    where the entries are Z(L) = POT_INPUT(0,L); C_i = POT_INPUT(3*i+1,L);
+    xi_i = POT_INPUT(3*i+2,L); eta_i = POT_INPUT(3*i+3,L). For L>=POT_LMAX,
+    the L=POT_LMAX channel is used, so that POT_LMAX=0 yields a multiplicative
+    potential. Use of non-multiplicative potentials is strongly discouraged.
+
+    For best results, set SD_RGRID_ZETA to (-Z + Sum C_i).
+
+    For best results, calculations using POT_NAME=='input' and 'input GJG75' 
+    should set STS_ASYMPTOTIC_Q=Z.
+
+  POT_MASK='none' (potential_tools.f90)
+    Modification of the multiplicative potential specified by POT_NAME. Can be one of:
+      'none'       - Use the potential as is.
+      'becke-3'    - Third-order Becke switching function. The switching function 
+                     starts at 1 for R=POT_MASK_R0, and is smoothly switched over
+                     to zero at POT_MASK_RX. To minimize artifacts, it should be
+                     used in conjunction with POT_SHIFT. Please see:
+                        A.D. Becke, J Chem Phys 88, 2547 (1988)
+                     for the definition of the switching function, and some of the
+                     reasons why it works well.
+    It is advisable to enable debugging output of the resulting potential using
+    SD_RGRID_REPORT
+
+  POT_MASK_R0=1000. (potential_tools.f90)
+    For distances from the origin smaller than POT_MASK_R0 (specified in Bohr), the
+    potential is not modified. Only applicable when POT_MASK/='none'
+
+  POT_MASK_RX=2000. (potential_tools.f90)
+    For distances from the origin greater than POT_MASK_RX (in Bohr), the multiplicative
+    potential is forced to zero. Only applicable when POT_MASK/='none'
+
+  POT_NAME='hydrogenic' (potential_tools.f90)
+    Choice of the multiplicative potential in the atomic Hamiltonian. Can be one of:
+      'hydrogenic'    - (-Z)/r; Z=POT_PARAM(1); You should set SD_RGRID_ZETA to Z for 
+                        optimal results as well.
+      'yukawa'        - (-Z)*exp(-A*r)/r; Z=POT_PARAM(1); A=POT_PARAM(2). For optimal
+                        results, set SD_RGRID_ZETA to POT_PARAM(1).
+      'Gauss-Coulomb' - (-Z)*exp(-A*r**2)/r; Z=POT_PARAM(1); A=POT_PARAM(2). For optimal
+                        results, set SD_RGRID_ZETA to POT_PARAM(1).
+      'harmonic'      - (1/2)*k*r**2; k=POT_PARAM(1); You should set SD_RGRID_ZETA to zero
+                        for optimal results.
+      'argon'         - Effective potential from H.G. Muller PRA 60, 1341 (1999), fit to
+                        ionization energies of argon atom. Set SD_RGRID_ZETA to 18.
+      'argon 2P'      - Valence-only effective potential for argon atom. This is NOT the
+                        same as valence-only potential given in HGM. Set SD_RGRID_ZETA to 
+                        zero for optimal results.
+      'argon 3S'      - Valence-only effective potential for argon atom, [3S] core. This 
+                        is a non-local potential. It received very limited testing. Some 
+                        observables (including dipole acceleration and possibly others) 
+                        will be incorrect. Set SD_RGRID_ZETA to zero.
+                        This potential was fit to reproduce the eigenspectrum and 
+                        transition dipoles of the 'argon' potential. For the eigenspectrum,
+                        the agreement is quite good (maximum error below 0.015 eV). For the
+                        bound transition dipoles, the agreement is quite good (errors below
+                        0.1 au) for transitions not involving L=0. Because we are missing
+                        a node in the L=0 states, transition dipoles involving L=0 states
+                        are very bad. This cannot be fixed.
+      '[Tong05] He'   - Helium atom. Use SD_RGRID_ZETA=2
+      '[Tong05] Ne'   - Neon atom. Use SD_RGRID_ZETA=10
+      '[Tong05] Ar'   - Argon atom. Use SD_RGRID_ZETA=18
+                        Effective potentials from Tong and Lin, J Phys B 38, 2593 (2005).
+                        These are a sum of Coulombic, Yukawa, and exponential terms, in the
+                        form: -(1/r)*(Z + a1*exp(-a2*r) + a3*r*exp(-a4*r) + a5*exp(-a6*r) ) 
+                        The recommended value of SD_RGRID_ZETA is Z+a1+a5.
+      '[GJG75]'       - Effective potentials from Garvey, Jackman, and Green, PRA 12, 1144
+                        (1975). The specific potential is selected by POT_PARAM(1), giving
+                        the nuclear charge Z, and POT_PARAM(2), giving the number of 
+                        electrons N. The potentials are available for Z<=54 and most N
+                        between 2 and 54 (except 38, 40, 43, 45, 47, 49, 51, and 53). 
+                        SD_RGRID_ZETA should be set to Z. STS_ASYMPTOTIC_Q should be
+                        set to (Z-N+1). Please keep in mind that these potentials are 
+                        designed to reproduce the Hartree-Fock-like total energy, are likely 
+                        unsuitable for describing electronic excitations or ionization.
+      'neon 1S'       - Valence-only effective potential for neon atom. Use SD_RGRID_ZETA=0.
+      'neon 3/2'      - Neon atom, 2p5(J=3/2) effective core. The potential is derived from 
+                        '[Tong05] Ne'. Use SD_RGRID_ZETA=10.
+      'neon 1/2'      - Neon atom, 2p5(J=1/2) effective core. The potential is derived from 
+                        '[Tong05] Ne'. Use SD_RGRID_ZETA=10.
+      'xenon 3/2'     - Valence-only effective potential for xenon atom, J=3/2 core.
+                        Use SD_RGRID_ZETA=0.
+      'xenon 1/2'     - Valence-only effective potential for xenon atom, J=1/2 core.
+                        Use SD_RGRID_ZETA=0.
+      'input Tong05'  - The (potentially) channel-dependent effective potential is supplied
+                        in POT_LMAX and POT_TONG05, as described below. Please make sure
+                        to choose the appropriate values for SD_RGRID_ZETA and 
+                        STS_ASYMPTOTIC_Q, as discussed below, in the POT_TONG05 entry.
+      'input'         - The (potentially) channel-dependent effective potential is supplied
+                        in POT_LMAX and POT_INPUT, as described below. Please make sure
+                        to choose the appropriate values for SD_RGRID_ZETA and
+                        STS_ASYMPTOTIC_Q, as discussed above, in the POT_INPUT entry.
+      'input GJG75'   - The (potentially) channel-dependent effective potential is given
+                        by POT_LMAX and POT_INPUT, as described above. Please make sure
+                        to set the appropritate SD_RGRID_ZETA and STS_ASYMPTOTIC_Q values.
+
+    See POT_PARAM below for the definition of parameters required by the potential.
+    Also see SD_RGRID_ZETA, especially for the potentials containing a singularity at
+    the origin. POT_TONG05 and POT_INPUT may also be important.
+
+  POT_LMAX=0 (potential_tools.f90)
+    Additional input parameter for POT_NAME='input Tong05', 'input', or 'input GJG75'. 
+    For angular momentum L between 0 and POT_LMAX, use parameters in POT_TONG05(:,L) or 
+    POT_INPUT(:,L). For higher values of L, use POT_TONG05(:,POT_LMAX) or 
+    POT_INPUT(:,POT_LMAX). Setting POT_LMAX to 0 requests a multiplicative 
+    potential. Please note that some features (most importantly the acceleration form
+    of the dipole) will work incorrectly for channel-dependent potentials. Generally,
+    channel-dependent potentials have received a lot less testing, so bugs and 
+    inconsistensies should be expected. The physical meaning of the channel-dependent
+    potentials in the velocity gauge is problematic as well.
+
+  POT_PARAM=[1.,0.] (potential_tools.f90)
+    User-controllable parameters for the radial multiplicative potential. The meaning
+    of the parameters depends on POT_NAME (see the corresponding entry).
+
+  POT_SHIFT=0.0 (potential_tools.f90)
+    Overall shift in the potetential BEFORE masking function is applied. In combination with
+    POT_MASK, POT_SHIFT is useful for forcing the long-range part of the potential to hard 
+    zero. On it's own, POT_SHIFT will simply change the asymptotic value of the binding 
+    potential. Please note that many parts of the code implicitly rely on the asymptotic
+    potential being zero.
+
+  POT_TONG05(0:8,0:4) = 0. (potential_tools.f90)
+    Additional input parameter for POT_NAME='input Tong05'. The effective potential is
+    in the form (the last term is not present in the Tong&Lin 2005 paper):
+
+       -a0/r -a1*exp(-a2*r)/r -a3*exp(-a4*r) -a5*exp(-a6*r)/r -a7*r*exp(-a8*r)
+
+    where the a0 ... a8 are the elements addressed by the first index in POT_TONG05. The
+    second index is the angular momentum channel, from 0 to POT_LMAX. Higher angular
+    channels use the parameters given by L=POT_LMAX. Please note that some features of the
+    code may not work, or may work incorrectly for channel-dependent potentials.
+
+    The appropriate choice of STS_ASYMPTOTIC_Q is A0. If A0 is not the same in different
+    angular channels, the photoelectron spectrum results are invalid. The appropriate
+    choice of SD_RGRID_ZETA is A0+A1+A5 in the L=0 channel.
+
+  PT_CHUNK=1 (propagator_tools.f90)
+    Size of OpenMP parallel chunk in the propagator loops. This is a performance-tuning
+    parameter. See source code in propagator_tools.f90 for more details.
+
+  PT_EPS_DT=-1. (propagator_tools.f90)
+    Atomic propagator contains terms which depend on the time step, and are recomputed
+    if the time step changes. PT_EPS_DT determines the maximum change in the time step
+    before atomic propagator needs to be updated. Setting PT_EPS_DT=0. will force 
+    atomic propagator update if the time step is not bit-for-bit identical to the
+    cached value. PT_EPS_DT=-1. (which is the default) will tolerate changes in up
+    to three last significant digits before recomputation occurs.
+
+  PT_FORCE_PAR_L=.false. (propagator_tools.f90)
+    Laser-field propagator can be parallelized either over angular momentum L, or over
+    angular momentum projection M. L-parallel version has a higher parallelization 
+    overhead, but is applicable to a larger number of cases. Normally, the propagator
+    will choose the appropriate parallel version; by setting PT_FORCE_PAR_L=.TRUE., it
+    is possible to force the use of the L-parallel version even when M-parallel code
+    is expected to be more efficient. This is a performance tuning/debugging parameter.
+
+  PT_MIX_SOLVER='default' (propagator_tools.f90)
+    Part of the laser propagator involving coupling between the L=0 and L=1 sub-blocks
+    requires solving a system of linear equations of the dimension (2*SD_NRADIAL). 
+    The possible choices are:
+      'default' = A synonym for 'SM'.
+      'SM'      = Use tri-diagonal solver with Sherman-Morrison correction.
+      'bi-CG'   = Use iterative bi-conjugate gradient solver, with a fallback to LAPACK.
+                  This choice is also affected by BICG_EPSILON and BICG_MAXITER
+                  [OBSOLETE]
+      'lapack'  = Use dense lapack solver. [OBSOLETE]
+    'SM' is the fastest and the most accurate choice. 'bi-CG' is slower, but is still
+    a linear-scaling choice. It may lose accuracy for single-precision calculations.
+    'lapack' is quadratic in SD_NRADIAL, and offers no accuracy advantage over 'SM'.
+    This is a debugging parameter. There should be no reason to use anything other 
+    than 'default'. Both 'bi-CG' and 'lapack' solvers have been removed as of Mar 09, 2016
+
+  PT_SENSE_REAL=.true. (propagator_tools.f90)
+    The propagator will try to take advantage of the purely real time steps. By
+    setting PT_SENSE_REAL=.false., it is possible to force use of the (slower) 
+    general-case code throughout. This is a debugging parameter.
+
+  ROTATION_MODE='auto' (spherical_tdse.f90)
+    Chooses the code implementing the non-adiabatic (frame rotation) term in the
+    Hamiltonian. Can be one of:
+      'none'        - Use a fixed frame. Vector-potential must be along Z; other 
+                      vector-potentials will be accepted, but (silently) produce 
+                      incorrect results. Field-unwrapping is disabled (see FIELD_UNWRAP)
+      'brute force' - Explicit finite-angle rotation, using full-matrix implementation 
+                      through Wigner rotation matrices. This version is marginally
+                      faster for small SD_LMAX values, but becomes numerically unstable 
+                      for large angular momenta. It is intended primarily for debugging.
+      'sparse'      - Small-angle rotation using sparse matrices. Large-angle rotations
+                      are handled by breaking them up into small steps (see RT_MAX_ROT)
+      'auto'        - Switches between 'none' and 'sparse' depending on the vector-
+                      potential choice. This is the default.
+
+  RT_BLOCKSIZE=16 (rotation_tools.f90)
+    Number of radial grid points rotated simultaneously for ROTATION_MODE='sparse'. 
+    This is a performance optimization parameter.
+
+  RT_MAX_ROT=1e-2 (rotation_tools.f90)
+    Controls the largest acceptable rotation angle for ROTATION_MODE='sparse'. When
+    necessary, rotations will be broken into steps with rotation angles around any
+    of the axes not exceeding RT_MAX_ROT/(SD_LMAX+1). The default setting 
+    (RT_MAX_ROT=1e-2) should yield at least 10 significant digits for all rotations.
+
+  RT_NSTEP_MAX=100 (rotation_tools.f90)
+    Occationally, we'll need to rotate the wavefunctions by a finite angle, 
+    necessitating a very large number of steps. In order to avoid allocating 
+    impossibly-large amounts of memory, we'll break finite rotations into
+    steps not exceeding RT_NSTEP_MAX. There should be no need to change this
+    parameter except during debugging.
+
+  RT_SENSE_REAL=.true. (rotation_tools.f90)
+    For the ROTATION_MODE='sparse' case, uses faster code when rotation matrices 
+    turn out to be real. RT_SENSE_REAL=.false. uses general-case code throughout.
+    This is a debugging parameter.
+
+  SD_ADAPTIVE_L=.true. (spherical_data.f90)
+    Dynamically adjust the maximum L used to represent the wavefunction, up to the
+    maximum set by SD_LMAX. Also see SD_TOLERANCE_L
+
+  SD_ADAPTIVE_R=.true. (spherical_data.f90)
+    Dynamically adjust the the radial extent of the wavefunction, up to the
+    maximum set by SD_NRADIAL. Also see SD_TOLERANCE_R and SD_NRADIAL_SCL.
+
+  SD_LMAX=10 (spherical_data.f90)
+    Largest angular momentum in the grid. Lowest angular momentum is always 0.
+    Also see SD_MMAX.
+
+  SD_MMAX=0 (spherical_data.f90)
+    Largest angular momentum projection on the Z axis of the local (NOT the
+    laboratory!) frame. The two recommended usage case are:
+    a) Vector potential remains parallel to the laboratory Z axis, so that
+       angular momentum projection is conserved:
+         -SD_LMAX<=SD_MMIN=SD_MMAX<=SD_LMAX
+    b) Arbitrary vector-potential:
+         SD_MMIN=-SD_LMAX; SD_MMAX=SD_LMAX
+    Other inputs will be accepted, but may lead to a norm non-conserving
+    propagator.
+
+  SD_MMIN=0 (spherical_data.f90)
+    Smallest angular momentum projection on the Z axis of the local (NOT the
+    laboratory!) frame. See SD_MMAX.
+
+  SD_NRADIAL=220 (spherical_data.f90)
+    Maximum number of points in the radial grid. If SD_ADAPTIVE_R=.T., parts
+    of the code may use smaller radial grids.
+
+  SD_NRADIAL_SCL=1.1 (spherical_data.f90)
+    Scale factor for growing the number of points in the radial grid. Also
+    see SD_ADAPTIVE_R, SD_RADIAL_EDGE, and SD_TOLERANCE_R
+
+  SD_NSPIN=1 (spherical_data.f90)
+    Number of spin components to consider. In the present version, thus must
+    be one.
+
+  SD_OPERATORS='channel' (spherical_data.f90)
+   This is a debugging parameter. Do not change the default unless you know
+   what you are doing. Choice of differential operators (laplacian and gradient). 
+   The default 'channel' uses channel-specific operators, differerent for L=0 
+   and L>0. Other choices are 'all common', which uses the same operators for 
+   all channels; 'grad common', which uses the same operators for the radial 
+   gradient, but remains per-channel for the laplacian; and 'lap common', which
+   uses common operators for the laplacian, but remains per-channel for the 
+   gradient. According to HGM, 'grad common' improves numerical stability for 
+   high fields. However, it does not impose the correct boundary conditions at 
+   the origin in the L=0 channel, and decreses the accuracy, possibly drastically.
+
+  SD_RADIAL_EDGE=-1 (spherical_data.f90)
+    Number of grid points which may be affected by the edge effects in the
+    derivative operators. When adaptive grid adjustment is in effect
+    (SD_ADAPTIVE_R=.R.), the wavefunctions will be kept at least this far
+    from the edge. The default is -1, corresponding to the number of bits 
+    in the real data type (32, 64, or 128 depending on the program being
+    built in single, double, or quadruple precision). Also see 
+    SD_TOLERANCE_R abd SD_NRADIAL_SCL.
+
+  SD_RGRID='uniform' (spherical_data.f90)
+    Choice of the radial grid. Can be one of:
+      'uniform'     - Uniformly distributed points. See SD_RGRID_DR.
+      'log'         - Uniform grid at the origin, followed by Logarithmically 
+                      distributed points. See SD_RGRID_NPAD, SD_RGRID_R0, and
+                      SD_RGRID_SCALE.
+      'log-uniform' - Uniform grid at the origin, followed by a logarithmic 
+                      grid until step reaches sd_rgrid_dr; uniform grid 
+                      afterwards. See  SD_RGRID_NPAD, SD_RGRID_R0, SD_RGRID_SCALE,
+                      and SD_RGRID_DR.
+      'read'        - Arbitrary user-defined points; uses rd_rgrid_file. See
+                      SD_RGRID_FILE.
+    Depending on the choice of SD_RGRID, several additional parameters
+    may need to be set to complete radial grid definition, including: 
+    SD_RGRID_DR, SD_RGRID_R0, SD_RGRID_SCALE, SD_RGRID_NPAD, and SD_RGRID_FILE
+    In most cases, SD_RGRID='log-uniform' yields the best balance between
+    cost of propagation and accuracy of solutions.
+
+    Setting SD_RGRID_RMIN to a non-zero value will start the radial grid at
+    (SD_RRGRID_RMIN) instead of the coordinate origin. It will additionally
+    impose infinite-barrier, rather than Coulombic, boundary conditions at
+    the origin.
+
+    Although not a grid parameter per se, SD_RGRID_ZETA can have a significant
+    impact on the grid quality; it affects all choices of SD_RGRID.
+
+    WARNING: Not all grids produced by sd_rgrid/='uniform' are of a good 
+    quality. Watch out for rapid oscillations in the left wavefunctions: this 
+    can (and does!) cause problems with the laser coupling operator later on.
+    Well-behaved grids tend to look like nearly uniform locally, and avoid
+    rapid changes in the grid point spacing. Grids containing abrupt changes
+    in point density usually require small time steps to achieve stable 
+    propagation in time.
+
+  SD_RGRID_DR=0.2 (spherical_data.f90)
+    Grid-point spacing of the uniform grid (SD_RGRID='uniform') or of the
+    outer uniform segment of SD_RGRID='log-uniform'
+
+  SD_RGRID_FILE='grid.dat' (spherical_data.f90)
+    For SD_RGRID='read', contains list of (SD_NRADIAL+1) grid point 
+    coordinates in Bohr, one grid point per line. The initial point 
+    at R=0 is assumed implicitly; the last [(SD_NRADIAL+1)-th] entry
+    of the list must give the end of the radial integration domain,
+    rather than an actual grid point.
+
+  SD_RGRID_NPAD=-1 (spherical_data.f90)
+    Non-uniform grids generated by SD_RGRID='log' and 'log-uniform' add 
+    a small uniform segment between the origin and the first point of the
+    logarithmic progression. This is done to avoid a large change in
+    grid spacing and consequent highly oscillatory terms in the 
+    derivative operators. The number of padding points is specified by
+    SD_RGRID_NPAD. The default value (SD_RGRID_NPAD=-1) will choose the
+    number of padding poind to minimize the change in grid spacing at
+    the junction point.
+
+  SD_RGRID_R0=1e-2 (spherical_data.f90)
+    For SD_RGRID='log' and 'log-uniform', the first point of the logarithmic
+    progression. Subsequent point are given by:
+      r(i) = SD_RGRID_R0 * SD_RGRID_SCALE**(i-1)
+
+  SD_RGRID_RMIN=0.0 (spherical_data.f90)
+    Starting point of the radial grid. The region of space for r<sd_rgrid_rmin 
+    is (implicitly) taken to be covered by an infinitely-high potential barrier.
+    Choosing a non-zero value here will change the boundary conditions: instead 
+    of matching the point-charge asymptotics requested by sd_rgrid_zeta, the 
+    zero boundary will apply. This is an expert-level parameter; please make 
+    sure you know what's going on before changing it! 
+
+  SD_RGRID_REPORT=' ' (spherical_data.f90)
+    Output file containing radial grid coordinates and multiplicative potential.
+    Blank value suppresses output.
+
+  SD_RGRID_SCALE=1.05 (spherical_data.f90)
+    Scaling factor of the logarithmic progression; see SD_RGRID_R0
+
+  SD_RGRID_ZETA=1.0 (spherical_data.f90)
+    For Coulomb-like potential, the effective nuclear charge at the origin.
+    This value is used to enforce the correct boundary conditions in the L=0
+    channel. The value of SD_RGRID_ZETA can have a substantial effect on the
+    overall accuracy of the calculation.
+
+  SD_RGRID_GRAD_DELTA=0.01 (spherical_data.f90)
+    Step-size control for numerical differential of the potential. 
+    Gradient of the potential is needed for computing dipole acceleration.
+    It is computed using symmetric numerical differentiation of the potential,
+    with the displacements of SD_RGRID_GRAD_DELTA times the distance to the
+    preceeding radial point within the grid.
+
+  SD_TOLERANCE_L(2)=(/-1,-1/) (spherical_data.f90)
+    Criterion used to adjust the effective maximum L value if 
+    SD_ADAPTIVE_L=.true. If the wavefunction in the current maximum L channel 
+    exceeds SD_TOLERANCE_L at any grid point, the effective L value will be 
+    incremented. If the wavefunction in the current two top L channels drop 
+    below SD_TOLERANCE_L/10 at all grid points, the effective L will be 
+    decremented.  Negative tolerances correspond to SPACING(0.1) for the 
+    current numerical type, which is conservative. The two entries refer
+    to the right and left wavefunctions, respectively. Due to our choice of
+    normalization, the left wavefunction is approximately proportional to 
+    the left wavefunction, times the effective grid spacing. If only the
+    first (right) cut-off is set, the left cut-off will be chosen to maintain
+    approximately the same accuracy in the left wavefunction.
+
+  SD_TOLERANCE_R(2)=(/-1,-1/) (spherical_data.f90)
+    Criterion used to adjust the effective maximum grid extent if 
+    SD_ADAPTIVE_R=.true. If the wavefunction exceeds SD_TOLERANCE_R
+    in the outer buffer region, the wavefunction extent will be
+    incremented, up to the maximum set by SD_NRADIAL. Note that
+    some terms (most notably the initial-state preparation,
+    calculation of the final iSURF corrections, and composition
+    analysis) will still use the entire SD_NRADIAL grid.
+    Negative tolerances correspond to SPACING(0.1) for the currentl 
+    numerical type, which is conservative. The two entries refer
+    to the right and left wavefunctions, respectively. Due to our choice of
+    normalization, the left wavefunction is approximately proportional to
+    the left wavefunction, times the effective grid spacing. If only the
+    first (right) cut-off is set, the left cut-off will be chosen to maintain
+    approximately the same accuracy in the left wavefunction.
+    Also see SD_NRADIAL_SCL and SD_RADIAL_EDGE. 
+
+  SKIP_LEFT_PROPAGATION=.false. (spherical_tdse.f90)
+    If set to .true., do not propagate the left wavefunction. This makes the 
+    calculation almost twice as fast, but causes incorrect results for almost 
+    all observables. The only observables guaranteed to work correctly are the 
+    final right wavefunction, and the photoelectron spectrum for 
+    sts_atend_mode='direct'. This parameter exists almost exclusively for 
+    benchmark bragging rights. 
+    This setting has no effect on TASK='imaginary time', where the left 
+    wavefunction is always necessary.
+
+  SKIP_TESTS=.true. (spherical_data.f90)
+    The code attempts to validate quality of the radial grids by:
+    a) comparing the accuracy of the radial derivatives of test functions
+       to known analytical solutions; and
+    b) by computing the eigenstates of the field-free Hamiltonian, and
+       examining these eigenstates for rapid oscillations in the left
+       eigenfunctions (this is the most common source of numerical
+       instabilities in time propagation).
+    These tests produce a considerable amount of output and, for the 
+    second test, can become numerically expensive. Once you are confident
+    that radial grid is appropriate for the field-free Hamiltonian, it is
+    possible to reduce computational cost by setting SKIP_TESTS=.true.
+    Please also see WT_ATOMIC_CACHE_PREFIX below.
+
+    Because 99% of the users simply ignore the output of these tests
+    even if they are enabled, the default has been changed to .false.
+
+  STS_ASYMPTOTIC_Q=1._rk (spherical_tsurf.f90)
+    Asymptotic nuclear charge for the coulomb-wave projection. Positive values
+    correspond to attractive interation. Only relevant if STS_COULOMB_ATEND=.true.
+
+  STS_ATEND_BLOCK=32 (spherical_tsurf.f90)
+    Maximum number of stationary solutions to process as a single block. Using too
+    large values here will increase memory requirements and reduce performance on
+    systems with a large number of cores and limited memory. See the code in
+    fill_stationary_solutions_at_matching_point() for details. This parameter has
+    no effect unless STS_ATEND_MODE='spectral'.
+
+  STS_ATEND_MODE='direct' (spherical_tsurf.f90)
+    Method used to calculate the post-propagation terms in iSURFC/iSURFV. Can be
+    either 'direct' (which is the default) or 'spectral'. In a 'direct' calculation,
+    we use Eq. 17 of the iSURF paper. The 'spectral' calculation uses Eq. 16. The
+    direct calculation is rigorously linear scaling, both in time and in memory,
+    and has almost negligible overhead compared to time propagation. The spectral 
+    form is "free" if composition analysis is desired, but should not be used
+    otherwise unless a problem with the 'direct' algorithm is suspected.
+
+  STS_COULOMB_ATEND=.false. (spherical_tsurf.f90) 
+    Calculate amplitudes of the scattering partial waves during composition
+    analysis. Additionally, calculates projections on the Rutherford scattering
+    waveves specified by the STS_KGRID/STS_DGRID combination.
+    The interaction potential must have Coulomb asymptotics with the
+    effective charge STS_ASYMPTOTIC_Q. Can be combined with STS_VOLKOV and
+    STS_VOLKOV_ATEND. Please note that the algorithm used by STS_COULOMB_ATEND
+    assumes that the entire wavefunction remains inside the simulation volume
+    at the time of the analysis. Even small leakage can lead to artifacts in
+    the calculated photoelectron spectrum. Please see notes for the example
+    [E4] for more details.
+    
+  STS_COULOMB_TABLE=' ' (spherical_tsurf.f90)
+    Output file for human-readable table of Coulomb photoelectron spectrum. 
+    Use blank (' ') for standard out. Only relevant if STS_COULOMB_ATEND=.true.
+
+  STS_COULOMB_OPENDX='coulomb.dx' (spherical_tsurf.f90)
+    Output file for OpenDX visualization of scattering-wave photoelectron spectrum; 
+    Use blank (' ') to disable.  Only relevant if STS_COULOMB_ATEND=.true.
+
+  STS_COULOMB_WAVES=' ' (spherical_tsurf.f90)
+    Output file for Coulomb partial-wave amplitudes; Use blank (' ') for standard out.
+    Only relevant if STS_COULOMB_ATEND=.true.
+
+  STS_DGRID='product' (spherical_tsurf.f90)  
+    Angular grid for asymptotic momentum directions. Allowed values are:
+      'product' = direct product of uniform grids along theta and phi
+                  STS_DGRID_NTHETA and STS_DGRID_NPHI must be specified.
+      'read'    = Read the desired K directions fron an external file (one line per
+                  direction; specify Cartesian KX, KY, KZ). STS_DGRID_COUNT
+                  and STS_DGRID_FILE must be specified.
+
+  STS_DGRID_COUNT=0 (spherical_tsurf.f90)
+    Total number of distinct directions for asymptotic momentum. Only relevant
+    if STS_DGRID='read'.
+
+  STS_DGRID_FILE='kd.table' (spherical_tsurf.f90)  
+    Name of the file containing asymptotic momentum directions. Only relevant if
+    STS_DGRID='read'. STS_DGRID_COUNT must be specified.
+
+  STS_DGRID_NPHI=30_ik (spherical_tsurf.f90)
+    Number of points along the azimuphal angle (0 to 2 pi range) in the product 
+    grid for asymptotic momentum directions. Only relevant if STS_DGRID='product'.
+
+  STS_DGRID_NTHETA=15_ik (spherical_tsurf.f90)
+    Number of points along the polar angle (0 to pi range) in the product grid for 
+    asymptotic momentum directions. Only relevant if  STS_DGRID='product'.
+
+  STS_KGRID='uniform' (spherical_tsurf.f90)  
+    Radial grid for k (asymptotic momentum magnitude). Allowed values are:
+      'uniform' = uniform (STS_KGRID_MIN:STS_KGRID_MAX] grid with 
+                  STS_KGRID_COUNT points
+      'read'    = Read the desired K magnitudes from an external file specified
+                  by STS_KGRID_FILE
+
+  STS_KGRID_COUNT=100_ik (spherical_tsurf.f90)
+    Number of values in the grid for asymptotic momentum magnitudes.
+
+  STS_KGRID_FILE ='km.table' (spherical_tsurf.f90) 
+    Name of the file containing asymptotic momentum magnitudes (one entry per 
+    line). STS_KGRID_COUNT must be specified. Only relevant if STS_KGRID='read'.
+
+  STS_KGRID_MAX=3.0_rk (spherical_tsurf.f90)
+    Maximum value of the asymptotic momentum magnitude. STS_KGRID_MAX is part of 
+    the grid. Only relevant if STS_KGRID='uniform'.
+
+  STS_KGRID_MIN=0.0_rk (spherical_tsurf.f90)
+    Minimum value of the asymptotic momentum magnitude. STS_KGRID_MIN is NOT a 
+    part of the grid. Only relevant if STS_KGRID='uniform'.
+
+  STS_R2R_SCALE=-1._rk (spherical_tsurf.f90)
+    Scale factor to go from the right wavefunction to the real-space wavefunction
+    If negative, the scale will be determined from the initial wavefunction at the
+    start of the simulation. Please do not adjust unless you know EXACTLY what
+    you are doing, and why. Changing this value will also affect visualization
+    requested by VISUALIZE_PREFIX
+
+  STS_RMATCH=-10._rk (spherical_tsurf.f90)
+    Matching sphere radius. Negative values will be interpreted as the distance
+    before the start of the absorbing boundary. The actual matching point will
+    be reset to the closest point in the radial R grid. For strong fields, the 
+    distance between the matching point and the start of the absorbing boundary 
+    should exceed twice the free-oscillation radius. The matching point should be 
+    selected as far away from the nucleus as possible. Choosing a too-small 
+    STS_RMATCH will contaminate the the calculated spectra due to contributions 
+    from high Rydberg states (both for STS_VOLKOV* and STS_COULOMB_ATEND). 
+    Additionally, for STS_VOLKOV* spectra, a matching point at a distance R will
+    introduce spurious interferences between spectral components separated by
+    less than |Z|/R in energy, where Z is the asymptitic effective charge.
+
+    Beware of "round" values for STS_RMATCH, which may fall exactly halfway
+    between two grid points. Because the code will try to work at the grid
+    point closest to the requested STS_RMATCH, the final choice of the grid 
+    point may then depend on the architecture, compiler, and compilation flags
+    (ie the results may become hard to reproduce).
+
+  STS_STEP_FREQUENCY=8 (spherical_tsurf.f90, used by spherical_tdse.f90)
+    Perform a t-SURF timestep at a each sts_step_frequency-th propagation time 
+    step. This helps to reduce the overhead of the t-SURF calculation, at the 
+    cost of reducing the accuracy of the spectrum. High-frequency componentns 
+    are mostly affected by the step frequency reduction. sts_step_frequency 
+    only applies if STS_VOLKOV=.T.
+
+  STS_VERBOSE=1 (spherical_tsurf.f90)
+    Level of output. Values higher than 1 are intended for debugging only.
+
+  STS_VOLKOV=.false. (spherical_tsurf.f90)     
+    Accumulate Volkov amplitudes during the TDSE simulation. Activating 
+    Volkov projection will have a significant impact on the execution time
+    and memory requirements. The additional cost is proportional to the
+    total number of the desired K vectors. Activating STS_VOLKOV is only
+    necessary if part of the population reaches the absorbing boundary
+    during the simulation; otherwise, STS_VOLKOV_ATEND is prefered. Please
+    note that using STS_VOLKOV for potentials with a long-range (Coulombic)
+    tail will ALWAYS introduce artifacts in the calculated photoelectron
+    spectrum. The artifacts in photoionization probabilities are especially 
+    pronounced for the low-momentum photoelectrons, and can be reduced by
+    matching the solutions further away from the nucleus (see STS_RMATCH). 
+    The photoionization phases calculated by STS_VOLKOV for Coulombic 
+    potentials are always incorrect, regardless of the position of the 
+    matching point.
+
+  STS_VOLKOV_ATEND=.false. (spherical_tsurf.f90)
+    Accumulate residual Volkov amplitudes during composition analysis.
+    This option can be combined with STS_VOLKOV=.true., yielding Volkov-state
+    projection at infinite time. Can also be combined with STS_COULOMB_ATEND.
+
+  STS_VOLKOV_OPENDX='tsurf.dx' (spherical_tsurf.f90)
+    Output file for OpenDX visualization of asymptotic Volkov-state amplitudes.
+    Use blank (' ') to disable. Only relevant if at least one of STS_VOLKOV or 
+    STS_VOLKOV_ATEND is .true.
+
+  STS_VOLKOV_TABLE=' ' (spherical_tsurf.f90)
+    Output file for human-readable Volkov state amplitudes. Use blank (' ') for 
+    standard out.  Only relevant if at least one of STS_VOLKOV or
+    STS_VOLKOV_ATEND is .true.
+
+  TASK='real time' (spherical_tdse.f90)
+    Chooses computational task to perform. Can be one of:
+      'real time'      - Real-time propagation of the initial wavefunction,
+                         under the influence of the laser field.
+      'imaginary time' - Imaginary-time propagation of the initial wavefunction.
+                         This option is primarily intended for debugging; it is
+                         usually much faster and more convenient to obtain atomic
+                         solutions using dense linear algebra.
+
+  TIMER_DISABLE=.false. (timer.f90)
+    Set to .true. to disable all internal timing code. This should result in
+    (normally slightly) faster execution. The default is to monitor execution
+    times and number of calls to major sections of the code.
+
+  TIMESTEPS=50000 (spherical_tdse.f90)
+    Number of time steps to perform in the simulation.
+
+  UNWRAP_THRESHOLD=1e-8 (spherical_tdse.f90)
+    Do not try to unwrap vector potential at time steps when vector-potential
+    magnitude is smaller than UNWRAP_THRESHOLD*maxval(abs(vp)). This helps to
+    minimize spurious coordinate-system rotation.
+
+  VERBOSE=2 (spherical_tdse.f90)
+    Extent of output detail. Settings above 2 are primarily for debugging;
+    the recommended range is between 0 and 2.
+
+  VISUALIZE_1STSEQ=1 (spherical_tdse.f90)
+    Sequence number to start wavefunction snapshots at.
+
+  VISUALIZE_EACH=1000 (spherical_tdse.f90)
+    Produce a snapshot each (visualize_each) timesteps. Additionally,
+    the initial and final wavefunctions are saved. Inactive unless
+    VISUALIZE_PREFIX is not blank.
+
+  VISUALIZE_PREFIX=' ' (spherical_tdse.f90)
+    Prefix of the filename for wavefunction snapshots during the simulation. 
+    The actual filename will consist of the prefix, followed by a 10-digit 
+    integer (sequence index) and ".data". Blank disables visualization.
+    See VISUALIZE_EACH to choose snapshot frequency. OpenDX network 'scid-dx.net',
+    together with the 'scid-dx.c' import module can be used to visualize the
+    data. Both the network and the import filter are found in the "./dx/"
+    subdirectory.
+
+  VP_AS_IS=.false. (spherical_tdse.f90)
+    Physical vector-potentials must be zero at the beginning and the end of the
+    simulation. This propertry is normally enforced in fill_vpot_table().
+    If VP_AS_IS is set to true, the vector-potential will not be adjusted in
+    any way. Unless used wisely, activating this flag will almost certainly 
+    produce unphysical results.
+
+  VP_PARAM=0. (vectorpotential_tools.f90)
+  VP_PARAM_X=0. (vectorpotential_tools.f90)
+  VP_SCALE=0. (vectorpotential_tools.f90)
+  VP_SCALE_X=0 (vectorpotential_tools.f90)
+
+  VP_SHAPE=' ' (vectorpotential_tools.f90)
+    Overall vector-potential shape. Combined with VP_SCALE, VP_PARAM, 
+    VP_SCALE_X, and VP_PARAM_X, determines the shape of the laser field.
+    Possible choices are:
+      'zero'        - The vector-potential is zero; propagation is entirely
+                      field-free.
+      'z Gaussian'  - Linearly-polarized (almost-)Gaussian pulse along lab Z;
+                      Pulse parameters from VP_SCALE/VP_PARAM
+      'zz Gaussian' - Sum of two independent "Gaussian" pulses along lab Z.
+                      Pulse 1 parameters from VP_SCALE/VP_PARAM
+                      Pulse 2 parameters from VP_SCALE_X/VP_PARAM_X
+      'zx Gaussian' - Elliptically-polarized "Gaussian" pulse, ZY plane
+                      Vector-potential along lab Z from VP_SCALE/VP_PARAM
+                      Vector-potential along lab X from VP_SCALE_X/VP_PARAM_X
+      'xy Gaussian' - Similar to 'zy Gaussian', but in the XY plane
+      'zx CW'       - Circularly polarized CW field in the ZX plane.
+                      VP_SCALE gives the magnitude, VP_PARAM(1) is the
+                      (circular) frequency
+      'z Sin2'      - Linearly-polarized along Z; Sin^2 vector-potential envelope.
+                      Pulse parameters from VP_SCALE/VP_PARAM
+      'x Sin2'      - Linearly-polarized along X; Sin^2 vector-potential envelope.
+                      Pulse parameters from VP_SCALE/VP_PARAM
+      'zx Sin2'     - Elliptically-polarized "Sin2" pulse, ZY plane
+                      Vector-potential along lab Z from VP_SCALE/VP_PARAM
+                      Vector-potential along lab X from VP_SCALE_X/VP_PARAM_X
+      'xy Sin2'     - Similar to 'zy Sin2', but in the XY plane
+      'z Flat-Sin2' - Linearly-polarized along Z; Flat-top vector-potential, with
+                      Sin^2 raising/falling edges.
+                      Pulse parameters from VP_SCALE/VP_PARAM
+      'table'       - Special-purpose input; see source code in spherical_tdse.f90
+                      Uses file specified by VP_TABLE to fetch vector potential
+                      (spherical coordinates) on a time grid. See VP_TABLE for the
+                      description of the format. VP_SCALE has no effect.
+                      WARNING: VP_SHAPE="table" is powerful, but makes it easy to 
+                      WARNING: request a non-sensical calculation. Here be dragons.
+      'spline'      - The vector potential is defined by cubic splines, specified
+                      in file given by VP_TABLE (see VP_TABLE for the description).
+                      The result of the spline interpolation will be multiplied by
+                      VP_SCALE.
+    "Gaussian" pulses above have envelopes modified at the wings to have 
+    finite duration. See code in GaussianVP() in vectorpotential_tools.f90 
+    for further details. The parameters are (add _X for the secondary component):
+      VP_SCALE     - overall vector potential magnitude
+      VP_PARAM(1)  - Carrier circular frequency [atomic units]
+      VP_PARAM(2)  - Carrier phase at pulse origin [radians]. VP_PARAM(2)=0 
+                     corresponds to the cosine carrier phase.
+      VP_PARAM(3)  - Pulse origin [atomic units]
+      VP_PARAM(4)  - Full width at half power [atomic units]
+      VP_PARAM(11) - Start of the envelope hard turn-off, relative to the 
+                     origin [atomic units]
+      VP_PARAM(12) - End of the envelope hard turn-off, relative to the 
+                     origin [atomic units]. VP_PARAM(12)>VP_PARAM(11).
+    "Sin2" pulses depend on the following parameters:
+      VP_SCALE     - overall vector potential magnitude
+      VP_PARAM(1)  - Carrier circular frequency [atomic units]
+      VP_PARAM(2)  - Carrier phase at pulse origin [radians]. VP_PARAM(2)=0 
+                     corresponds to the sine carrier phase.
+      VP_PARAM(3)  - Pulse origin [atomic units]
+      VP_PARAM(4)  - Full width at zero [atomic units]
+    "Flat-Sin2" pulses take the same parameters as "Sin2", plus:
+      VP_PARAM(11) - Duration of the raising/falling edges [atomic units]
+    Also see FIELD_PREVIEW.
+
+  VP_TABLE='vp.table' (vectorpotential_tools.f90)
+    Name of the file containing defining the vector-potential. Relevant 
+    if VP_SHAPE='table' and VP_SHARE='spline'. Also pay attention to the
+    value of ROTATION_MODE, as discussed below.
+
+    For VP_SHAPE='table', the file must contain the contents of the 
+    vpot_table array [defined in spherical_tdse.f90, the input happens in
+    the fill_vpot_table routine]. The file is expected to contain 4 real
+    numbers for each of the (ITS=-1..2*TIMESTEPS+1) half-timesteps. The 
+    four numbers for the half time-step ITS are:
+
+       time [atomic units]; normally 0.5*DT*ITS
+       vector-potential magnitude [atomic units]; negative magnitudes are OK
+       polar theta angle [Radian]
+       polar phi angle [Radian]
+
+    The input is in Fortran free format, with all time steps read at once.
+       
+    Time propagation starts at ITS=0. It is perfectly possible to specify
+    a non-uniform time grid (this should work, but no promises!). It is
+    also possible to specify different time steps for the first and second
+    halfs of a time step, which will work, but will spoil the accuracy of
+    the time propagation.
+
+    It is possible, and sometimes correct, to enter a negative vector-potential 
+    magnitude: the code in unwrap_vpot_table (spherical_tdse.f90) will try to 
+    adjust the magnitude and the direction parameters to mininize the frame 
+    rotations. These adjustments can be disabled by setting FIELD_UNWRAP=.FALSE.
+
+    By default, field entered through VP_SHAPE='table' is assumed to have 
+    general polarization. If the field is in fact linearly-polarized along the Z
+    direction (which is expected to be a common special case), please make sure 
+    that all polar angles are zero and set ROTATION_MODE='none'. This also 
+    disables vector-potential unwrapping.
+
+    For VP_SHAPE='spline', the input file is expected to defined six splines,
+    two for each Cartesian direction. For each pair, the first spline defines
+    the Cartesian amplitude SA_{x/y/z}(t) of the vector-potential. The second 
+    spline gives the corresponding phase SP_{x/y/z}(t), so that the vector 
+    potential along that direction is given by:
+
+        A_{x/y/z}(t) = SA_{x/y/z}(t) * cos(SP_{x/y/z}(t))
+
+    The resulting vector-potential will undergo field-unwrapping (unless
+    disabled by FIELD_UNWRAP=.FALSE.), and will be assumed to have general
+    polarization (unless linear polarization along the Z axis is explicitly
+    requested, by setting ROTATION_MODE='none'). It is expected that the
+    vector-potential is physical; no attempt to enforce this is made.
+
+    For each spline, we expect:
+
+       the number of points defining the spline, on a separate line. If
+       the number of points is zero, the corresponding component is taken
+       to be zero everywhere.
+
+       for each point, two real numbers giving the time and the value. These
+       values are entered in Fortran free format, with all points being 
+       read at once.
+
+    We use "natural" cubic splines [ie with the second derivative taken to 
+    vanish at the edges] to interpolate the control points. As the result,
+    the electric field defined by this input is continuous and smooth. 
+    However, the first derivative of the electric field is smooth, but not
+    necessarily continuos, which could introduce high-frequency artifacts.
+    It is recommended to use a sufficiently large number of control points,
+    and to check the Fourier transform of the resulting field for artifacts.
+
+    It is not necessary to align the control points of the splines in time.
+
+  WT_ATOMIC_CACHE_PREFIX=' ' (wavefunction_tools.f90)
+    Field-free solutions of the atomic Hamiltonian are used for testing grid
+    quality (see SKIP_TESTS above) and to analyze the final wavefunctions at
+    the end of time propagation. These solutions are obtained by diagonalizing
+    (SD_NRADIAL,SD_NRADIAL) sub-blocks of the field-free Hamiltonian, using
+    dense linear-algebra routines from LAPACK (CGEEV/ZGEEV). The cost of obtaining
+    the atomic solutions scales as O(SD_LMAX*SD_NRADIAL**3), and can become 
+    substantial. If WT_ATOMIC_CACHE_PREFIX is set to a non-empty value, atomic
+    solutions will be cached in files with '-L=nnn' appended to the value of
+    WT_ATOMIC_CACHE_PREFIX. Cached atomic solutions are specific to a particular
+    grid choice, compiler, and real kind choice. There is no checking; it is
+    the user's responsibility to remove stale atomic solutions.
+
+  WT_DISABLE_ORTHOGONALIZATION=.F. (wavefunction_tools.f90)
+    This is a debugging parameter. Setting it to .FALSE. disables explicit
+    re-orthogonalization of the eigenvectors of the atomic wavefunctions.
+
+  WT_ITERATIVE_IMPROVEMENT=.T. (wavefunction_tools.f90)
+    Field-free solutions of the atomic Hamiltonian will be improved using
+    inverse iterations. Using iterative refinement approximately doubles the
+    cost of computing the solutions, but greatly improves their accuracy.
+
+  WT_MAX_SOLUTION_ITERATIONS=20 (wavefunction_tools.f90)
+    Maximum number of passes used to find atomic eigenvectors using inverse
+    iteration. Each pass involves five updates of the eigenvalue, each with
+    three eigenvector updates.

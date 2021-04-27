@@ -20,6 +20,7 @@
 !  Theoretically, changing the value of rk and/or ik here should be sufficient to 
 !  switch the entire program to the desired accuracy.
 !
+test nonsensical change
 module accuracy
   implicit none
   private

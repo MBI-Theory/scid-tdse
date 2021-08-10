@@ -1,4 +1,4 @@
-Last updated: 2020 Dec 17
+Last updated: 2021 Aug 10
 ------------
 
   All input to scid-tdse is provided through the sph_tdse namelist, with one
@@ -383,6 +383,16 @@ Input keywords
                         set to (Z-N+1). Please keep in mind that these potentials are 
                         designed to reproduce the Hartree-Fock-like total energy, are likely 
                         unsuitable for describing electronic excitations or ionization.
+      '[SFG99] Li'    - Lithium atom, from W. Schweizer, P. Fassbinder, and R. Gonzalez-Ferez,
+                        At. Data Nucl. Data Tables 72, 33-55 (1999). The fit is to the Rydberg
+                        series energies and transition dipoles, for n>=6 (s and p series).
+                        Use SD_RGRID_ZETA=3.
+      '[SFG99] Na'    - Sodium atom. Use SD_RGRID_ZETA=11.
+      '[SFG99] K'     - Potassion atom. Use SD_RGRID_ZETA=19.
+      '[SFG99] Rb'    - Rubidium atom. Use SD_RGRID_ZETA=37.
+      '[SFG99] Ca'    - Caesium atom. Use SD_RGRID_ZETA=55.
+                        Please keep in mind that very small time steps may be necessary for
+                        Rubidium and Caesium.
       'neon 1S'       - Valence-only effective potential for neon atom. Use SD_RGRID_ZETA=0.
       'neon 3/2'      - Neon atom, 2p5(J=3/2) effective core. The potential is derived from 
                         '[Tong05] Ne'. Use SD_RGRID_ZETA=10.

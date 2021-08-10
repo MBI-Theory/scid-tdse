@@ -33,7 +33,7 @@ module potential_tools
   public pt_evaluate_potential
   public rcsid_potential_tools
   !
-  character(len=clen), save :: rcsid_potential_tools = "$Id: potential_tools.f90,v 1.19 2021/04/26 15:44:44 ps Exp ps $"
+  character(len=clen), save :: rcsid_potential_tools = "$Id: potential_tools.f90,v 1.20 2021/08/10 12:09:12 ps Exp ps $"
   !
   !  We recognize
   !
@@ -109,6 +109,23 @@ module potential_tools
   real(rk), parameter   :: tong05_he(0:8) = (/ 1.0,   1.231,  0.662,   -1.325,    1.236,   -0.231,  0.480,   0.000,    1.000   /)
   real(rk), parameter   :: tong05_ne(0:8) = (/ 1.0,   8.069,  2.148,   -3.570,    1.986,    0.931,  0.602,   0.000,    1.000   /)
   real(rk), parameter   :: tong05_ar(0:8) = (/ 1.0,  16.039,  2.007,  -25.543,    4.525,    0.961,  0.443,   0.000,    1.000   /)
+  !
+  !  Parameter tables from Schweizer, Fassbinder, and Gonzalez-Ferez, At. Data Nucl. Data Tables 72, 33-55 (1999).
+  !  This potential is a special case of Tong&Lin functional form, with a5 through a8 being zero.
+  !
+  !   Parameter(Tong)    Expression (SFG99)
+  !  -----------------  -------------------
+  !        Zc            tilde-Z (or 1 if not specified)
+  !        a1            (Z - tilde-Z)
+  !        a2            a1
+  !        a3            a2
+  !        a4            a3
+  !                                             Zc    a1   a2      a3     a4    a5-a8
+  real(rk), parameter   :: sfg99_li(0:8)  = (/ 1.0,  2.0, 3.395,  3.212, 3.207, 0., 0., 0., 0. /)
+  real(rk), parameter   :: sfg99_na(0:8)  = (/ 1.0, 10.0, 7.902, 23.51 , 2.688, 0., 0., 0., 0. /)
+  real(rk), parameter   :: sfg99_k (0:8)  = (/ 1.0, 18.0, 3.491, 10.591, 1.730, 0., 0., 0., 0. /)
+  real(rk), parameter   :: sfg99_rb(0:8)  = (/ 1.0, 36.0, 3.431, 10.098, 1.611, 0., 0., 0., 0. /)
+  real(rk), parameter   :: sfg99_cs(0:8)  = (/ 1.0, 54.0, 3.294, 11.005, 1.509, 0., 0., 0., 0. /)
   !
   !  My fit to tong05_ne, eliminating 1S core.                                                                                     
   !                                                                                                                                
@@ -296,6 +313,21 @@ module potential_tools
         write (out,"('WARNING: GJG75 parameters are not designed for describing atomic excited states or ionization!'/)")
         call select_gjg(nint(pot_param(1)),nint(pot_param(2)))
         call report_gjg
+      case ('[SFG99] Li')
+        write (out,"('""Lithium"" from W Schweizer, P. Fassbinder, and R. Gonzalez-Ferez, " // &
+                   "At. Data Nucl. Data Tables, 72, 33-55 (1999)')")
+      case ('[SFG99] Na')
+        write (out,"('""Sodium"" from W Schweizer, P. Fassbinder, and R. Gonzalez-Ferez, " // &
+                   "At. Data Nucl. Data Tables, 72, 33-55 (1999)')")
+      case ('[SFG99] K')
+        write (out,"('""Potassium"" from W Schweizer, P. Fassbinder, and R. Gonzalez-Ferez, " // &
+                   "At. Data Nucl. Data Tables, 72, 33-55 (1999)')")
+      case ('[SFG99] Rb')
+        write (out,"('""Rubidium"" from W Schweizer, P. Fassbinder, and R. Gonzalez-Ferez, " // &
+                   "At. Data Nucl. Data Tables, 72, 33-55 (1999)')")
+      case ('[SFG99] Cs')
+        write (out,"('""Caesium"" from W Schweizer, P. Fassbinder, and R. Gonzalez-Ferez, " // &
+                   "At. Data Nucl. Data Tables, 72, 33-55 (1999)')")
       case ('neon 1S')
         write (out,"('""Neon"" valence-only potential, inspired by X M Tong and C D Lin, J Phys B 38, 2593 (2005)')")
       case ('neon 1/2')
@@ -404,6 +436,16 @@ module potential_tools
         v = tong05(r,tong05_ne)
       case ('[Tong05] Ar')
         v = tong05(r,tong05_ar)
+      case ('[SFG99] Li')
+        v = tong05(r,sfg99_li)
+      case ('[SFG99] Na')
+        v = tong05(r,sfg99_na)
+      case ('[SFG99] K')
+        v = tong05(r,sfg99_k)
+      case ('[SFG99] Rb')
+        v = tong05(r,sfg99_rb)
+      case ('[SFG99] Cs')
+        v = tong05(r,sfg99_cs)
       case ('neon 1S')
         v = tong05(r,neon_1S)
       case ('neon 3/2')

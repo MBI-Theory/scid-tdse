@@ -1,8 +1,13 @@
-Last updated: 2021 Apr 26
+Last updated: 2021 Aug 10
 ------------
 
 Change log
 ----------
+
+2020 Aug 10
+
+ - Added potentials for Li, Na, K, Rb, and Cs from Schweizer, Fassbinder, and
+   Gonzalez-Ferez, At. Data Nucl. Data Tables 72, 33-55 (1999).
 
 2020 Apr 26
 

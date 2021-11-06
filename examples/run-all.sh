@@ -34,7 +34,7 @@ function run_test () {
     export I_MPI_DEBUG=5
     # export I_MPI_FABRICS=shm:ofi  # May be needed by Intel MPI 2020 and later
     export I_MPI_OFI_PROVIDER=shm
-    ulimit -s 1024000
+    ulimit -s 10240
       ../spherical_tdse.x < "${inp}" > "${out}" 2>&1 
     # Intel MPI
     # mpirun -genvall -np 2 -s all $(pwd)/../spherical_tdse.x < "${inp}" > "${out}" 2>&1

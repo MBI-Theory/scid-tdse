@@ -732,7 +732,8 @@ module math
     logs = 0._rk
     zr   = z
     inflate_z: do while(abs(zr)<zcut)
-      logs = logs + log(zr*(zr+1)*(zr+2))
+      ! logs = logs + log(zr*(zr+1)*(zr+2)) ! This "optimization" does not work, because of the branch cuts of log()
+      logs = logs + log(zr) + log(zr+1) + log(zr+2)
       zr   = zr + 3
     end do inflate_z
     ! write (out,"(' zr = ',2(1x,g25.15),' logs = ',2(1x,g25.15))") zr, logs

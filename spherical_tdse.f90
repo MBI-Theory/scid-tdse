@@ -61,7 +61,7 @@ module spherical_tdse
   public start
   public rcsid_spherical_tdse
   !
-  character(len=clen), save :: rcsid_spherical_tdse = "$Id: spherical_tdse.f90,v 1.130 2021/04/26 15:44:44 ps Exp ps $"
+  character(len=clen), save :: rcsid_spherical_tdse = "$Id: spherical_tdse.f90,v 1.131 2022/02/19 16:17:27 ps Exp ps $"
   !
   integer, parameter       :: iu_detail             = 29           ! Unit for detailed output; remains open during the entire run
   integer, parameter       :: iu_temp               = 22           ! An arbitrary unit number, which can be used here
@@ -1580,7 +1580,9 @@ module spherical_tdse
       call nt_merge_all(wfn_l)
       call nt_merge_all(wfn_r)
       call flush_wrapper(out)
-      call dump_wavefunctions(final_wf_dump_prefix)
+      if (nts%this_node==1) then
+        call dump_wavefunctions(final_wf_dump_prefix)
+      end if
     end if
     !
     write (out,"(/'Analyzing wavefunction composition'/)")

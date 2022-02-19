@@ -61,7 +61,7 @@ module spherical_tdse
   public start
   public rcsid_spherical_tdse
   !
-  character(len=clen), save :: rcsid_spherical_tdse = "$Id: spherical_tdse.f90,v 1.131 2022/02/19 16:17:27 ps Exp ps $"
+  character(len=clen), save :: rcsid_spherical_tdse = "$Id: spherical_tdse.f90,v 1.132 2022/02/19 18:54:26 ps Exp ps $"
   !
   integer, parameter       :: iu_detail             = 29           ! Unit for detailed output; remains open during the entire run
   integer, parameter       :: iu_temp               = 22           ! An arbitrary unit number, which can be used here
@@ -1574,7 +1574,7 @@ module spherical_tdse
     !
     call sts_report(tsurf,'In TDSE')
     !
-    if (final_wf_dump_prefix/=' ' .and. nts%this_node==1) then
+    if (final_wf_dump_prefix/=' ') then
       write (out,"(/'Dumping final wavefunction to disk, prefix = ',a/)") trim(final_wf_dump_prefix)
       call flush_wrapper(out)
       call nt_merge_all(wfn_l)

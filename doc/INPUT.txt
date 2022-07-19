@@ -973,6 +973,10 @@ Input keywords
                       Pulse parameters from VP_SCALE/VP_PARAM
       'x Sin2'      - Linearly-polarized along X; Sin^2 vector-potential envelope.
                       Pulse parameters from VP_SCALE/VP_PARAM
+      'zz Sin2'     - Linearly-polarized along Z; two independent pulses with Sin^2
+                      envelope.
+                      Pulse 1 parameters from VP_SCALE/VP_PARAM
+                      Pulse 2 parameters from VP_SCALE_X/VP_PARAM_X
       'zx Sin2'     - Elliptically-polarized "Sin2" pulse, ZY plane
                       Vector-potential along lab Z from VP_SCALE/VP_PARAM
                       Vector-potential along lab X from VP_SCALE_X/VP_PARAM_X

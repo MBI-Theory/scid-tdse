@@ -1,8 +1,12 @@
-Last updated: 2021 Aug 10
+Last updated: 2022 Jul 19
 ------------
 
 Change log
 ----------
+
+2022 Jul 19
+
+ - Added vp_shape="zz Sin2".
 
 2020 Aug 10
 

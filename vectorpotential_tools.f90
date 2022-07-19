@@ -41,6 +41,7 @@
 !  'zx Gaussian' - finite-time Gaussian envelope, independent components along lab Z and Y
 !  'xy Gaussian' - finite-time Gaussian envelope, independent components along lab Z and Y
 !  'z Sin2'      - Sin^2 envelope, polarized along lab Z
+!  'zz Sin2'     - Two pulses with Sin^2 envelope, polarized along lab Z
 !  'z Flat-Sin2' - Flat-top pulse with sin^2 raise/fall
 !  'zx CW'       - CW field, circularly polarized in the ZY plane
 !
@@ -58,7 +59,7 @@ module vectorpotential_tools
   public vp_apot
   public rcsid_vectorpotential_tools
   !
-  character(len=clen), save :: rcsid_vectorpotential_tools = "$Id: vectorpotential_tools.f90,v 1.18 2021/04/26 15:44:44 ps Exp ps $"
+  character(len=clen), save :: rcsid_vectorpotential_tools = "$Id: vectorpotential_tools.f90,v 1.19 2022/07/19 10:03:20 ps Exp $"
   !
   !  List of vector-potential names. These are used in a couple different places; 
   !  I would prefer any typos to cause a compile-time error!
@@ -69,6 +70,7 @@ module vectorpotential_tools
   character(len=*), parameter :: vpn_zzGaussian = 'zz Gaussian'
   character(len=*), parameter :: vpn_xSin2      = 'x Sin2'
   character(len=*), parameter :: vpn_zSin2      = 'z Sin2'
+  character(len=*), parameter :: vpn_zzSin2     = 'zz Sin2'
   character(len=*), parameter :: vpn_zFlatSin2  = 'z Flat-Sin2'
   character(len=*), parameter :: vpn_zxGaussian = 'zx Gaussian'
   character(len=*), parameter :: vpn_xyGaussian = 'xy Gaussian'
@@ -191,6 +193,11 @@ module vectorpotential_tools
         apot = vp_scale * Sin2VP(t,omega,phase,origin,width)
         th   = 0.5_xk * pi_xk
         ph   = 0._xk
+      case (vpn_zzSin2)
+        apot = vp_scale   * Sin2VP(t,  omega,  phase,  origin,  width) &
+             + vp_scale_x * Sin2VP(t,x_omega,x_phase,x_origin,x_width)
+        th   = 0._xk
+        ph   = 0._xk
       case (vpn_zFlatSin2)
         apot = vp_scale * FlatSin2VP(t,omega,phase,origin,width,flat_raise)
         th   = 0._xk
@@ -273,6 +280,9 @@ module vectorpotential_tools
           call init_Sin2VP('along lab X',vp_param,omega,phase,origin,width)
         case (vpn_zSin2)
           call init_Sin2VP('along lab Z',vp_param,omega,phase,origin,width)
+        case (vpn_zzSin2)
+          call init_Sin2VP('along lab Z (1)',vp_param,    omega,  phase,  origin,  width)
+          call init_Sin2VP('along lab Z (2)',vp_param_x,x_omega,x_phase,x_origin,x_width)
         case (vpn_zFlatSin2)
           call init_FlatSin2VP('along lab Z',vp_param,omega,phase,origin,width,flat_raise)
         case (vpn_zxGaussian)

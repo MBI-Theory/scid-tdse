@@ -1,8 +1,12 @@
-Last updated: 2022 Jul 19
+Last updated: 2022 September 26
 ------------
 
 Change log
 ----------
+
+2022 Sep 26
+
+ - Added vp_shape="alt spline".
 
 2022 Jul 19
 

@@ -1,6 +1,6 @@
 !
 !   SCID-TDSE: Simple 1-electron atomic TDSE solver
-!   Copyright (C) 2015-2021 Serguei Patchkovskii, Serguei.Patchkovskii@mbi-berlin.de
+!   Copyright (C) 2015-2022 Serguei Patchkovskii, Serguei.Patchkovskii@mbi-berlin.de
 !
 !   This program is free software: you can redistribute it and/or modify
 !   it under the terms of the GNU General Public License as published by
@@ -59,7 +59,7 @@ module vectorpotential_tools
   public vp_apot
   public rcsid_vectorpotential_tools
   !
-  character(len=clen), save :: rcsid_vectorpotential_tools = "$Id: vectorpotential_tools.f90,v 1.19 2022/07/19 10:03:20 ps Exp $"
+  character(len=clen), save :: rcsid_vectorpotential_tools = "$Id: vectorpotential_tools.f90,v 1.21 2022/09/26 17:19:41 ps Exp ps $"
   !
   !  List of vector-potential names. These are used in a couple different places; 
   !  I would prefer any typos to cause a compile-time error!
@@ -78,6 +78,7 @@ module vectorpotential_tools
   character(len=*), parameter :: vpn_xySin2     = 'xy Sin2'
   character(len=*), parameter :: vpn_zxCW       = 'zx CW'
   character(len=*), parameter :: vpn_spline     = 'spline'
+  character(len=*), parameter :: vpn_altspline  = 'alt spline'
   !
   real(xk), save            :: vp_scale   = 0.00_xk     ! Overall magnitude of the vector potential
   character(len=clen), save :: vp_shape   = ' '         ! Shape of the vector-potential. See vp_apot()
@@ -104,6 +105,11 @@ module vectorpotential_tools
                                                         ! amplitude and phase along X, Y, and Z directions. The format
                                                         ! is described in doc/INPUT.txt, under the vp_table keyword.
                                                         ! vp_scale is influential in this case; don't forget to set it.
+                                                        !
+                                                        ! For vp_shape='alt spline', the file should contain six individual
+                                                        ! splines, which are interpreted as two vector-potentials shifted 
+                                                        ! in time by VP_PARAM(3)/VP_PARAM_X(3), and scaled by 
+                                                        ! VP_SCALE/VP_SCALE_X. See doc/INPUT.txt for details
                                                         !
                                                         ! In either case, the data should be supplied in Fortran 
                                                         ! free-form input format, with no fixed columns or formats.
@@ -141,12 +147,16 @@ module vectorpotential_tools
   real(xk), save            :: flat_raise   = 0._xk     ! vp_param(11) : Duration of the raising and falling edges, in 
                                                         !                atomic units of time
   !
-  !  Data for vp_shape='spline', loaded from the file specified by vp_table
+  !  Data for vp_shape='spline' or 'alt spline', loaded from the file specified by vp_table
   !
-  type(cs_data), save       :: splines(6)               ! We define six splines in total, two for each Cartesian direction:
+  type(cs_data), save       :: splines(6)               ! vp_shape='spline'
+                                                        ! We define six splines in total, two for each Cartesian direction:
                                                         ! 1,2: Envelope and phase for A_x
                                                         ! 3,4: Ditto, for A_y
                                                         ! 5,6: Ditto, for A_z
+                                                        ! vp_shape='alt spline'
+                                                        ! 1,2,3: X/Y/Z components of the vector-potential 1
+                                                        ! 4,5,6: X/Y/Z components of the vector-potential 2
   !
   contains
   !
@@ -252,6 +262,8 @@ module vectorpotential_tools
         ph = atan2(ay,ax)
       case (vpn_spline)
         call vp_spline(t,apot,th,ph)
+      case (vpn_altspline)
+        call vp_altspline(t,apot,th,ph)
     end select
     if (present(theta)) theta = th
     if (present(phi)  ) phi   = ph
@@ -301,6 +313,8 @@ module vectorpotential_tools
           omega = vp_param(1)
         case (vpn_spline)
           call init_splines
+        case (vpn_altspline)
+          call init_altsplines
       end select
       first = .false.
       !$omp flush(first)
@@ -523,9 +537,6 @@ module vectorpotential_tools
   end subroutine vp_spline
   !
   subroutine init_splines
-    integer(ik)                  :: iu, ios, ispl, npts
-    real(xk), allocatable        :: xy(:,:)
-    character(len=clen)          :: msg
     character(len=10), parameter :: names(6) = (/ 'X envelope', 'X phase   ', &
                                                   'Y envelope', 'Y phase   ', &
                                                   'Z envelope', 'Z phase   ' /)
@@ -533,6 +544,56 @@ module vectorpotential_tools
     write (out,"(/'Using cubic-spline interpolation to define the vector-potential')")
     write (out,"(t5,'Loading splines from ',a)") trim(vp_table)
     write (out,"(t5,'Scaling factor = ',g0.8)") vp_scale
+    !
+    call init_splines_common(names)
+  end subroutine init_splines
+  !
+  subroutine vp_altspline(t,vpot,th,ph)
+    real(xk), intent(in)  :: t            ! Time where we need the vector-potential
+    real(xk), intent(out) :: vpot, th, ph ! Vector-potential, spherical coordinates
+    !
+    real(xk) :: vp_x, vp_y, vp_z ! Cartesian components of the vector-potential
+    !
+    vp_x =        vp_scale   * cs_evaluate(splines(1),t-vp_param  (3))
+    vp_y =        vp_scale   * cs_evaluate(splines(2),t-vp_param  (3))
+    vp_z =        vp_scale   * cs_evaluate(splines(3),t-vp_param  (3))
+    vp_x = vp_x + vp_scale_x * cs_evaluate(splines(4),t-vp_param_x(3))
+    vp_y = vp_y + vp_scale_x * cs_evaluate(splines(5),t-vp_param_x(3))
+    vp_z = vp_z + vp_scale_x * cs_evaluate(splines(6),t-vp_param_x(3))
+    !
+    !  Special case: if the X and Y fields vanish identically, force theta and phi to be zero
+    !  In all other cases, the unwrap routine should take of keeping the vector-potential
+    !  as smooth as possible.
+    !
+    if (vp_x==0._xk .and. vp_y==0._xk) then
+      vpot = vp_z ; th = 0._xk ; ph = 0._xk
+    else
+      vpot = sqrt(vp_x**2+vp_y**2+vp_z**2)
+      th   = acos(vp_z/vpot)
+      ph   = atan2(vp_y,vp_x)
+    end if
+  end subroutine vp_altspline
+  !
+  subroutine init_altsplines
+    character(len=2), parameter :: xyz(6) = (/ 'X1', 'Y1', 'Z1', 'X2', 'Y2', 'Z2' /)
+    !
+    write (out,"(/'Using cubic-spline interpolation to define the vector-potential')")
+    write (out,"(t5,'Loading splines from ',a)") trim(vp_table)
+    write (out,"(t5,'Scaling factor [Field 1] = ',g24.12)") vp_scale
+    write (out,"(t5,'    Time delay [Field 1] = ',g24.12)") vp_param(3)
+    write (out,"(t5,'Scaling factor [Field 2] = ',g24.12)") vp_scale_x
+    write (out,"(t5,'    Time delay [Field 2] = ',g24.12)") vp_param_x(3)
+    write (out,"()")
+    !
+    call init_splines_common(xyz)
+  end subroutine init_altsplines
+
+  subroutine init_splines_common(codes)
+    character(len=*), intent(in) :: codes(:)
+    !
+    integer(ik)                 :: iu, ios, ispl, npts
+    real(xk), allocatable       :: xy(:,:)
+    character(len=clen)         :: msg
     !
     error_block: do
       msg = "opening " // trim(vp_table)
@@ -548,7 +609,7 @@ module vectorpotential_tools
         allocate (xy(2,npts),stat=ios)
         if (ios/=0) exit error_block
         !
-        write (out,"(t5,'spline ',i0,' defining ',a,' contains ',i0,' points.')") ispl, trim(names(ispl)), npts
+        write (out,"(t5,'spline ',i0,' defining component ',a,' contains ',i0,' points.')") ispl, trim(codes(ispl)), npts
         !
         if (npts>0) then
           write (msg,"('reading data points for spline #',i0,' npts = ',i0)") ispl, npts
@@ -568,7 +629,7 @@ module vectorpotential_tools
       return
     end do error_block
     !
-    write (out,"('init_splines: Error ',a,'. ios = ',i0)") trim(msg), ios
-    stop 'vectorpotential_tools%init_splines - error initializing splines'
-  end subroutine init_splines
+    write (out,"('init_splines_common: Error ',a,'. ios = ',i0)") trim(msg), ios
+    stop 'vectorpotential_tools%init_splines_common - error initializing splines'
+  end subroutine init_splines_common
 end module vectorpotential_tools

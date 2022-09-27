@@ -3,6 +3,7 @@
 *.x
 *.il
 *.a
+*.swp
 *__genmod.f90 
 *.optrpt
 *.dbg

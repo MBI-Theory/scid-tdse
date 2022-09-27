@@ -1,3 +1,5 @@
+.PHONY: goal clear
+
 goal: makefile.dep
 	  $(MAKE) spherical_tdse.x
 	  # make build_pes.x
@@ -22,6 +24,9 @@ ACT2 = -e 's/^!\*nm/    /' # Disable MPI statements
 # include configs/babel-ifort18_opt.mak
 # include configs/zen-gfortran-7_opt.mak
 # include configs/zen-gfortran-11_opt.mak
+# include configs/zen-gfortran-12_opt.mak
+# include configs/zen-oneapi_opt.mak
+# include configs/zen-oneapi_opt_mpi.mak
 # include configs/zen-aocc-1.1_opt.mak      # VERY SLOW CODE. DO NOT USE.
 # include configs/oink-gfortran_opt.mak
 # include configs/macos_m1-gfortran_opt.mak

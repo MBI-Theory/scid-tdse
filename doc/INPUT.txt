@@ -1,4 +1,4 @@
-Last updated: 2021 Aug 10
+Last updated: 2022 September 26
 ------------
 
   All input to scid-tdse is provided through the sph_tdse namelist, with one
@@ -990,10 +990,23 @@ Input keywords
                       description of the format. VP_SCALE has no effect.
                       WARNING: VP_SHAPE="table" is powerful, but makes it easy to 
                       WARNING: request a non-sensical calculation. Here be dragons.
+                      For most cases, VP_SHAPE="alt spline" is probably a better
+                      choice, as it is less dependent on the parameters of the 
+                      calculation.
       'spline'      - The vector potential is defined by cubic splines, specified
                       in file given by VP_TABLE (see VP_TABLE for the description).
-                      The result of the spline interpolation will be multiplied by
+                      The vector-potential is given by envelope + phase. The 
+                      result of the spline interpolation will be multiplied by
                       VP_SCALE.
+      'alt spline'  - The vector-potential is defined by cubic splines, specified
+                      in VP_TABLE (see below for the description). The splines 
+                      interpolate the vector-potential directly, so that a much
+                      denser set of spline points will likely be needed than for
+                      'spline'. The interpolated vector-potential is scaled by
+                      VP_SCALE and is delayed in time by VP_PARAM(3). If two sets
+                      of splines are given in the VP_TABLE, the second set is
+                      scaled and delayed by VP_SCALE_X and VP_PARAM_X(3), 
+                      respectively.
     "Gaussian" pulses above have envelopes modified at the wings to have 
     finite duration. See code in GaussianVP() in vectorpotential_tools.f90 
     for further details. The parameters are (add _X for the secondary component):
@@ -1016,11 +1029,14 @@ Input keywords
       VP_PARAM(4)  - Full width at zero [atomic units]
     "Flat-Sin2" pulses take the same parameters as "Sin2", plus:
       VP_PARAM(11) - Duration of the raising/falling edges [atomic units]
+    "alt spline" pulses depend on the following parameters:
+      VP_SCALE     - overall vector potential magnitude
+      VP_PARAM(3)  - Pulse time offset [atomic units]
     Also see FIELD_PREVIEW.
 
   VP_TABLE='vp.table' (vectorpotential_tools.f90)
-    Name of the file containing defining the vector-potential. Relevant 
-    if VP_SHAPE='table' and VP_SHARE='spline'. Also pay attention to the
+    Name of the file containing defining the vector-potential. Relevant if 
+    VP_SHAPE='table', 'spline', and 'alt spline'. Also pay attention to the
     value of ROTATION_MODE, as discussed below.
 
     For VP_SHAPE='table', the file must contain the contents of the 
@@ -1053,7 +1069,7 @@ Input keywords
     that all polar angles are zero and set ROTATION_MODE='none'. This also 
     disables vector-potential unwrapping.
 
-    For VP_SHAPE='spline', the input file is expected to defined six splines,
+    For VP_SHAPE='spline', the input file is expected to contain six splines,
     two for each Cartesian direction. For each pair, the first spline defines
     the Cartesian amplitude SA_{x/y/z}(t) of the vector-potential. The second 
     spline gives the corresponding phase SP_{x/y/z}(t), so that the vector 
@@ -1061,11 +1077,22 @@ Input keywords
 
         A_{x/y/z}(t) = SA_{x/y/z}(t) * cos(SP_{x/y/z}(t))
 
-    The resulting vector-potential will undergo field-unwrapping (unless
-    disabled by FIELD_UNWRAP=.FALSE.), and will be assumed to have general
-    polarization (unless linear polarization along the Z axis is explicitly
-    requested, by setting ROTATION_MODE='none'). It is expected that the
-    vector-potential is physical; no attempt to enforce this is made.
+    For VP_SHAPE='alt spline', the input file is expected to contain six
+    splines. The first three splines (one for each Cartesian direction) are
+    delayed in time by VP_PARAM(3) and scaled by VP_SCALE. The following 
+    three splines are delayed by VP_PARAM_X(3) and scaled by VP_SCALE_X, so
+    that the vector potential along Cartesian directions is given by:
+
+        A_x(t) = VP_SCALE*SP_1(t-VP_PARAM(3)) + VP_SCALE_X*SP_4(t-VP_PARAM_X(3))
+        A_y(t) = VP_SCALE*SP_2(t-VP_PARAM(3)) + VP_SCALE_X*SP_5(t-VP_PARAM_X(3))
+        A_z(t) = VP_SCALE*SP_3(t-VP_PARAM(3)) + VP_SCALE_X*SP_6(t-VP_PARAM_X(3))
+
+    For both VP_SHAPE='spline' and 'alt spline', the resulting vector-potential
+    will undergo field-unwrapping (unless disabled by FIELD_UNWRAP=.FALSE.), 
+    and will be assumed to have general polarization (unless linear polarization
+    along the Z axis is explicitly requested, by setting ROTATION_MODE='none'). 
+    It is expected that the vector-potential is physical; no attempt to enforce 
+    this is made.
 
     For each spline, we expect:
 

@@ -612,7 +612,7 @@ Input keywords
     cost of propagation and accuracy of solutions.
 
     Setting SD_RGRID_RMIN to a non-zero value will start the radial grid at
-    (SD_RRGRID_RMIN) instead of the coordinate origin. It will additionally
+    (SD_RGRID_RMIN) instead of the coordinate origin. It will additionally
     impose infinite-barrier, rather than Coulombic, boundary conditions at
     the origin.
 
@@ -646,7 +646,9 @@ Input keywords
     derivative operators. The number of padding points is specified by
     SD_RGRID_NPAD. The default value (SD_RGRID_NPAD=-1) will choose the
     number of padding poind to minimize the change in grid spacing at
-    the junction point.
+    the junction point. For high nuclear charges, using smaller valued
+    if SD_RGRID_NPAD may lead to more stable time propagation, at the
+    cost of some reduction in accuracy.
 
   SD_RGRID_R0=1e-2 (spherical_data.f90)
     For SD_RGRID='log' and 'log-uniform', the first point of the logarithmic

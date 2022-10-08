@@ -9,6 +9,11 @@ passed=""
 failed=""
 dontknow=""
 #
+#  MacOS requires a wrapper to let program run at full speed
+#
+wrapper=""
+[ "$(uname -s)" = "Darwin" ] && wrapper="caffeinate -i "
+#
 function run_test () {
   local inp="$1" ;
   local out ;
@@ -24,7 +29,8 @@ function run_test () {
     export MALLOC_TRACE="$trc"  # Will do nothing unless mtrace() call is activated in spherical_tdse.f90
                                 # Use "mtrace" script (part of glibc-utils package) to analyze the traces
     export HUGETLB_MORECORE=thp
-    export OMP_STACKSIZE=500M
+    # export OMP_STACKSIZE=32768
+    export OMP_STACKSIZE=3072
     # Please note that if there are enough physical cores to support all running threads
     # (both OMP and MPI) setting OMP_WAIT_POLICY=passive and/or I_MPI_WAIT_MODE=on will
     # likely reduce the performance. The difference is quite dramatic on AMD Zen nodes.
@@ -34,8 +40,9 @@ function run_test () {
     export I_MPI_DEBUG=5
     # export I_MPI_FABRICS=shm:ofi  # May be needed by Intel MPI 2020 and later
     export I_MPI_OFI_PROVIDER=shm
-    ulimit -s 10240
-      ../spherical_tdse.x < "${inp}" > "${out}" 2>&1 
+    # ulimit -s 32768
+    ulimit -s 3072
+    ${wrapper} ../spherical_tdse.x < "${inp}" > "${out}" 2>&1 
     # Intel MPI
     # mpirun -genvall -np 2 -s all $(pwd)/../spherical_tdse.x < "${inp}" > "${out}" 2>&1
     # OpenMPI

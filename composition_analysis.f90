@@ -37,7 +37,7 @@ module composition_analysis
   public ca_maxram
   public rcsid_composition_analysis
   !
-  character(len=clen) :: rcsid_composition_analysis = "$Id: composition_analysis.f90,v 1.17 2021/04/26 15:44:44 ps Exp ps $"
+  character(len=clen) :: rcsid_composition_analysis = "$Id: composition_analysis.f90,v 1.18 2022/10/08 17:24:26 ps Exp ps $"
   !
   real(rk), save :: ca_maxram = 0._rk ! Maximum amount of memory which can be used during the analysis step
                                       ! This limit does NOT include the memory needed to compute atomic 
@@ -167,6 +167,8 @@ module composition_analysis
       call wt_atomic_solutions(verbose,lval,block_eval,block_evec)
       en(:,lval) = block_eval(:)
       scan_spin: do ispin=1,sd_nspin
+        ! gfortran is having trouble generating good code for this array assignment
+        ! there does not seem to be anything we could do about it though ...
         amp(:,1,ispin,mmin:mmax,lval) = matmul(transpose(block_evec(:,:,1)),wfn_r%wfn(:,ispin,lval,mmin:mmax))
         amp(:,2,ispin,mmin:mmax,lval) = matmul(transpose(block_evec(:,:,2)),wfn_l%wfn(:,ispin,lval,mmin:mmax))
       end do scan_spin

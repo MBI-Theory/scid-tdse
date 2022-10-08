@@ -36,7 +36,7 @@ module math
   public MathInterpolate
   public rcsid_math
 !
-  character(len=clen), save :: rcsid_math = "$Id: math.f90,v 1.13 2022/02/19 18:54:26 ps Exp $"
+  character(len=clen), save :: rcsid_math = "$Id: math.f90,v 1.14 2022/10/08 17:24:26 ps Exp ps $"
 !
 !
   integer(ik), parameter       :: factorial_slack = 5         ! Extra factorials to produce while filling the cache
@@ -251,25 +251,30 @@ module math
     real(rk), intent(in)  :: euler_angles(3) ! Euler rotation angles: alpha, beta, and gamma
     real(rk), intent(out) :: mat(3,3)        ! Rotation matrix
     !
-    real(rk) :: a, b, g, rma(3,3), rmb(3,3), rmg(3,3)
+    real(rk) :: a, b, g, rma(3,3), rmb(3,3), rmg(3,3), rmba(3,3)
+    real(rk) :: sin_a, cos_a, sin_b, cos_b, sin_g, cos_g
     !
-    a = euler_angles(1)
-    b = euler_angles(2)
-    g = euler_angles(3)
+    a = euler_angles(1) ; sin_a = sin(a) ; cos_a = cos(a)
+    b = euler_angles(2) ; sin_b = sin(b) ; cos_b = cos(b)
+    g = euler_angles(3) ; sin_g = sin(g) ; cos_g = cos(g)
     !
-    rma(1,:) = (/  cos(a),  sin(a),   0._rk /)
-    rma(2,:) = (/ -sin(a),  cos(a),   0._rk /)
-    rma(3,:) = (/  0._rk,    0._rk,   1._rk /)
+    !  We can't use array constructors here: gfortran ends up creating array temporaries
+    !  in this case.
     !
-    rmb(1,:) = (/  cos(b),   0._rk, -sin(b) /)
-    rmb(2,:) = (/  0._rk,    1._rk,   0._rk /)
-    rmb(3,:) = (/  sin(b),   0._rk,  cos(b) /)
+    rma(1,1) =  cos_a ; rma(1,2) = sin_a ; rma(1,3) =  0._rk
+    rma(2,1) = -sin_a ; rma(2,2) = cos_a ; rma(2,3) =  0._rk
+    rma(3,1) =  0._rk ; rma(3,2) = 0._rk ; rma(3,3) =  1._rk
     !
-    rmg(1,:) = (/  cos(g),  sin(g),  0._rk  /)
-    rmg(2,:) = (/ -sin(g),  cos(g),  0._rk  /)
-    rmg(3,:) = (/  0._rk,    0._rk,  1._rk  /)
+    rmb(1,1) =  cos_b ; rmb(1,2) = 0._rk ; rmb(1,3) = -sin_b
+    rmb(2,1) =  0._rk ; rmb(2,2) = 1._rk ; rmb(2,3) =  0._rk
+    rmb(3,1) =  sin_b ; rmb(3,2) = 0._rk ; rmb(3,3) =  cos_b
     !
-    mat = matmul(rmg,matmul(rmb,rma))
+    rmg(1,1) =  cos_g ; rmg(1,2) = sin_g ; rmg(1,3) =  0._rk
+    rmg(2,1) = -sin_g ; rmg(2,2) = cos_g ; rmg(2,3) =  0._rk
+    rmg(3,1) =  0._rk ; rmg(3,2) = 0._rk ; rmg(3,3) =  1._rk
+    !
+    rmba = matmul(rmb,rma)
+    mat  = matmul(rmg,rmba)
   end subroutine MathRotationMatrix
   !
   !  Rotation matrix for angular momentum eigenfunctions, following L&L III Eq. 58.10

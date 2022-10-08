@@ -46,7 +46,7 @@ module wavefunction_tools
   public wt_r2r_scale
   public rcsid_wavefunction_tools
   !
-  character(len=clen), save :: rcsid_wavefunction_tools = "$Id: wavefunction_tools.f90,v 1.61 2021/04/26 15:44:44 ps Exp ps $"
+  character(len=clen), save :: rcsid_wavefunction_tools = "$Id: wavefunction_tools.f90,v 1.62 2022/10/06 17:14:31 ps Exp ps $"
   !
   integer, parameter  :: iu_temp                = 24  ! An arbitrary unit number, which can be used here
   integer, parameter  :: wt_adaptive_r_buffer   = 8   ! Maximum number of points to examine for adaptive nradial determination
@@ -79,7 +79,8 @@ module wavefunction_tools
     integer(ik)         :: ios
     !
     call TimerStart('Atomic solutions')
-    if (size(eval)/=sd_nradial .or. any(ubound(evec)/=(/sd_nradial,sd_nradial,2/)) .or. lval<0 .or. lval>sd_lmax) then
+    if (size(eval)/=sd_nradial .or. ubound(evec,1)/=sd_nradial .or. ubound(evec,2)/=sd_nradial .or. ubound(evec,3)/=2 &
+        .or. lval<0 .or. lval>sd_lmax) then
       stop 'wavefunction_tools%wt_atomic_solutions - bad arguments'
     end if
     !
@@ -155,7 +156,7 @@ module wavefunction_tools
     logical     :: converged
     !
     call TimerStart('Atomic solution (single)')
-    if (any(ubound(evec)/=(/sd_nradial,2/)) .or. lval<0 .or. lval>sd_lmax) then
+    if (ubound(evec,1)/=sd_nradial .or. ubound(evec,2)/=2 .or. lval<0 .or. lval>sd_lmax) then
       stop 'wavefunction_tools%wt_one_atomic_solution - bad arguments'
     end if
     !
@@ -211,11 +212,13 @@ module wavefunction_tools
     !
     real(rk), allocatable     :: tmat(:,:)
     complex(lrk), allocatable :: evec_guess(:,:,:), eval_guess(:)
+    real(rk), allocatable     :: eval_guess_real(:)
     integer(ik)               :: order(sd_nradial)
     integer(ik)               :: alloc, ipt
     !
     call TimerStart('Atomic solutions: Guess')
-    allocate (tmat(sd_nradial,sd_nradial),evec_guess(sd_nradial,sd_nradial,2),eval_guess(sd_nradial),stat=alloc)
+    allocate (tmat(sd_nradial,sd_nradial),evec_guess(sd_nradial,sd_nradial,2), &
+              eval_guess(sd_nradial),eval_guess_real(sd_nradial),stat=alloc)
     if (alloc/=0) stop 'wavefunction_tools%wt_atomic_solution_guess - no memory for tmat'
     !
     if (lval==0) then
@@ -243,8 +246,9 @@ module wavefunction_tools
              lval, maxval(abs(evec_guess(:,:,1)-conjg(transpose(evec_guess(:,:,1)))))
     end if
     !
-    call lapack_geev(evec_guess,eval_guess)
-    call order_keys(real(eval_guess,kind=rk),order)
+    call lapack_geev(sd_nradial,evec_guess,eval_guess)
+    eval_guess_real = real(eval_guess,kind=rk)
+    call order_keys(eval_guess_real,order)
     eval = eval_guess(order)
     !
     !  LAPACK _GEEV conjugates the left eigenvectors. Let's begin by undoing the damage.
@@ -252,7 +256,7 @@ module wavefunction_tools
     evec(:,:,1) = conjg(evec_guess(:,order,1))
     evec(:,:,2) =       evec_guess(:,order,2)
     !
-    deallocate (evec_guess,eval_guess)
+    deallocate (evec_guess,eval_guess,eval_guess_real)
     call TimerStop('Atomic solutions: Guess')
   end subroutine wt_atomic_solution_guess
   !
@@ -310,7 +314,9 @@ module wavefunction_tools
     complex(rk) :: scl
     integer(ik) :: imax
     !
-    if (any(ubound(vecx)/=(/sd_nradial,2/))) stop 'wavefunction_tools%wt_normalize_one_atomic_solution - bad arguments'
+    if (ubound(vecx,1)/=sd_nradial .or. ubound(vecx,2)/=2) then
+      stop 'wavefunction_tools%wt_normalize_one_atomic_solution - bad arguments'
+    end if
     !
     !  Normalize right eigenvector. Iterative refinement tends to produce very large eigenvectors,
     !  with norms which can easily exceed the dynamics range of the underlying real type. We therefore

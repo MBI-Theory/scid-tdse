@@ -61,7 +61,7 @@ module checkpoint_tools
   integer(ik), save         :: ckpt_max_checkpoints = 3_ik      ! Maximum number of checkpoints to keep.
   integer(ik), save         :: ckpt_interval        = 10000_ik  ! Number of timesteps between checkpoints.
   !
-  character(len=clen), save :: rcsid_checkpoint_tools = "$Id: checkpoint_tools.f90,v 1.16 2021/04/26 15:44:44 ps Exp ps $"
+  character(len=clen), save :: rcsid_checkpoint_tools = "$Id: checkpoint_tools.f90,v 1.17 2022/10/08 17:24:26 ps Exp ps $"
   !
   type ckpt_data
     private                                                         ! This data is not for exterrrnal consumption
@@ -243,6 +243,9 @@ module checkpoint_tools
       action = 'verifying header'
       if (tag/='SCID CKPT' .or. version/=ckpt_version .or. any(options.neqv.options2)) then
         write (out,"('Checkpoint header mismatch')")
+        ! gfortran introduces an array temporary for the transfer() below. There
+        ! does not seem to be anything we could do about it: adding an explicit
+        ! temporary still creates a temporary array ...
         write (out,"('Expected: ',a,' V.',i0,' options = ',2l1,'(',2z8,')')") &
                'SCID CKPT', ckpt_version, options, transfer(options,1_ik,2)
         write (out,"('Received: ',a,' V.',i0,' options = ',2l1,'(',2z8,')')") &

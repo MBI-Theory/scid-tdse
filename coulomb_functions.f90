@@ -72,7 +72,7 @@
    public coulombFG, coulombF, coulombBound
    public rcsid_coulomb_functions
    !
-   character(len=clen), save :: rcsid_coulomb_functions = "$Id: coulomb_functions.f90,v 1.13 2021/04/26 15:44:44 ps Exp ps $"
+   character(len=clen), save :: rcsid_coulomb_functions = "$Id: coulomb_functions.f90,v 1.14 2022/10/08 17:24:26 ps Exp ps $"
    !
  ! integer, parameter      :: out         = 6
  ! integer, parameter      :: ik          = selected_int_kind(15)
@@ -142,7 +142,7 @@
      !
      if (x<=0) stop 'coulomb_functions%coulombFG - bad x'
      if (nlambda<=0) stop 'coulomb_functions%coulombFG - bad nlambda'
-     if (any(ubound(fg)/=(/nlambda,4_ik/))) stop 'coulomb_functions%coulombFG - bad array sizes'
+     if (ubound(fg,1)/=nlambda .or. ubound(fg,2)/=4_ik) stop 'coulomb_functions%coulombFG - bad array sizes'
      !
      !  Start by filling coefficient tables: we'll need these repeatedly.
      !

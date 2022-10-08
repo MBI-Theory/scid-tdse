@@ -24,7 +24,7 @@
 !   real(rk), intent(in)  :: xr(:,:) ! Reduced solution vectors
 !   real(rk), intent(out) :: x (:,:) ! Full Solution vectors
     !
-    integer(ik) :: nm, nf, nr, nrhs
+    integer(ik) :: nm, nf, nr, nrhs, j
     !
     nm = size(r,dim=1) ! Total size of the linear problem
     nf = size(f,dim=1) ! Number of eliminated degrees of freedom
@@ -37,8 +37,19 @@
     if (size(x,dim=2)/=nrhs .or. size(xr,dim=2)/=nrhs) &
        stop 'tridiagonal_cyclic%cr_solver_backward_step_g - bad argument dimensions (4)'
     !
-    x(2:2*nr:2,:)   = xr(1:nr,:)
-    x(1:2*nf-1:2,:) = spread(f(1:nf,1),2,nrhs) * r(1:2*nf-1:2,:)
-    x(1:2*nr-1:2,:) = x(1:2*nr-1:2,:) + spread(f(1:nr,2),2,nrhs)*xr(1:nr,:)
-    x(3:2*nf-1:2,:) = x(3:2*nf-1:2,:) + spread(f(1:nf-1,3),2,nrhs)*xr(1:nf-1,:)
+    !  gfortran (at least up ro 12.2) generates bad code for the vector version,
+    !  using spread() intrinsic, which involves creation of completely unnecessary 
+    !  array temporaries. We'll use the more verbose but equivalent forall instead.
+    !
+    ! x(2:2*nr:2,:)   = xr(1:nr,:)
+    ! x(1:2*nf-1:2,:) = spread(f(1:nf,1),2,nrhs) * r(1:2*nf-1:2,:)
+    ! x(1:2*nr-1:2,:) = x(1:2*nr-1:2,:) + spread(f(1:nr,2),2,nrhs)*xr(1:nr,:)
+    ! x(3:2*nf-1:2,:) = x(3:2*nf-1:2,:) + spread(f(1:nf-1,3),2,nrhs)*xr(1:nf-1,:)
+    !
+    rhs_solve: forall (j=1:nrhs) 
+      x(2:2*nr:2,j)   = xr(1:nr,j)
+      x(1:2*nf-1:2,j) = f(1:nf,1) * r(1:2*nf-1:2,j)
+      x(1:2*nr-1:2,j) = x(1:2*nr-1:2,j) + f(1:nr,2)  *xr(1:nr,j)
+      x(3:2*nf-1:2,j) = x(3:2*nf-1:2,j) + f(1:nf-1,3)*xr(1:nf-1,j)
+    end forall rhs_solve
 ! end subroutine cr_solve_backward_step_g

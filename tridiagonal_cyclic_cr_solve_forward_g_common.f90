@@ -23,7 +23,7 @@
 !   real(rk), intent(in)  :: r (:,:)  ! Full RHS set
 !   real(rk), intent(out) :: rr(:,:)  ! Reduced RHS set on this step
     !
-    integer(ik) :: nm, nf, nr, nrhs
+    integer(ik) :: nm, nf, nr, nrhs, j
     !
     nm = size(r,dim=1)    ! Total size of the linear problem
     nf = size(f,dim=1)    ! Number of eliminated degrees of freedom
@@ -34,6 +34,13 @@
     if (nm/=nf+nr .or. (nf/=nr .and. nf/=nr+1)) stop 'tridiagonal_cyclic%cr_solver_forward_step_g - bad argument dimensions (2)'
     if (size(rr,dim=2)/=nrhs) stop 'tridiagonal_cyclic%cr_solver_forward_step_g - bad argument dimensions (3)'
     !
-    rr(1:nr,:)   = r(2:2*nr:2,:) + spread(f(1:nr,4),2,nrhs)*r(1:2*nr-1:2,:) 
-    rr(1:nf-1,:) = rr(1:nf-1,:) + spread(f(1:nf-1,5),2,nrhs)*r(3:2*nf-1:2,:)
+    !  gfortran, as of version 12.2, creates explicit array temporaries for the spread()
+    !  intrinsic. rewrite with forall
+    !
+    ! rr(1:nr,:)   = r(2:2*nr:2,:) + spread(f(1:nr,4),2,nrhs)*r(1:2*nr-1:2,:) 
+    ! rr(1:nf-1,:) = rr(1:nf-1,:) + spread(f(1:nf-1,5),2,nrhs)*r(3:2*nf-1:2,:)
+    rhs_loop: forall (j=1:nrhs) 
+      rr(1:nr,j)   = r(2:2*nr:2,j) + f(1:nr,4)  *r(1:2*nr-1:2,j) 
+      rr(1:nf-1,j) = rr(1:nf-1,j)  + f(1:nf-1,5)*r(3:2*nf-1:2,j)
+    end forall rhs_loop
 ! end subroutine cr_solve_forward_step_g

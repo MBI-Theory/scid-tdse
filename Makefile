@@ -19,12 +19,12 @@ ACT2 = -e 's/^!\*nm/    /' # Disable MPI statements
 #
 # System-specific overrides
 #
-  include vanilla.mak
+# include vanilla.mak
 # include configs/babel-gfortran_opt.mak
 # include configs/babel-ifort18_opt.mak
 # include configs/zen-gfortran-7_opt.mak
 # include configs/zen-gfortran-11_opt.mak
-# include configs/zen-gfortran-12_opt.mak
+  include configs/zen-gfortran-12_opt.mak
 # include configs/zen-oneapi_opt.mak
 # include configs/zen-oneapi_opt_mpi.mak
 # include configs/zen-aocc-1.1_opt.mak      # VERY SLOW CODE. DO NOT USE.
@@ -59,12 +59,6 @@ LIBS = $(LAPACK) $(LAPACK) $(LIBEXTRA)
 	$(ACT) $(ACT2) $< >preprocess/$<
 	$(F90) -c preprocess/$<
 
-dgefa.o:        dgefa.f
-	$(F90) -c dgefa.f
-
-dgedi.o:        dgedi.f
-	$(F90) -c dgedi.f
-
 #hacks.o:	hacks.f90 accuracy.o
 #	$(F90) -O0 -c hacks.f90
 
@@ -86,8 +80,6 @@ LIBSPHERICAL += composition_analysis.o
 LIBSPHERICAL += constants.o
 LIBSPHERICAL += coulomb_functions.o
 LIBSPHERICAL += cubic_spline.o
-LIBSPHERICAL += dgefa.o
-LIBSPHERICAL += dgedi.o
 LIBSPHERICAL += hacks.o
 LIBSPHERICAL += lapack.o
 LIBSPHERICAL += math.o

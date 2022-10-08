@@ -52,8 +52,6 @@ module propagator_tools
   use spherical_data_initialize
   use tridiagonal_tools
   use node_tools
-! use lapack
-! use bicg_tools
   implicit none
   private
   public pt_fwd_atomic_n, pt_rev_atomic_n
@@ -64,18 +62,13 @@ module propagator_tools
   public pt_reset_caches
   public rcsid_propagator_tools
   !
-  character(len=clen), save :: rcsid_propagator_tools = "$Id: propagator_tools.f90,v 1.43 2021/04/26 15:44:44 ps Exp ps $"
+  character(len=clen), save :: rcsid_propagator_tools = "$Id: propagator_tools.f90,v 1.45 2022/10/08 17:24:26 ps Exp ps $"
   !
   character(len=20), save :: pt_mix_solver  = 'default' ! Solver to use for L=0 Hmix inverse. Can be:
                                                         ! 'default' - will use the fastest solver
                                                         ! 'SM'      - tri-diagonal solver with Sherman-Morrison
-                                                        !             correction. This is the default.
-                                                        ! 'bi-CG'   - bi-conjugate gradient solver
-                                                        ! 'lapack'  - Lapack zgesv 
-                                                        ! There is no sane reason to use 'lapack' except
-                                                        ! for debugging the much faster, and just as
-                                                        ! accurate bi-CG or SM solvers. 
-                                                        ! Both 'bi-CG' and 'lapack' has been removed as of Mar 9, 2016
+                                                        !             correction. This is the default, and the only
+                                                        !             possible choice.
   integer, save           :: pt_chunk       = 1         ! Size of dynamic chunk in loop scheduling
   logical, save           :: pt_sense_real  = .true.    ! Use special-case optimizations for real time steps.
                                                         ! Real time step may lead to better optimizations and/or
@@ -1352,8 +1345,10 @@ module propagator_tools
       npe  = (m1lx-m1l0) + (d1lx-d1l0)
       nme  = (m1lx-m1l0) - (d1lx-d1l0)
       ! Adjust the average operator
-      mpd(1,(/1,3/)) = mpd(1,(/1,3/)) + npe
-      mmd(1,(/1,3/)) = mmd(1,(/1,3/)) + nme
+      mpd(1,1) = mpd(1,1) + npe(1)
+      mpd(1,3) = mpd(1,3) + npe(2)
+      mmd(1,1) = mmd(1,1) + nme(1)
+      mmd(1,3) = mmd(1,3) + nme(2)
     else 
       ! lval>0, operators are the same, and the difference terms vanish
       mpd  = sd_m1n_lx + fac_b*sd_d1n_lx
@@ -1383,8 +1378,10 @@ module propagator_tools
     !  If you pay attention, it turns out to coinside with the laser-coupling 
     !  operator for L=lval.
     !
-    mpd(1,(/1,3/)) = mpd(1,(/1,3/)) - npe
-    mmd(1,(/1,3/)) = mmd(1,(/1,3/)) - nme
+    mpd(1,1) = mpd(1,1) - npe(1)
+    mpd(1,3) = mpd(1,3) - npe(2)
+    mmd(1,1) = mmd(1,1) - nme(1)
+    mmd(1,3) = mmd(1,3) - nme(2)
     call m3d_decompose(mpd,mpd_f,mpd_p)
     call m3d_decompose(mmd,mmd_f,mmd_p)
     !
@@ -1594,9 +1591,11 @@ module propagator_tools
       ! Construct the difference operator
       npe  = (m1lx-m1l0) + (d1lx-d1l0)
       nme  = (m1lx-m1l0) - (d1lx-d1l0)
-      ! Adjust the average operator
-      mpd(1,(/1,2/)) = mpd(1,(/1,2/)) + npe
-      mmd(1,(/1,2/)) = mmd(1,(/1,2/)) + nme
+      ! Adjust the average operator. Vector subscripts on the left cause trouble for gfortran ...
+      mpd(1,1) = mpd(1,1) + npe(1)
+      mpd(1,2) = mpd(1,2) + npe(2)
+      mmd(1,1) = mmd(1,1) + nme(1)
+      mmd(1,2) = mmd(1,2) + nme(2)
     else 
       ! lval>0, operators are the same, and the difference terms vanish
       mpd  = sd_m1t_lx + fac_b*sd_d1t_lx
@@ -1634,8 +1633,10 @@ module propagator_tools
     !  If you pay attention, it turns out to coinside with the laser-coupling 
     !  operator for L=lval.
     !
-    mpd(1,(/1,2/)) = mpd(1,(/1,2/)) - npe
-    mmd(1,(/1,2/)) = mmd(1,(/1,2/)) - nme
+    mpd(1,1) = mpd(1,1) - npe(1)
+    mpd(1,2) = mpd(1,2) - npe(2)
+    mmd(1,1) = mmd(1,1) - nme(1)
+    mmd(1,2) = mmd(1,2) - nme(2)
     call m3d_decompose(mpd,mpd_f,mpd_p)
     call m3d_decompose(mmd,mmd_f,mmd_p)
     !

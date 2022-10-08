@@ -53,7 +53,7 @@ module spherical_tsurf
   public sts_report
   public rcsid_spherical_tsurf
   !
-  character(len=clen), save :: rcsid_spherical_tsurf = "$Id: spherical_tsurf.f90,v 1.36 2021/04/26 15:44:44 ps Exp ps $"
+  character(len=clen), save :: rcsid_spherical_tsurf = "$Id: spherical_tsurf.f90,v 1.37 2022/10/08 17:24:26 ps Exp ps $"
   !
   !  Private data, not visible outside the module
   !
@@ -279,7 +279,10 @@ module spherical_tsurf
           th = (ith-0.5_rk)*pi/sts_dgrid_ntheta
           fill_direction_phi: do iph=1,sts_dgrid_nphi
             ph = (iph-0.5_rk)*2._rk*pi/sts_dgrid_nphi
-            sts_dtab(:,iph+(ith-1)*sts_dgrid_nphi) = (/ sin(th)*cos(ph), sin(th)*sin(ph), cos(th) /)
+            ! gfortran really generates bad code for array assignments ...
+            sts_dtab(1,iph+(ith-1)*sts_dgrid_nphi) = sin(th)*cos(ph)
+            sts_dtab(2,iph+(ith-1)*sts_dgrid_nphi) = sin(th)*sin(ph)
+            sts_dtab(3,iph+(ith-1)*sts_dgrid_nphi) = cos(th)
           end do fill_direction_phi
         end do fill_direction_theta
         !$omp end parallel do
@@ -380,6 +383,7 @@ module spherical_tsurf
     integer(ik)              :: ikm, ikd, lv, mv, my_lmax, my_mmin, my_mmax
     integer(ik)              :: alloc     
     real(rk)                 :: th, ph       ! Theta and phi angles for the vector-potential in the lab c.s.
+    real(rk)                 :: euler(3)     ! Euler angles for MathRotationMatrix - stupic gfortran ...
     real(rk)                 :: az           ! Vector-potential along local Z
     real(rk)                 :: krm(3,3)     ! Rotation matrix for the lab->local coordinate system transformation
     real(rk)                 :: kd_loc(3)    ! K-vector direction in the local coordinate system
@@ -422,7 +426,8 @@ module spherical_tsurf
     az = real(vp(1),kind=rk)
     th = real(vp(2),kind=rk)
     ph = real(vp(3),kind=rk)
-    call MathRotationMatrix((/ph,th,0._rk/),krm)
+    euler(1) = ph ; euler(2) = th ; euler(3) = 0._rk
+    call MathRotationMatrix(euler,krm)
     if (sts_verbose>=2) then
       write (out,"('       Time step to expansion point = ',g25.17)") dt1
       write (out,"('          Time step to interval end = ',g25.17)") dt2

@@ -28,14 +28,13 @@ module test_tools
   use propagator_tools
   use wavefunction_tools
   use node_tools
-  use lapack
   use sort_tools
   implicit none
   private
   public derivatives_test, fieldfree_test, imaginary_propagation_test
   public rcsid_test_tools
   !
-  character(len=clen), save :: rcsid_test_tools = "$Id: test_tools.f90,v 1.29 2021/04/26 15:44:44 ps Exp ps $"
+  character(len=clen), save :: rcsid_test_tools = "$Id: test_tools.f90,v 1.30 2022/10/06 17:14:31 ps Exp ps $"
   !
   contains
   !

@@ -37,7 +37,7 @@ module rotation_tools
   public rt_rotate_bruteforce
   public rcsid_rotation_tools
   !
-  character(len=clen), save :: rcsid_rotation_tools = "$Id: rotation_tools.f90,v 1.34 2021/04/26 15:44:44 ps Exp ps $"
+  character(len=clen), save :: rcsid_rotation_tools = "$Id: rotation_tools.f90,v 1.35 2022/10/08 17:24:26 ps Exp ps $"
   !
   real(rk), save    :: rt_max_rot   = 1e-3_rk  ! Maximum allowed rotation angle, in Radian
                                                ! The actual rotation threshold will be (rt_max_rot/(sd_lmax+1))
@@ -241,6 +241,9 @@ module rotation_tools
             if (left) r_tmp(mmin:mmax,:irc) = conjg(r_tmp(mmin:mmax,:irc))
             ! Apply the propagators to each R point in turn
             if (use_dense) then
+              ! Gfortran creates a (potentially large!) temporary array for the result of matmult
+              ! here. Using r_tmp2 as a temporary buffer does not seem to make any difference -
+              ! it seems to be a problem with the matmul intrinsic itself.
               r_tmp(mmin:mmax,1:irc) = matmul(srm(mmin:mmax,mmin:mmax),r_tmp(mmin:mmax,1:irc))
             else
               apply_rotations: do istep=1,cstep
@@ -369,6 +372,7 @@ module rotation_tools
     !
     complex(rk) :: rm_from(mult,mult), rm_to(mult,mult)
     integer(ik) :: im1, im2
+    real(rk)    :: e_from(3), e_to(3)
     !
     !  Conceptually, we need two rotations:
     !  1) From the initial point [from] to the lab system
@@ -378,9 +382,12 @@ module rotation_tools
     !  so that we have to flip the sign of the beta Euler angle to get the correct
     !  rotation matrix. Oh well.
     !
-    call MathYJMRotationMatrix(euler_angles=real((/-from(2),-from(1),0._xk/),kind=rk),mult=mult,mat=rm_from)
-    call MathYJMRotationMatrix(euler_angles=real((/-to(2),  -to(1),  0._xk/),kind=rk),mult=mult,mat=rm_to)
-    rm = matmul(conjg(rm_to),transpose(rm_from))
+    e_from(1) = -from(2) ; e_from(2) = -from(1) ; e_from(3) = 0._rk
+    e_to  (1) = -to  (2) ; e_to  (2) = -to  (1) ; e_to  (3) = 0._rk
+    call MathYJMRotationMatrix(euler_angles=e_from,mult=mult,mat=rm_from)
+    call MathYJMRotationMatrix(euler_angles=e_to,  mult=mult,mat=rm_to)
+    rm_to = conjg(rm_to)
+    rm = matmul(rm_to,transpose(rm_from))
     !
     !  MathYJMRotationMatrix assumes harmonics use L&L III phase conventions.
     !  Our propagator uses Mathematica phase conventions, which differ by

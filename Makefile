@@ -19,12 +19,12 @@ ACT2 = -e 's/^!\*nm/    /' # Disable MPI statements
 #
 # System-specific overrides
 #
-# include vanilla.mak
+  include vanilla.mak
 # include configs/babel-gfortran_opt.mak
 # include configs/babel-ifort18_opt.mak
 # include configs/zen-gfortran-7_opt.mak
 # include configs/zen-gfortran-11_opt.mak
-  include configs/zen-gfortran-12_opt.mak
+# include configs/zen-gfortran-12_opt.mak
 # include configs/zen-oneapi_opt.mak
 # include configs/zen-oneapi_opt_mpi.mak
 # include configs/zen-aocc-1.1_opt.mak      # VERY SLOW CODE. DO NOT USE.

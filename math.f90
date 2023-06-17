@@ -36,7 +36,7 @@ module math
   public MathInterpolate
   public rcsid_math
 !
-  character(len=clen), save :: rcsid_math = "$Id: math.f90,v 1.14 2022/10/08 17:24:26 ps Exp ps $"
+  character(len=clen), save :: rcsid_math = "$Id: math.f90,v 1.15 2023/06/09 14:10:24 ps Exp $"
 !
 !
   integer(ik), parameter       :: factorial_slack = 5         ! Extra factorials to produce while filling the cache
@@ -488,7 +488,7 @@ module math
       upward_l_m_loop: do m=m_low,m_high
         vlm = ylm(m,l-1) * (0._rk,1._rk)*costh*sqrtn(2*l-1)
         if (l>=abs(m)+2) then
-          vlm = vlm + ylm(m,l-2) * rsqrn(2*l-3)*sqrtn(l-1-m)*sqrtn(l-1+m)
+          vlm = vlm + ylm(m,l-2) * rsqrn(2*l-3)*sqrtn(l-1-m)*sqrtn(l-1+m) ! Spurious gfortran warning here
         end if
         ylm(m,l) = vlm * sqrtn(2*l+1)*rsqrn(l-m)*rsqrn(l+m)
       end do upward_l_m_loop

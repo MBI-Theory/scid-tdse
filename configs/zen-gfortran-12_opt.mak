@@ -1,7 +1,5 @@
 BUILD_ID :="Optimized gfortran-12 (ZEN/EPYC), built on $(shell hostname) at $(shell date)"
 ACT = sed -e 's/^!\*qd/    /' # Enable quad-math statements
-# WARNING: requesting -mtune=znver2 leads to incorrect code
-# WARNING: requesting -fexternal-blas leads to unreasonable stack requirements
 F90 = gfortran-12 -I. \
       -flto -O3 -fprotect-parens -march=native -mtune=native -fopenmp \
       -ffast-math -fcx-fortran-rules -mrecip \

@@ -61,7 +61,7 @@ module spherical_tdse
   public start
   public rcsid_spherical_tdse
   !
-  character(len=clen), save :: rcsid_spherical_tdse = "$Id: spherical_tdse.f90,v 1.133 2022/10/08 17:24:26 ps Exp ps $"
+  character(len=clen), save :: rcsid_spherical_tdse = "$Id: spherical_tdse.f90,v 1.135 2023/06/17 13:45:36 ps Exp ps $"
   !
   integer, parameter       :: iu_detail             = 29           ! Unit for detailed output; remains open during the entire run
   integer, parameter       :: iu_temp               = 22           ! An arbitrary unit number, which can be used here
@@ -103,6 +103,14 @@ module spherical_tdse
                                                                    ! The only observables guaranteed to work correctly are the final right
                                                                    ! wavefunction, and the photoelectron spectrum for sts_atend_mode='direct'.
                                                                    ! This parameter exists almost exclusively for benchmark bragging rights.
+  logical                  :: fake_left_propagation = .true.       ! For evaluation of properties during time propagation, replace left
+                                                                   ! wavefunction by the complex conjugate of the right wavefunction.
+                                                                   ! This is nearly always an approximation to the exact right wavefunction,
+                                                                   ! but it may produce reasonable observables when the Hamiltonian matrix
+                                                                   ! is nearly Hermitian.
+                                                                   ! fake_left_propagation has no effect unless skip_left_propagation==.true.
+  logical                  :: reconstruct_left      = .false.      ! If set to .True., the left wavefunction will be reconstructed from the
+                                                                   ! right at the end of time propagation.
   real(xk)                 :: dt                    = 0.01_xk      ! Time step, in atomic units of time
   integer(ik)              :: timesteps             = 50000_ik     ! Number of time steps to perform
   character(len=clen)      :: dt_subdivision        = 'on'         ! Time step subdivision conrol. Can be one of:
@@ -140,6 +148,7 @@ module spherical_tdse
   character(len=clen)      :: detail_output         = 'detail.table'! File containing full-accuracy results from the simulation
   real(rk)                 :: composition_threshold = 1e-10_rk     ! Threshold for reporting the field-free amplitudes
                                                                    ! Set to a negative number to disable composition analysis
+  real(rk)                 :: composition_max_energy= huge(1._rk)  ! Largest real part of eigenvalue to include in the analysis
   character(len=clen)      :: initial_wf_dump_prefix= ' '          ! Initial wavefunction dump in human-readable from
   character(len=clen)      :: final_wf_dump_prefix  = ' '          ! Final radial wavefunction in human-readable form is dumped in
                                                                    ! files with final_wf_dump_prefix used as a prefix. Empty
@@ -185,12 +194,12 @@ module spherical_tdse
                       task, dt, dt_subdivision, dt_max_la, dt_interpolant_width, timesteps, rotation_mode, &
                       field_unwrap, unwrap_threshold, field_preview, skip_tests, &
                       output_each, detail_frequency, detail_output, &
-                      composition_threshold, final_wf_dump_prefix, &
+                      composition_threshold, composition_max_energy, final_wf_dump_prefix, &
                       initial_wf_dump_prefix, &
                       vp_as_is, &
                       do_dipole, do_dipole_plasma, &
                       visualize_prefix, visualize_each, visualize_1stseq, &
-                      skip_left_propagation, &
+                      skip_left_propagation, fake_left_propagation, reconstruct_left, &
                       ! Parameters from spherical_data
                       sd_nradial, sd_nspin, sd_lmax, sd_mmin, sd_mmax, &
                       sd_adaptive_l, sd_tolerance_l, sd_adaptive_r, sd_tolerance_r, &
@@ -214,6 +223,7 @@ module spherical_tdse
                       ! Parameters from wavefunction_tools
                       wt_atomic_cache_prefix, wt_iterative_improvement, &
                       wt_disable_orthogonalization, wt_max_solution_iterations, &
+                      wt_enable_memory_caches, &
                       ! Parameters from cap_tools
                       cap_name, cap_param, &
                       ! Parameters from spherical_tsurf
@@ -679,6 +689,9 @@ module spherical_tdse
     !
     call TimerStart('Visualize wavefunction')
     !
+    if (skip_left_propagation .and. fake_left_propagation) then
+      call wt_fake_left(wfn_l,wfn_r)
+    end if
     call nt_merge_all(wfn_l)
     call nt_merge_all(wfn_r)
     if (nts%this_node/=1) then
@@ -917,7 +930,7 @@ module spherical_tdse
     !  Prepare vector-potential array as needed.
     !
     if (allocated(vsub)) then
-      if (ubound(vsub,dim=2)<2*nsub) deallocate (vsub)
+      if (ubound(vsub,dim=2)<2*nsub) deallocate (vsub) ! Spurious gfortran warning here
     end if
     if (.not.allocated(vsub)) then
       allocate (vsub(0:3,0:2*nsub),stat=alloc)
@@ -1051,6 +1064,14 @@ module spherical_tdse
         write (out,"(/'Detailed output is not enabled; will not calculate dipole velocity or acceleration'/)")
       end if
       do_dipole(2:3) = .false.
+    end if
+    if (skip_left_propagation) then
+      if (fake_left_propagation) then
+        write (out,"(/'WARNING: Left wavefunction approximated by conjugate of the right wavefunction.')")
+        write (out,"( 'WARNING: Expect reduced accuracy for the observables during propagation.'/)")
+      else
+        write (out,"(/'WARNING: Left wavefunction is not evaluated. Observables are incorrect.'/)")
+      end if
     end if
     if (nts%this_node==1) then
       call write_detail_header
@@ -1234,6 +1255,9 @@ module spherical_tdse
       detail_out = (detail_output/=' ') .and. (force .or. mod(its,detail_frequency)==0)
       if (.not.normal_out .and. .not.detail_out) return
       !
+      if (skip_left_propagation .and. fake_left_propagation) then
+        call wt_fake_left(wfn_l,wfn_r)
+      end if
       call nt_merge_borders(wfn_l)
       call nt_merge_borders(wfn_r)
       call wt_energy(wfn_l,wfn_r,vp1,energy,norm)
@@ -1508,6 +1532,11 @@ module spherical_tdse
     !
     if (.not.skip_tests) call fieldfree_test(verbose)
     !
+    ! Caches must be initialized before prepare_initial_wavefunction(), 
+    ! which may refer to them.
+    !
+    call wt_init_memory_caches(verbose)
+    !
     !  We need a wavefunction to start from
     !
     call prepare_initial_wavefunction
@@ -1588,9 +1617,13 @@ module spherical_tdse
       end if
     end if
     !
+    if (reconstruct_left) then
+      write (out,"(/'Reconstructing left wavefunction'/)")
+      call wt_reconstruct_left(verbose,wfn_l,wfn_r)
+    end if
     write (out,"(/'Analyzing wavefunction composition'/)")
     call flush_wrapper(out)
-    call ca_analyze(verbose,composition_threshold,wfn_l,wfn_r,tsurf)
+    call ca_analyze(verbose,composition_threshold,composition_max_energy,wfn_l,wfn_r,tsurf)
     call sts_atend_direct(tsurf,wfn_r)
     !
     call sts_report(tsurf,'At end')

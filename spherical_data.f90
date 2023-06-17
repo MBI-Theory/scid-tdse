@@ -46,7 +46,7 @@ module spherical_data
   public sd_wfn
   public rcsid_spherical_data
   !
-  character(len=clen), save :: rcsid_spherical_data = "$Id: spherical_data.f90,v 1.43 2021/04/26 15:44:44 ps Exp ps $"
+  character(len=clen), save :: rcsid_spherical_data = "$Id: spherical_data.f90,v 1.44 2023/06/09 14:10:24 ps Exp $"
   !
   integer, parameter          :: iu_temp        = 23         ! An arbitrary unit number, which can be used here
   !
@@ -74,7 +74,7 @@ module spherical_data
   logical, save               :: sd_adaptive                 ! Active if any adaptive-grid flags are on (sd_adaptive_l or
                                                              ! sd_adaptive_r).
   logical, save               :: sd_adaptive_l  = .true.     ! Dynamically adjust maximum angular momentum, up to sd_lmax
-  real(rk), save              :: sd_tolerance_l(2) = (/ -1, -1 /)  
+  real(rk), save              :: sd_tolerance_l(2) = (/ -1._rk, -1._rk /)
                                                              ! When the largest element of the angular momentum channel
                                                              ! exceeds sd_tolerance_l, increment the dynamic angular momentum.
                                                              ! Negative values request tolerance of spacing(0.1_rk)
@@ -86,7 +86,7 @@ module spherical_data
   logical, save               :: sd_adaptive_r  = .true.     ! Dynamically adjust maximum extent of the grid, up to sd_nradial
                                                              ! Only some of the terms in the propagator can benefit from the
                                                              ! finite wavefunction extent, so the benefit is quite modest.
-  real(rk), save              :: sd_tolerance_r(2) = (/ -1, -1 /)         
+  real(rk), save              :: sd_tolerance_r(2) = (/ -1._rk, -1._rk /)
                                                              ! When the wavefunction exceeds sd_adaptive_r, increment dynamic
                                                              ! extent. Negative values request tolerance of spacing(0.1_rk)
                                                              ! See wt_update_lrmax and wt_reset_lrmax in wavefunction_tools.f90

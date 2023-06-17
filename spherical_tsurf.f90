@@ -53,7 +53,7 @@ module spherical_tsurf
   public sts_report
   public rcsid_spherical_tsurf
   !
-  character(len=clen), save :: rcsid_spherical_tsurf = "$Id: spherical_tsurf.f90,v 1.37 2022/10/08 17:24:26 ps Exp ps $"
+  character(len=clen), save :: rcsid_spherical_tsurf = "$Id: spherical_tsurf.f90,v 1.38 2023/06/09 14:10:24 ps Exp $"
   !
   !  Private data, not visible outside the module
   !
@@ -749,7 +749,7 @@ module spherical_tsurf
       !
       accu = 0
       minus_1: do mv=max(mmin,-(lv-1)),min(mmax,lv-1)
-        accu = accu + clm(lv,mv)*ylm(mv,lv-1)*psilm(1,lv,mv)
+        accu = accu + clm(lv,mv)*ylm(mv,lv-1)*psilm(1,lv,mv) ! Spurious gfortran warning here
       end do minus_1
       sylm(3,lv) = electron_charge * az * accu
       !

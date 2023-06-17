@@ -37,22 +37,23 @@ module composition_analysis
   public ca_maxram
   public rcsid_composition_analysis
   !
-  character(len=clen) :: rcsid_composition_analysis = "$Id: composition_analysis.f90,v 1.18 2022/10/08 17:24:26 ps Exp ps $"
+  character(len=clen) :: rcsid_composition_analysis = "$Id: composition_analysis.f90,v 1.19 2023/06/17 13:45:36 ps Exp ps $"
   !
-  real(rk), save :: ca_maxram = 0._rk ! Maximum amount of memory which can be used during the analysis step
-                                      ! This limit does NOT include the memory needed to compute atomic 
-                                      ! solutions on the fly.
-                                      ! 0 means no limit.
+  real(rk), save :: ca_maxram           = 0._rk       ! Maximum amount of memory which can be used during the analysis step
+                                                      ! This limit does NOT include the memory needed to compute atomic 
+                                                      ! solutions on the fly.
+                                                      ! 0 means no limit.
   !
   contains
   !
   !  Calculation of the field-free eigenspectrum
   !
-  subroutine ca_analyze(verbose,threshold,wfn_l,wfn_r,tsurf)
+  subroutine ca_analyze(verbose,threshold,emax,wfn_l,wfn_r,tsurf)
     integer(ik), intent(in)       :: verbose   ! Debugging level
     real(rk), intent(in)          :: threshold ! Reporting threshold for the amplitudes of the field-free solutions
+    real(rk), intent(in)          :: emax      ! Only include eigenvalues with real part not exceeding emax
     type(sd_wfn), intent(in)      :: wfn_l     ! Left/right wavefunction pair to analyze
-    type(sd_wfn), intent(in)      :: wfn_r
+    type(sd_wfn), intent(in)      :: wfn_r     ! 
     type(sts_data), intent(inout) :: tsurf     ! A side-effect of the analysis allows calculation of photoelectron
                                                ! spectra; this is done here.
     !
@@ -65,9 +66,23 @@ module composition_analysis
     complex(rk)              :: pop_total, pop_bound, pop_all_bound, pop_all
     complex(rk)              :: lm_norms(sd_mmin:sd_mmax,0:sd_lmax)
     real(rk)                 :: ram_global, ram_thread    ! Memory requirements, in Mbytes
+    real(rk)                 :: ecut                      ! Actual value of the energy cut-off, could be
+                                                          ! emax or huge(1._rk)
+    integer(ik)              :: iemax                     ! Index of the top eigenvalue included in the analysis.
     integer(ik)              :: max_threads
     !
     call TimerStart('Field-free analysis')
+    !
+    !  Trap for incompatible input parameters: spectral-form tsurf can only be done if 
+    !  the full set of eigenstate amplitudes is calculated.
+    !
+    ecut = emax
+    if (sts_active_atend .and. ecut<huge(1._rk)) then
+      ecut = huge(1._rk)
+      write (out,"(/'WARNING: Spectral-form iSURF requires full eigendecomposition.')") 
+      write (out,"( 'WARNING: The value of composition_max_energy has been reset.'/)")
+      call flush_wrapper(out)
+    end if
     !
     !  Begin by calculating norms of each L,M channel contribution; this is useful check
     !  on the quality of the analysis later.
@@ -149,8 +164,8 @@ module composition_analysis
     amp = 0
     en  = 0
     !$omp parallel default(none) num_threads(max_threads) &
-    !$omp& private(lval,mval,mmin,mmax,ispin,block_evec,block_eval,alloc) &
-    !$omp& shared(sd_nradial,sd_lmax,sd_mmin,sd_mmax,sd_nspin,verbose) &
+    !$omp& private(lval,mval,mmin,mmax,ispin,block_evec,block_eval,alloc,iemax) &
+    !$omp& shared(sd_nradial,sd_lmax,sd_mmin,sd_mmax,sd_nspin,verbose,emax) &
     !$omp& shared(wfn_l,wfn_r,amp,en,tsurf,nts)
     allocate (block_evec(sd_nradial,sd_nradial,2),stat=alloc)
     if (alloc/=0) then
@@ -166,11 +181,12 @@ module composition_analysis
       !
       call wt_atomic_solutions(verbose,lval,block_eval,block_evec)
       en(:,lval) = block_eval(:)
+      iemax = find_iemax(lval)
       scan_spin: do ispin=1,sd_nspin
         ! gfortran is having trouble generating good code for this array assignment
         ! there does not seem to be anything we could do about it though ...
-        amp(:,1,ispin,mmin:mmax,lval) = matmul(transpose(block_evec(:,:,1)),wfn_r%wfn(:,ispin,lval,mmin:mmax))
-        amp(:,2,ispin,mmin:mmax,lval) = matmul(transpose(block_evec(:,:,2)),wfn_l%wfn(:,ispin,lval,mmin:mmax))
+        amp(:iemax,1,ispin,mmin:mmax,lval) = matmul(transpose(block_evec(:,:iemax,1)),wfn_r%wfn(:,ispin,lval,mmin:mmax))
+        amp(:iemax,2,ispin,mmin:mmax,lval) = matmul(transpose(block_evec(:,:iemax,2)),wfn_l%wfn(:,ispin,lval,mmin:mmax))
       end do scan_spin
       !
       call sts_atend_terms(tsurf,lval,en(:,lval),block_evec(:,:,2),amp(:,1,1,sd_mmin:sd_mmax,lval))
@@ -196,6 +212,9 @@ module composition_analysis
     !
     !  Reporting part, in increasingly excruciating detail
     !
+    if (ecut<huge(1._rk)) then
+      write (out,"(/'WARNING: Populations listed below include only eigenstates with Re[E]<=',g0.8/)") ecut
+    end if
     write (out,"(/t5,'Final populations, by total angular momentum'/)")
     write (out,"((1x,a5,3(2x,a24,1x,a24)))") &
            ' L ', ' Total population ', ' ', ' Bound population ', ' ', ' Continuum population ', ' ', &
@@ -205,11 +224,12 @@ module composition_analysis
     l_resolved_l_channels: do lval=0,sd_lmax
       pop_total = 0
       pop_bound = 0
+      iemax     = find_iemax(lval)
       !$omp parallel do default(none) &
       !$omp& private(mval,iev,wgt) reduction(+:pop_total,pop_bound) &
-      !$omp& shared(sd_mmin,sd_mmax,sd_nradial,lval,amp,en)
+      !$omp& shared(sd_mmin,sd_mmax,sd_nradial,lval,amp,en,iemax)
       l_resolved_m_channels: do mval=max(sd_mmin,-lval),min(lval,sd_mmax)
-        l_resolved_evs: do iev=1,sd_nradial
+        l_resolved_evs: do iev=1,iemax
           ! wgt = abs(sum(amp(iev,1,:,mval,lval)*amp(iev,2,:,mval,lval)))
           wgt = sum(amp(iev,1,:,mval,lval)*amp(iev,2,:,mval,lval))
           pop_total = pop_total + wgt
@@ -224,6 +244,8 @@ module composition_analysis
     write (out,"()")
     !
     write (out,"()")
+    if (ecut<huge(1._rk)) &
+    write (out,"('                      Energy cut-off: ',g24.13)") ecut
     write (out,"('Total population across all channels: ',g24.13,1x,g24.13)") pop_all
     write (out,"('                        Bound states: ',g24.13,1x,g24.13)") pop_all_bound
     write (out,"('                    Continuum states: ',g24.13,1x,g24.13)") pop_all-pop_all_bound
@@ -237,10 +259,11 @@ module composition_analysis
       lm_resolved_m_channels: do mval=max(sd_mmin,-lval),min(lval,sd_mmax)
         pop_total = 0
         pop_bound = 0
+        iemax     = find_iemax(lval)
         !$omp parallel do default(none) &
         !$omp& private(iev,wgt) reduction(+:pop_total,pop_bound) &
-        !$omp& shared(mval,sd_nradial,lval,amp,en)
-        lm_resolved_evs: do iev=1,sd_nradial
+        !$omp& shared(mval,sd_nradial,lval,amp,en,iemax)
+        lm_resolved_evs: do iev=1,iemax
           ! wgt = abs(sum(amp(iev,1,:,mval,lval)*amp(iev,2,:,mval,lval)))
           wgt = sum(amp(iev,1,:,mval,lval)*amp(iev,2,:,mval,lval))
           pop_total = pop_total + wgt
@@ -259,8 +282,9 @@ module composition_analysis
       '---', '---', '---', '-------------', '----------', '-----------', '-----------', &
                               '-----------', '-----------', '-----------', '---------'
     state_resolved_l_channels: do lval=0,sd_lmax
+      iemax = find_iemax(lval)
       state_resolved_m_channels: do mval=max(sd_mmin,-lval),min(lval,sd_mmax)
-        state_resolved_evs: do iev=1,sd_nradial
+        state_resolved_evs: do iev=1,iemax
           if (all(abs(amp(iev,:,:,mval,lval))<threshold)) cycle state_resolved_evs
           ! wgt = abs(sum(amp(iev,1,:,mval,lval)*amp(iev,2,:,mval,lval)))
           wgt = sum(amp(iev,1,:,mval,lval)*amp(iev,2,:,mval,lval))
@@ -275,5 +299,21 @@ module composition_analysis
     call flush_wrapper(out)
     !
     call TimerStop('Field-free analysis')
+    !
+    contains
+
+    function find_iemax(lval) result(iemax)
+      integer(ik), intent(in) :: lval
+      integer(ik)             :: iemax, iev
+      !
+      iemax = sd_nradial
+      if (emax>real(en(sd_nradial,lval),kind=rk)) return
+      do_find_iemax: do iev=1,sd_nradial
+        if (real(en(iev,lval),kind=rk)>emax) then
+          iemax = iev - 1
+          exit do_find_iemax
+        end if
+      end do do_find_iemax
+    end function find_iemax
   end subroutine ca_analyze
 end module composition_analysis

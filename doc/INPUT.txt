@@ -1,4 +1,4 @@
-Last updated: 2022 September 26
+Last updated: 2023 June 17
 ------------
 
   All input to scid-tdse is provided through the sph_tdse namelist, with one
@@ -90,7 +90,13 @@ Input keywords
     A brief description of the input; will be copied close to the top of the
     output file, but is otherwise ignored.
 
-  COMPOSITION_THRESHOLD=1e-4 (spherical_tdse.f90)
+  COMPOSITION_MAX_ENERGY=huge(1.) (spherical_tdse.f90)
+    Composition analysis will only include states with the real part of the
+    eigenvalue smaller than the specified threshold. Using non-default values
+    may speed-up composition analysis, but will lead to parts of the final
+    population being missing from the analysis.
+
+  COMPOSITION_THRESHOLD=1e-10 (spherical_tdse.f90)
     Threshold for reporting the field-free amplitudes of the field-free
     solutions in the final wavefunction. Set to a negative number to disable 
     composition analysis. Composition analysis requires diagonalization of
@@ -174,14 +180,27 @@ Input keywords
     Also see DT_MAX_LA, DT_INTERPOLANT_WIDTH, and SD_ADAPTIVE
 
   DT_MAX_LA=2.00 (spherical_tdse.f90)
-     Maximum acceptable value of ((sd_lmax+1)*vector_potential**2*dt) after the 
-     step subdivision. To guarantee stable propagation, smaller thresholds are 
-     needed for small grid spacings close to the origin. This value has no effect 
-     unless dt_subdivision=='on'. Please note that this parameter had a different
-     meaning (and a different default value) for spherical_tdse.f90 versions less
-     than 1.114 (Jul 10, 2018). The appropriate value of DT_MAX_LA is also 
-     sensitive to the grid structure at the origin. Dense grids may require
-     smaller DT_MAX_LA values for stable propagation. Also see DT_INTERPOLANT_WIDTH
+    Maximum acceptable value of ((sd_lmax+1)*vector_potential**2*dt) after the 
+    step subdivision. To guarantee stable propagation, smaller thresholds are 
+    needed for small grid spacings close to the origin. This value has no effect 
+    unless dt_subdivision=='on'. Please note that this parameter had a different
+    meaning (and a different default value) for spherical_tdse.f90 versions less
+    than 1.114 (Jul 10, 2018). The appropriate value of DT_MAX_LA is also 
+    sensitive to the grid structure at the origin. Dense grids may require
+    smaller DT_MAX_LA values for stable propagation. Also see DT_INTERPOLANT_WIDTH
+
+  FAKE_LEFT_PROPAGATION=.true. (spherical_tdse.f90)
+    Modifies the effect of SKIP_LEFT_PROPAGATION=.TRUE. by approximating the
+    left wavefunction by the complex conjugate of the right wavefunction.
+    The error this approximation introduces for the observables depends on
+    the degree of non-Hermiticity of the Hamiltonian. It is probably not too
+    bad for uniform grids and properties which are not sensitive to the value
+    of the wavefunction at the origin and close to the absorber region (e.g.
+    dipole velocity may be OK; dipole expectation and acceleration almost
+    certainly won't be). It is strongly recommended to test the accuracy for
+    each specific choice of the Hamiltonian and grid.
+
+    Also see SKIP_LEFT_PROPAGATION and RECONSTRUCT_LEFT
 
   FIELD_PREVIEW='field.table' (spherical_tdse.f90)
     Reports the laser field used in the simulation, before simulation
@@ -496,6 +515,18 @@ Input keywords
     setting PT_SENSE_REAL=.false., it is possible to force use of the (slower) 
     general-case code throughout. This is a debugging parameter.
 
+  RECONSTRUCT_LEFT=.false. (spherical_tdse.f90)
+    Reconstruct the left wavefunction at the end of the propagation, by transforming
+    the right wavefunction. This transformation is expensive and memory-intensive
+    (it requires computing the eigendecomposition of the field-free Hamiltonian), but
+    may be an overall win when combined with SKIP_LEFT_PROPAGATION=.TRUE. Caching
+    transformation matrices will somewhat reduce the cost and memory requirements.
+    Please keep in mind that RECONSTRUCT_LEFT won't exactly reproduce the results
+    of time propagation with both left and right wavefunctions present (see e.g.
+    test cases "argon_hhg*.inp").
+
+    See also SKIP_LEFT_PROPAGATION, FAKE_LEFT_PROPAGATION, WT_ATOMIC_CACHE_PREFIX
+
   ROTATION_MODE='auto' (spherical_tdse.f90)
     Chooses the code implementing the non-adiabatic (frame rotation) term in the
     Hamiltonian. Can be one of:
@@ -723,6 +754,8 @@ Input keywords
     benchmark bragging rights. 
     This setting has no effect on TASK='imaginary time', where the left 
     wavefunction is always necessary.
+
+    Also see FAKE_LEFT_PROPAGATION and RECONSTRUCT_LEFT
 
   SKIP_TESTS=.true. (spherical_data.f90)
     The code attempts to validate quality of the radial grids by:
@@ -1124,14 +1157,22 @@ Input keywords
     dense linear-algebra routines from LAPACK (CGEEV/ZGEEV). The cost of obtaining
     the atomic solutions scales as O(SD_LMAX*SD_NRADIAL**3), and can become 
     substantial. If WT_ATOMIC_CACHE_PREFIX is set to a non-empty value, atomic
-    solutions will be cached in files with '-L=nnn' appended to the value of
-    WT_ATOMIC_CACHE_PREFIX. Cached atomic solutions are specific to a particular
-    grid choice, compiler, and real kind choice. There is no checking; it is
-    the user's responsibility to remove stale atomic solutions.
+    solutions will be cached in files with '-L=nnnnn' appended to the value of
+    WT_ATOMIC_CACHE_PREFIX. The right-to-left eigenvalue transformation matrices
+    will be cached in files with '-R2L=nnnnn' appended to the name. Cached 
+    solutions are specific to a particular grid choice, compiler, and real 
+    kind choice. There is no checking; it is the user's responsibility to 
+    remove stale atomic solutions.
 
   WT_DISABLE_ORTHOGONALIZATION=.F. (wavefunction_tools.f90)
     This is a debugging parameter. Setting it to .FALSE. disables explicit
     re-orthogonalization of the eigenvectors of the atomic wavefunctions.
+
+  WT_ENABLE_MEMORY_CACHES(2)=(/.false,.false./) (wavefunction_tools.f90)
+    Enable caching of the eigendecomposions (the first flag) and the right-
+    to-left transformation matrices (the second flag) in memory. This option
+    is unlikely to be beneficial unless SCID-TDSE is used as a loadable library.
+    It will dramatically increase the memory requirements.
 
   WT_ITERATIVE_IMPROVEMENT=.T. (wavefunction_tools.f90)
     Field-free solutions of the atomic Hamiltonian will be improved using

@@ -37,7 +37,7 @@ module rotation_tools
   public rt_rotate_bruteforce
   public rcsid_rotation_tools
   !
-  character(len=clen), save :: rcsid_rotation_tools = "$Id: rotation_tools.f90,v 1.35 2022/10/08 17:24:26 ps Exp ps $"
+  character(len=clen), save :: rcsid_rotation_tools = "$Id: rotation_tools.f90,v 1.36 2023/06/09 14:10:24 ps Exp $"
   !
   real(rk), save    :: rt_max_rot   = 1e-3_rk  ! Maximum allowed rotation angle, in Radian
                                                ! The actual rotation threshold will be (rt_max_rot/(sd_lmax+1))
@@ -206,13 +206,14 @@ module rotation_tools
         ! tri-diagonal matrices; it is probably OK to assume dense linear algebra is considerably more efficient.
         !
         use_dense = nstep>(mmax-mmin+1._rk)**2/200 + ((mmax-mmin+1._rk)*nstep)/sd_nradial
+        use_real  = .false.  ! Only relevant if use_dense is not set
         if (use_dense) then
           call expand_small_angle_propagators(prop_fwd(mmin:mmax,:,:cstep), &
                     prop_rev(mmin:mmax,:,:cstep),prop_revf(mmin:mmax,:,:cstep),prop_revp(mmin:mmax,:cstep), &
                     srm(mmin:mmax,mmin:mmax))
         else ! .not.use_dense
           !  If the propagator is real, we can save a bit of effort here
-          use_real = .false.
+          ! use_real = .false. ! Mover the assignment up, to suppress a spurious gfortran warning
           if (rt_sense_real) then
             eps = spacing(max(maxval(abs(prop_fwd(mmin:mmax,:,:cstep))), &
                               maxval(abs(prop_rev(mmin:mmax,:,:cstep)))))

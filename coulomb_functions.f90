@@ -72,7 +72,7 @@
    public coulombFG, coulombF, coulombBound
    public rcsid_coulomb_functions
    !
-   character(len=clen), save :: rcsid_coulomb_functions = "$Id: coulomb_functions.f90,v 1.14 2022/10/08 17:24:26 ps Exp ps $"
+   character(len=clen), save :: rcsid_coulomb_functions = "$Id: coulomb_functions.f90,v 1.15 2023/06/09 14:10:24 ps Exp $"
    !
  ! integer, parameter      :: out         = 6
  ! integer, parameter      :: ik          = selected_int_kind(15)
@@ -186,7 +186,7 @@
      !
      !  If F and G are very different, expect problems with the accuracy!
      !
-     if (abs(fg(1,3))>=1e3*abs(fg(1,1)) .or. abs(fg(1,1))>=1e3*abs(fg(1,3))) then
+     if (abs(fg(1,3))>=1e3_rk*abs(fg(1,1)) .or. abs(fg(1,1))>=1e3_rk*abs(fg(1,3))) then
        write (out,"(/'WARNING: Accuracy loss of more than 3 digits expected in coulombFG')")
        write (out,"(' lambdamin = ',  1x,g32.24e3)") lambdamin
        write (out,"(' x         = ',  1x,g32.24e3)") x
@@ -258,7 +258,7 @@
        deltah    = (b(n)*D-1)*deltah
        call kahan_add(h,hc,deltah)
        plusminus = plusminus*sign(1._rk,D)
-       if (abs(deltah)<=1e-6*spacing(abs(h))) then  ! We effectively use double-double representation for the sum!
+       if (abs(deltah)<=1e-6_rk*spacing(abs(h))) then  ! We effectively use double-double representation for the sum!
          cf1       = h
          return
        end if
@@ -330,7 +330,7 @@
        D      = 1/(D*a(n)+b(n))
        deltah = (b(n)*D-1)*deltah
        call kahan_add(h,hc,deltah)
-       if (abs(deltah)<=1e-6*spacing(abs(h))) then
+       if (abs(deltah)<=1e-6_rk*spacing(abs(h))) then
          cf2 = h
          return
        end if

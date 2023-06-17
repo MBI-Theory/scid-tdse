@@ -29,7 +29,7 @@
    public besselj_table
    public rcsid_spherical_bessel
    !
-   character(len=clen), save :: rcsid_spherical_bessel = "$Id: spherical_bessel.f90,v 1.6 2021/04/26 15:44:44 ps Exp ps $"
+   character(len=clen), save :: rcsid_spherical_bessel = "$Id: spherical_bessel.f90,v 1.7 2023/06/09 14:10:24 ps Exp $"
    !
    ! integer, parameter :: ik = selected_int_kind(15)
    ! integer, parameter :: rk = selected_real_kind(28,50)
@@ -58,7 +58,7 @@
      jnp1 = 0._rk
      big  = sqrt(huge(1._rk))
      downward_recursion: do n=nmax+1,0,-1
-       jnm1 = (2*n+1)*zm1*jn - jnp1
+       jnm1 = real(2*n+1,kind=rk)*zm1*jn - jnp1
        ! Try rescaling if jnm1 grows too large
        if (abs(jnm1)>=big) then
          jnm1 = jnm1 / big 
@@ -101,10 +101,10 @@
      !
      grow_n: do 
        ! write (*,*) ' nmax = ', nmax
-       err = (0.5_rk*euler_e*z/nmax)**(nmax-lmax)
+       err = (0.5_rk*euler_e*z/real(nmax,kind=rk))**(nmax-lmax)
        if (err<eps) exit grow_n
-       if (nmax>=huge(1_ik)/3) stop 'spherical_bessel%starting_besselj_order - starting order too large'
-       nmax = nint(1.05_rk*nmax+1)
+       if (nmax>=huge(1_ik)/3_ik) stop 'spherical_bessel%starting_besselj_order - starting order too large'
+       nmax = nint(1.05_rk*real(nmax,kind=rk)+1._rk)
      end do grow_n
      ! write (*,*) ' nmax = ', nmax
    end function starting_besselj_order

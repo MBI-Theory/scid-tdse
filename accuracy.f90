@@ -55,7 +55,7 @@ module accuracy
   integer, parameter :: clen   = 255                        ! Standard character length; enough for most
                                                             ! keywords and file names
   !
-  character(len=clen), save :: rcsid_accuracy = "$Id: accuracy.f90,v 1.45 2021/04/26 15:44:44 ps Exp ps $"
+  character(len=clen), save :: rcsid_accuracy = "$Id: accuracy.f90,v 1.46 2023/06/09 14:10:24 ps Exp $"
   !
   !  System kinds; should only be used where we interface to external libraries
   !
@@ -94,7 +94,7 @@ module accuracy
     !
     real(rk) :: bits
     !
-    bits = digits*(log(real(radix,kind=rk))/log(2._rk))
+    bits = real(digits,kind=rk)*(log(real(radix,kind=rk))/log(2._rk))
     int_bytes = ceiling((1+bits)/8._rk)
   end function int_bytes
 
@@ -104,7 +104,7 @@ module accuracy
     real(rk) :: exp_bits, mant_bits
     !
     exp_bits   = log(real(exp_range,kind=rk))/log(2._rk)
-    mant_bits  = digits*(log(real(radix,kind=rk))/log(2._rk))
+    mant_bits  = real(digits,kind=rk)*(log(real(radix,kind=rk))/log(2._rk))
     real_bytes = ceiling((exp_bits+mant_bits)/8._rk)
   end function real_bytes
 
@@ -119,7 +119,8 @@ module accuracy
   elemental function isnan_real(x) result(v)
     ! Depending on the compiler, it may be necessary to uncomment one of the lines below
     ! use IEEE_ARITHMETIC , only: isnan => ieee_is_nan ! This may be very expensive - it keeps switching FPU mode flags.
-      logical, intrinsic   :: isnan                    ! This works for relatively recent gfortran and ifort versiobns
+      intrinsic            :: isnan                    ! This works for relatively recent gfortran and ifort versiobns
+    ! logical, intrinsic   :: isnan                    ! ... or somewhat older versions
     ! logical, external    :: isnan
     real(rk), intent(in) :: x
     logical              :: v

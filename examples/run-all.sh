@@ -81,6 +81,7 @@ echo "Cheap tests (expected runtime < 1 minute each)"
 for inp in hydrogen_1S_2P0_uniform.inp hydrogen_1S_2P0_uniform_restart.inp hydrogen_1S_2P0.inp \
            hydrogen_2P0_ion.inp hydrogen_2P0_ion_restart.inp helium_GJG75.inp \
            helium_triplet_spline_linear.inp helium_triplet_vptable_linear.inp \
+           argon_hhg_full.inp argon_hhg_fakeleft.inp argon_hhg_fakeleft2.inp \
            ; do
   run_test $inp
 done
@@ -92,7 +93,7 @@ echo "Intermediate tests (expected runtime < 10 minutes each)"
 for inp in helium_1S_adiabatic.inp argon_3P1_cooper.inp argon_3P1_offcooper.inp \
            argon_3P1m_circ_l.inp argon_3P1m_circ_r.inp hydrogen_1S_hhg_linear.inp \
            hydrogen_2P0_sfi_tsurf.inp argon_3P1m_ell_ckpt_mpi.inp argon_3P1m_ell_rstrt_mpi.inp \
-           hydrogen_1S_hhg_spline.inp \
+           hydrogen_1S_hhg_spline.inp argon_circ-hhg_full.inp argon_circ-hhg_fakeleft2.inp \
            ; do
   run_test $inp
 done

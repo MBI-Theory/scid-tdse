@@ -3,7 +3,7 @@ ACT = sed -e 's/^!\*qd/    /' # Enable quad-math statements
 # WARNING: requesting -mtune=znver2 leads to incorrect code
 # WARNING: requesting -fexternal-blas leads to unreasonable stack requirements
 F90 = gfortran-11 -I. \
-      -O3 -fprotect-parens -march=znver2 -mtune=znver1 -fopenmp \
+      -O3 -fprotect-parens -march=native -mtune=znver1 -fopenmp \
       -ffast-math -fcx-fortran-rules -mrecip \
       -fno-realloc-lhs -fbacktrace -g \
       -static-libgfortran \

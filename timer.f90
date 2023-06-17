@@ -45,7 +45,7 @@ module timer
   public timer_disable
   public rcsid_timer
 !
-  character(len=clen), save :: rcsid_timer = "$Id: timer.f90,v 1.5 2021/04/26 15:44:44 ps Exp ps $"
+  character(len=clen), save :: rcsid_timer = "$Id: timer.f90,v 1.6 2023/06/09 14:10:24 ps Exp $"
 !
   integer, parameter     :: trk        = selected_real_kind(14)  ! Must be of default integer kind
   integer(ik), parameter :: table_size = 1000 ! Max number of entries to track
@@ -329,14 +329,14 @@ module timer
         if ( (last_count-count) > (count_max/2) ) then
           !? write (out,"(' # this is a roll-over, adjust counters')")
           count_overflow = count_overflow + 1
-          overflow = overflow + count_max
+          overflow = overflow + real(count_max,kind=rk)
         end if
       end if
       last_count = count
       !
       ! Convert to seconds
       !
-      t = (overflow+count)/count_rate
+      t = (overflow+real(count,kind=rk))/real(count_rate,kind=rk)
       !
       if (t<last_time) then
         !

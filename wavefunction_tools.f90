@@ -37,34 +37,107 @@ module wavefunction_tools
   implicit none
   private
   public wt_atomic_cache_prefix, wt_iterative_improvement, wt_disable_orthogonalization
-  public wt_max_solution_iterations
+  public wt_max_solution_iterations, wt_enable_memory_caches
+  public wt_init_memory_caches
   public wt_atomic_solutions, wt_one_atomic_solution
   public wt_normalize, wt_energy, wt_dipole
   public wt_adaptive_r_buffer
   public wt_reset_lrmax, wt_update_lrmax
   public wt_resize
   public wt_r2r_scale
+  public wt_fake_left
+  public wt_reconstruct_left
   public rcsid_wavefunction_tools
   !
-  character(len=clen), save :: rcsid_wavefunction_tools = "$Id: wavefunction_tools.f90,v 1.62 2022/10/06 17:14:31 ps Exp ps $"
+  character(len=clen), save :: rcsid_wavefunction_tools = "$Id: wavefunction_tools.f90,v 1.64 2023/06/17 13:45:36 ps Exp ps $"
   !
-  integer, parameter  :: iu_temp                = 24  ! An arbitrary unit number, which can be used here
-  integer, parameter  :: wt_adaptive_r_buffer   = 8   ! Maximum number of points to examine for adaptive nradial determination
-  character(len=clen) :: wt_atomic_cache_prefix = ' ' ! Atomic solution for each L will be cached
-                                                      ! here; these quantities are expensive to
-                                                      ! recompute, especially if we run a 2D simulation
-                                                      ! Blank means no caching
-  logical             :: wt_iterative_improvement = .true.
-                                                      ! Set to .true. if the atomic eigenstates are to be 
-                                                      ! iteratively refined
-  logical             :: wt_disable_orthogonalization = .false.
-                                                      ! Set to .true. to skip explicit Gram-Schmidt orthogonalization
-                                                      ! for the atomic solutions
-  integer(ik)         :: wt_max_solution_iterations = 20_ik
-                                                      ! Max number of iterations in trying to find the eigenvectors
-                                                      ! in wt_one_atomic_solution()
+  integer, parameter        :: wt_adaptive_r_buffer   = 8   ! Maximum number of points to examine for adaptive nradial determination
+  character(len=clen), save :: wt_atomic_cache_prefix = ' ' ! Atomic solution for each L will be cached
+                                                            ! here; these quantities are expensive to
+                                                            ! recompute, especially if we run a 2D simulation
+                                                            ! Blank means no caching
+  logical, save             :: wt_iterative_improvement = .true.
+                                                            ! Set to .true. if the atomic eigenstates are to be 
+                                                            ! iteratively refined
+  logical, save             :: wt_disable_orthogonalization = .false.
+                                                            ! Set to .true. to skip explicit Gram-Schmidt orthogonalization
+                                                            ! for the atomic solutions
+  integer(ik), save         :: wt_max_solution_iterations = 20_ik
+                                                            ! Max number of iterations in trying to find the eigenvectors
+                                                            ! in wt_one_atomic_solution()
+  logical, save             :: wt_enable_memory_caches(2) = (/ .false., .false. /)
+                                                            ! Set to .true. to enable in-memory caching of eigensolutions (1)
+                                                            ! and right-to-left transformation matrices (2)
+                                                            ! If eigensolutions and transformation matrices exist in the disk
+                                                            ! cache specified by wt_atomic_cache_prefix, they'll be loaded.
+  !
+  !  In-memory caches. These caches can be enormously large; do not activate them
+  !  unless you have plenty of RAM!
+  !
+  complex(rk), allocatable, save :: cache_eval(:,    :)     ! First index: 1..sd_nradial; Second index: 0..sd_lmax
+  complex(rk), allocatable, save :: cache_evec(:,:,:,:)     ! First & second indices: 1..sd_nradial; Third index: 1,2; Fourth index: 0..sd_lmax
+  complex(rk), allocatable, save :: cache_r2l (:,:,  :)     ! First & second indices: 1..sd_nradial; Third index: 0..sd_lmax
   !
   contains
+  !
+  subroutine wt_init_memory_caches(verbose)
+    integer(ik), intent(in) :: verbose
+    !
+    integer(ik) :: alloc, lval
+    real(rk)    :: ram
+    !
+    if (.not.any(wt_enable_memory_caches)) return
+    !
+    call TimerStart('Atomic memory cache')
+    !
+    !  Eigensolution cache
+    !
+    if (wt_enable_memory_caches(1)) then 
+      ram = real(sd_lmax+1,rk)*real(sd_nradial+2*sd_nradial**2,rk)*2._rk*rk_bytes()
+      write (out,"(/'Allocating ',f0.3,' Gbytes of RAM for the atomic eigenfunctions cache.'/)") ram/1024._rk**3
+      call flush_wrapper(out)
+      !
+      !  Cache field-free eigenvalues and eigenfunctions
+      !
+      wt_enable_memory_caches(1) = .false. ! To stop wt_atomic_solutions from going weird
+      allocate (cache_eval(sd_nradial,0:sd_lmax),cache_evec(sd_nradial,sd_nradial,2,0:sd_lmax),stat=alloc)
+      if (alloc/=0) then
+        write (out,"('Error ',i0,' allocating memory for eigenfunctions cache')") alloc
+        stop 'wavefunction_tools%wt_init_memory_caches (1)'
+      end if
+      !$omp parallel do default(shared) private(lval)
+      fill_eigenfunctions_cache: do lval=0,sd_lmax
+        call wt_atomic_solutions(verbose,lval,cache_eval(:,lval),cache_evec(:,:,:,lval))
+      end do fill_eigenfunctions_cache
+      !$omp end parallel do
+      wt_enable_memory_caches(1) = .true.  ! We can start caching
+    end if
+    !
+    !  R2L cache
+    !
+    if (wt_enable_memory_caches(2)) then 
+      ram = real(sd_lmax+1,rk)*real(sd_nradial**2,rk)*2._rk*rk_bytes()
+      write (out,"(/'Allocating ',f0.3,' Gbytes of RAM for the R2L cache.'/)") ram/1024._rk**3
+      call flush_wrapper(out)
+      !
+      !  Cache R2L transformation matrices
+      !
+      wt_enable_memory_caches(2) = .false. ! To stop wr_r2l_transform from going wonky
+      allocate (cache_r2l(sd_nradial,sd_nradial,0:sd_lmax),stat=alloc)
+      if (alloc/=0) then
+        write (out,"('Error ',i0,' allocating memory for R2L cache')") alloc
+        stop 'wavefunction_tools%wt_init_memory_caches (2)'
+      end if
+      !$omp parallel do default(shared) private(lval)
+      fill_r2l_cache: do lval=0,sd_lmax
+        call wt_r2l_transform(verbose,lval,cache_r2l(:,:,lval))
+      end do fill_r2l_cache
+      !$omp end parallel do
+      wt_enable_memory_caches(2) = .true.  ! We can start caching
+    end if
+    !
+    call TimerStop('Atomic memory cache')
+  end subroutine wt_init_memory_caches
   !
   !  Calculate a block of atomic solutions. We return the non-zero part of the
   !  eigenvectors only, instead of the much larger total wavefunction.
@@ -73,10 +146,10 @@ module wavefunction_tools
     integer(ik), intent(in)  :: verbose     ! Reporting level
     integer(ik), intent(in)  :: lval        ! Desired angular momentum
     complex(rk), intent(out) :: eval(:)     ! Eigenvalues of the Hamiltonian matrix block for L=lval
-    complex(rk), intent(out) :: evec(:,:,:) ! Left (:,:,1) and right (:,:,2) eigenvectors  
+    complex(rk), intent(out) :: evec(:,:,:) ! Left (:,:,1) and right (:,:,2) column-eigenvectors
     !
     character(len=clen) :: cache
-    integer(ik)         :: ios
+    integer(ik)         :: iu_temp, ios
     !
     call TimerStart('Atomic solutions')
     if (size(eval)/=sd_nradial .or. ubound(evec,1)/=sd_nradial .or. ubound(evec,2)/=sd_nradial .or. ubound(evec,3)/=2 &
@@ -84,21 +157,32 @@ module wavefunction_tools
       stop 'wavefunction_tools%wt_atomic_solutions - bad arguments'
     end if
     !
-    !  Try to load from cache first
+    !  First, go to the in-memory cache if it's present
+    !
+    if (wt_enable_memory_caches(1)) then
+      eval = cache_eval(:,    lval)
+      evec = cache_evec(:,:,:,lval)
+      call TimerStop('Atomic solutions')
+      return
+    end if
+    !
+    !  Try to load from the disk cache next
     !
     if (wt_atomic_cache_prefix/=' ') then
       !
       !  This function may be called from a parallel region; make sure it
       !  does not try to access the same file from multiple threads!
       !
-      !$omp critical
       write (cache,"(a,'-L=',i5.5)") trim(wt_atomic_cache_prefix), lval
-      open (iu_temp,action='read',status='old',form='unformatted',iostat=ios,file=trim(cache))
+!*ibc !$omp critical
+      open (newunit=iu_temp,action='read',status='old',form='unformatted',iostat=ios,file=trim(cache))
+!*ibc !$omp end critical
       if (ios==0) then
-        read (iu_temp) eval, evec
+        read (iu_temp,iostat=ios) eval, evec
         close (iu_temp)
       end if
-      !$omp end critical
+      ! Read errors (e.g. because another thread is creating the file right now)
+      ! will cause us to drop through and recompute the eigensolution
       if (ios==0) then
         call TimerStop('Atomic solutions')
         return
@@ -126,8 +210,9 @@ module wavefunction_tools
     call wt_atomic_solution_verify(lval,evec)
     !
     if (wt_atomic_cache_prefix/=' ') then
-      !$omp critical
-      open (iu_temp,action='write',status='new',form='unformatted',iostat=ios,file=trim(cache))
+!*ibc !$omp critical
+      open (newunit=iu_temp,action='write',status='new',form='unformatted',iostat=ios,file=trim(cache))
+!*ibc !$omp end critical
       if (ios/=0) then
         write (out,"('Error ',i0,' creating new cache file ',a)") ios, trim(cache)
         write (out,"('Skipping wavefunction save for L=',i0,' and continuing')") lval
@@ -135,7 +220,6 @@ module wavefunction_tools
         write (iu_temp) eval, evec
         close (iu_temp)
       end if
-      !$omp end critical
     end if
     call TimerStop('Atomic solutions')
   end subroutine wt_atomic_solutions
@@ -1333,4 +1417,154 @@ module wavefunction_tools
     end if
     call TimerStop('WF R2R')
   end function wt_r2r_scale
+  !
+  !  "Fake" left wavefunction from the right wavefunction.
+  !  We simply replace the left wavefunction by the complex conjugate of the right wavefunction.
+  !  This is not an approximation for Hermitian hamiltonians - which we sadly don't generally have.
+  !
+  subroutine wt_fake_left(wfn_l,wfn_r)
+    type(sd_wfn), intent(inout) :: wfn_l   ! Left wavefunction
+    type(sd_wfn), intent(in)    :: wfn_r   ! Right wavefunction
+    !
+    integer(ik) :: lval, mval, sval
+    !
+    call TimerStart('WF fake left')
+    wfn_l%lmax     = wfn_r%lmax             ! Copy wavefunction parameters
+    wfn_l%lmax_top = wfn_r%lmax_top
+    wfn_l%nradial  = wfn_r%nradial
+    !$omp parallel default(none) &
+    !$omp& shared(sd_mmin,sd_mmax,sd_nspin,wfn_l,wfn_r,nts) &
+    !$omp& private(mval,lval,sval)
+    !$omp do collapse(3)
+    copy_loop_m: do mval=sd_mmin,sd_mmax
+      copy_loop_l: do lval=0,wfn_r%lmax
+        copy_loop_s: do sval=1,sd_nspin
+          if (lval<abs(mval)) cycle copy_loop_s
+          if (nts%dist(lval)>0) cycle copy_loop_s ! Hook for distributed-memory parallelization
+          wfn_l%wfn(:,sval,lval,mval) = conjg(wfn_r%wfn(:,sval,lval,mval))
+        end do copy_loop_s
+      end do copy_loop_l
+    end do copy_loop_m
+    !$omp end do
+    !$omp end parallel
+    call TimerStop('WF fake left')
+  end subroutine wt_fake_left
+  !
+  !  Construct a right-to left transformation matrix in a given L channel
+  !  The transformation is given by: 
+  !     R2L = VL VL^\dagger
+  !     L   = R2L R^*
+  !  where VL are the left column-eigenvectors of the Hamiltonian matrix.
+  !
+  subroutine wt_r2l_transform(verbose,lval,r2l)
+    integer(ik), intent(in)  :: verbose     ! Reporting level
+    integer(ik), intent(in)  :: lval        ! Desired angular momentum
+    complex(rk), intent(out) :: r2l(:,:)    ! Transformation matrix for L=lval
+    !
+    character(len=clen)      :: cache
+    integer(ik)              :: ios, alloc, iu_temp
+    complex(rk), allocatable :: eval(:), evec(:,:,:)
+    !
+    call TimerStart('R2L xform matrix')
+    if (ubound(r2l,1)/=sd_nradial .or. ubound(r2l,2)/=sd_nradial .or. lval<0 .or. lval>sd_lmax) then
+      stop 'wavefunction_tools%wr_r2l_transform - bad arguments'
+    end if
+    !
+    !  First, go to the in-memory cache if it's present
+    !
+    if (wt_enable_memory_caches(2)) then
+      r2l = cache_r2l(:,:,lval)
+      call TimerStop('R2L xform matrix')
+      return
+    end if
+    !
+    !  Try to load from disk cache next
+    !
+    if (wt_atomic_cache_prefix/=' ') then
+      !
+      !  This function may be called from a parallel region; make sure it
+      !  does not try to access the same file from multiple threads!
+      !
+      write (cache,"(a,'-R2L=',i5.5)") trim(wt_atomic_cache_prefix), lval
+!*ibc !$omp critical
+      open (newunit=iu_temp,action='read',status='old',form='unformatted',iostat=ios,file=trim(cache))
+!*ibc !$omp end critical
+      if (ios==0) then
+        read (iu_temp,iostat=ios) r2l
+        close (iu_temp)
+      end if
+      ! If either open or read failed, we'll fall through here, and recompute
+      if (ios==0) then
+        call TimerStop('R2L xform matrix')
+        return
+      end if
+      !
+      ! Open was unsuccessful; proceed through calculation, and try to save the 
+      ! results once we have them
+      !
+    end if
+    !
+    !  Recompute the transform
+    !
+    allocate (eval(sd_nradial),evec(sd_nradial,sd_nradial,2),stat=alloc)
+    if (alloc/=0) then
+      write (out,"('Error ',i0,' allocating temporaries in wr_r2l_transform. sd_nradial = ',i0)") alloc, sd_nradial
+      stop 'wavefunction_tools%wr_r2l_transform - out of memory'
+    end if
+    call wt_atomic_solutions(verbose,lval,eval,evec)
+    evec(:,:,2) = transpose(conjg(evec(:,:,1)))
+    r2l(:,:) = matmul(evec(:,:,1),evec(:,:,2))
+    deallocate (eval,evec)
+    !
+    if (wt_atomic_cache_prefix/=' ') then
+!*ibc !$omp critical
+      open (newunit=iu_temp,action='write',status='new',form='unformatted',iostat=ios,file=trim(cache))
+!*ibc !$omp end critical
+      if (ios/=0) then
+        write (out,"('Error ',i0,' creating new cache file ',a)") ios, trim(cache)
+        write (out,"('Skipping R2L matrix save for L=',i0,' and continuing')") lval
+      else
+        write (iu_temp) r2l
+        close (iu_temp)
+      end if
+    end if
+    call TimerStop('R2L xform matrix')
+  end subroutine wt_r2l_transform
+  !
+  !  Reconstruct left wavefunction from the right wavefunction
+  !  Reconstruction requires building eigendecomposition of the atomic hamiltonian;
+  !  This is a rather expensive operation!
+  !
+  subroutine wt_reconstruct_left(verbose,wfn_l,wfn_r)
+    integer(ik), intent(in)     :: verbose !
+    type(sd_wfn), intent(inout) :: wfn_l   ! Left wavefunction
+    type(sd_wfn), intent(in)    :: wfn_r   ! Right wavefunction
+    !
+    integer(ik)              :: lval, mval, sval
+    complex(rk), allocatable :: r2l(:,:)
+    !
+    call TimerStart('WF reconstruct left')
+    wfn_l%lmax     = wfn_r%lmax             ! Copy wavefunction parameters
+    wfn_l%lmax_top = wfn_r%lmax_top
+    wfn_l%nradial  = wfn_r%nradial
+    !$omp parallel default(none) &
+    !$omp& shared(sd_mmin,sd_mmax,sd_nspin,wfn_l,wfn_r,nts,sd_nradial,verbose) &
+    !$omp& private(mval,lval,sval,r2l)
+    allocate (r2l(sd_nradial,sd_nradial))
+    !$omp do schedule(dynamic,1)
+    copy_loop_l: do lval=wfn_r%lmax,0,-1
+      if (nts%dist(lval)>0) cycle copy_loop_l ! Hook for distributed-memory parallelization
+      call wt_r2l_transform(verbose,lval,r2l)
+      copy_loop_m: do mval=sd_mmin,sd_mmax
+        if (lval<abs(mval)) cycle copy_loop_m
+        copy_loop_s: do sval=1,sd_nspin
+          wfn_l%wfn(:,sval,lval,mval) = matmul(r2l,conjg(wfn_r%wfn(:,sval,lval,mval)))
+        end do copy_loop_s
+      end do copy_loop_m
+    end do copy_loop_l
+    !$omp end do
+    deallocate (r2l)
+    !$omp end parallel
+    call TimerStop('WF reconstruct left')
+  end subroutine wt_reconstruct_left
 end module wavefunction_tools

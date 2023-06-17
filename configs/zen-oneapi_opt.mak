@@ -1,10 +1,11 @@
 BUILD_ID :="Optimized Intel oneAPI, built on $(shell hostname) at $(shell date)"
 ACT = sed -e 's/^!\*qd/    /' # Enable quad-math statements
 #ACT2 = -e 's/^!\*mp/    /' # Enable MPI statements
+# -axMIC-AVX512 is not supported by recent oneapi
 F90 = ifort \
             -qopenmp -qmkl=sequential -align all -align array256byte -pad \
             -warn -assume buffered_io \
-            -O3 -ipo8 -no-prec-div -xAVX -axAVX2,MIC-AVX512 -complex_limited_range -fp-model fast=1 -ftz -assume protect_parens -heap-arrays 32 \
+            -O3 -ipo8 -no-prec-div -xAVX -axAVX2 -complex_limited_range -fp-model fast=1 -ftz -assume protect_parens -heap-arrays 32 \
             -qopt-prefetch=0 -qopt-matmul -qopt-subscript-in-range -qopt-dynamic-align \
             -qopt-mem-layout-trans=3 -qopt-multi-version-aggressive \
             -debug full -debug extended -traceback -qopt-report=5 \

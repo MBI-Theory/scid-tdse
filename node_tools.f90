@@ -75,7 +75,7 @@ module node_tools
   public nt_rebalance, nt_rebalance_needed, nt_finalize
   public nt_force_stdin
   !
-  character(len=clen), save :: rcsid_node_tools = "$Id: node_tools.f90,v 1.10 2021/04/26 15:44:44 ps Exp ps $"
+  character(len=clen), save :: rcsid_node_tools = "$Id: node_tools.f90,v 1.11 2023/06/09 14:10:24 ps Exp $"
   !
   !  All local state must be assembled in the nt_state structure, to potentiallly 
   !  allow multiple simultaneous instances of the solver at some far away future time
@@ -403,9 +403,9 @@ module node_tools
     !
     call hack_store(buf)  ! Necessary to prevent caching of the values in buf()
     !
-    wfn%lmax     = buf(1)
-    wfn%nradial  = buf(2)
-    wfn%lmax_top = buf(3)
+    wfn%lmax     = buf(1) ! Spurious gfortran warning here
+    wfn%nradial  = buf(2) ! Spurious gfortran warning here
+    wfn%lmax_top = buf(3) ! Spurious gfortran warning here
     !
     if (nt_verbose>=3) then
       write (out,"('nt_broadcast_wavefunction: node = ',i0,' lmax = ',i0,' nradial = ',i0)") &
@@ -942,8 +942,8 @@ module node_tools
 !*mp   write (out,"('nt_add_real: MPI_AllGather failed with code ',i0)") ierror
 !*mp   stop 'node_tools%nt_add_real - MPI_AllGather'
 !*mp end if
+!*mp val = sum(buf)
     !
-    val = sum(buf)
     if (nt_verbose>=5) then
       write (out,"('nt_add_real: node = ',i0,' result = ',g48.24e3)") nts%this_node, val
     end if
@@ -966,8 +966,8 @@ module node_tools
 !*mp   write (out,"('nt_add_complex: MPI_AllGather failed with code ',i0)") ierror
 !*mp   stop 'node_tools%nt_add_complex - MPI_AllGather'
 !*mp end if
+!*mp val = sum(buf)
     !
-    val = sum(buf)
     if (nt_verbose>=5) then
       write (out,"('nt_add_complex: node = ',i0,' result = ',2g38.24e3)") nts%this_node, val
     end if
@@ -990,8 +990,8 @@ module node_tools
 !*mp   write (out,"('nt_add_complex_array: MPI_AllGather failed with code ',i0)") ierror
 !*mp   stop 'node_tools%nt_add_complex_array - MPI_AllGather'
 !*mp end if
+!*mp val = sum(buf,dim=2)
     !
-    val = sum(buf,dim=2)
     if (nt_verbose>=5) then
       write (out,"('nt_add_complex_array: node = ',i0,' result:')") nts%this_node
       write (out,"(4g38.24e3)") val
@@ -1015,8 +1015,8 @@ module node_tools
 !*mp   write (out,"('nt_add_complex2: MPI_AllGather failed with code ',i0)") ierror
 !*mp   stop 'node_tools%nt_add_complex_array2 - MPI_AllGather'
 !*mp end if
+!*mp val = sum(buf,dim=3)
     !
-    val = sum(buf,dim=3)
     if (nt_verbose>=5) then
       write (out,"('nt_add_complex_array2: node = ',i0,' result:')") nts%this_node
       write (out,"(4g38.24e3)") val

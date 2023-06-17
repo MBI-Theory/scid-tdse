@@ -33,7 +33,7 @@ module potential_tools
   public pt_evaluate_potential
   public rcsid_potential_tools
   !
-  character(len=clen), save :: rcsid_potential_tools = "$Id: potential_tools.f90,v 1.20 2021/08/10 12:09:12 ps Exp ps $"
+  character(len=clen), save :: rcsid_potential_tools = "$Id: potential_tools.f90,v 1.21 2023/06/09 14:10:24 ps Exp $"
   !
   !  We recognize
   !
@@ -105,10 +105,10 @@ module potential_tools
   !
   !  The last term is not actually in Tong&Lin.
   !
-  !                                             Zc     a1      a2        a3        a4        a5      a6       a7        a8
-  real(rk), parameter   :: tong05_he(0:8) = (/ 1.0,   1.231,  0.662,   -1.325,    1.236,   -0.231,  0.480,   0.000,    1.000   /)
-  real(rk), parameter   :: tong05_ne(0:8) = (/ 1.0,   8.069,  2.148,   -3.570,    1.986,    0.931,  0.602,   0.000,    1.000   /)
-  real(rk), parameter   :: tong05_ar(0:8) = (/ 1.0,  16.039,  2.007,  -25.543,    4.525,    0.961,  0.443,   0.000,    1.000   /)
+  !                                             Zc      a1        a2          a3        a4         a5        a6        a7     a8
+  real(rk), parameter   :: tong05_he(0:8) = (/ 1._rk,  1.231_rk, 0.662_rk, -1.325_rk, 1.236_rk,-0.231_rk, 0.480_rk, 0._rk, 1._rk /)
+  real(rk), parameter   :: tong05_ne(0:8) = (/ 1._rk,  8.069_rk, 2.148_rk, -3.570_rk, 1.986_rk, 0.931_rk, 0.602_rk, 0._rk, 1._rk /)
+  real(rk), parameter   :: tong05_ar(0:8) = (/ 1._rk, 16.039_rk, 2.007_rk,-25.543_rk, 4.525_rk, 0.961_rk, 0.443_rk, 0._rk, 1._rk /)
   !
   !  Parameter tables from Schweizer, Fassbinder, and Gonzalez-Ferez, At. Data Nucl. Data Tables 72, 33-55 (1999).
   !  This potential is a special case of Tong&Lin functional form, with a5 through a8 being zero.
@@ -120,26 +120,29 @@ module potential_tools
   !        a2            a1
   !        a3            a2
   !        a4            a3
-  !                                             Zc    a1   a2      a3     a4    a5-a8
-  real(rk), parameter   :: sfg99_li(0:8)  = (/ 1.0,  2.0, 3.395,  3.212, 3.207, 0., 0., 0., 0. /)
-  real(rk), parameter   :: sfg99_na(0:8)  = (/ 1.0, 10.0, 7.902, 23.51 , 2.688, 0., 0., 0., 0. /)
-  real(rk), parameter   :: sfg99_k (0:8)  = (/ 1.0, 18.0, 3.491, 10.591, 1.730, 0., 0., 0., 0. /)
-  real(rk), parameter   :: sfg99_rb(0:8)  = (/ 1.0, 36.0, 3.431, 10.098, 1.611, 0., 0., 0., 0. /)
-  real(rk), parameter   :: sfg99_cs(0:8)  = (/ 1.0, 54.0, 3.294, 11.005, 1.509, 0., 0., 0., 0. /)
+  !                                             Zc      a1     a2         a3        a4        a5-a8
+  real(rk), parameter   :: sfg99_li(0:8)  = (/ 1._rk,  2._rk, 3.395_rk,  3.212_rk, 3.207_rk, 0._rk, 0._rk, 0._rk, 0._rk /)
+  real(rk), parameter   :: sfg99_na(0:8)  = (/ 1._rk, 10._rk, 7.902_rk, 23.510_rk, 2.688_rk, 0._rk, 0._rk, 0._rk, 0._rk /)
+  real(rk), parameter   :: sfg99_k (0:8)  = (/ 1._rk, 18._rk, 3.491_rk, 10.591_rk, 1.730_rk, 0._rk, 0._rk, 0._rk, 0._rk /)
+  real(rk), parameter   :: sfg99_rb(0:8)  = (/ 1._rk, 36._rk, 3.431_rk, 10.098_rk, 1.611_rk, 0._rk, 0._rk, 0._rk, 0._rk /)
+  real(rk), parameter   :: sfg99_cs(0:8)  = (/ 1._rk, 54._rk, 3.294_rk, 11.005_rk, 1.509_rk, 0._rk, 0._rk, 0._rk, 0._rk /)
   !
   !  My fit to tong05_ne, eliminating 1S core.                                                                                     
   !                                                                                                                                
-  real(rk), parameter   :: neon_1S  (0:8) = (/ 1.0, -46.1787, 2.46572, -0.523021, 1.27345, 29.0013, 1.51537, 0.010304, 0.411271/)
+  real(rk), parameter   :: neon_1S  (0:8) = (/ 1._rk,-46.1787_rk,2.46572_rk,-0.523021_rk,1.27345_rk,29.0013_rk,1.51537_rk, &
+                                               0.010304_rk,0.411271_rk/)
   !
   !  My reoptimization of tong05_ne, targeting specific spin-orbit cores.
   !
-  real(rk), parameter   :: neon_3_2 (0:8) = (/ 1.0, 8.0731, 2.0833, -3.5921, 1.98051, 0.89827, 0.71919, -0.026825, 0.67424 /)
-  real(rk), parameter   :: neon_1_2 (0:8) = (/ 1.0, 8.0854, 2.0374, -3.5867, 1.92889, 0.87084, 0.79550, -0.023105, 0.73210 /)
+  real(rk), parameter   :: neon_3_2 (0:8) = (/ 1._rk,8.0731_rk,2.0833_rk,-3.5921_rk,1.98051_rk,0.89827_rk,0.71919_rk, &
+                                              -0.026825_rk,0.67424_rk /)
+  real(rk), parameter   :: neon_1_2 (0:8) = (/ 1._rk,8.0854_rk,2.0374_rk,-3.5867_rk,1.92889_rk,0.87084_rk,0.79550_rk, &
+                                              -0.023105_rk,0.73210_rk /)
   !
   !  My potential for the two Xenon spin-orbit cores
   !
-  real(rk), parameter   :: xenon_3_2(0:8) = (/ 1.0,  5.88494, 0.875503, 0.0, 1.0, -108.66428, 4.643858, 0.0, 1.0 /)
-  real(rk), parameter   :: xenon_1_2(0:8) = (/ 1.0,  7.67004, 0.954979, 0.0, 1.0, -108.67858, 4.284618, 0.0, 1.0 /)
+  real(rk), parameter   :: xenon_3_2(0:8) = (/ 1._rk,5.88494_rk,0.875503_rk,0._rk,1._rk,-108.66428_rk,4.643858_rk,0._rk,1._rk /)
+  real(rk), parameter   :: xenon_1_2(0:8) = (/ 1._rk,7.67004_rk,0.954979_rk,0._rk,1._rk,-108.67858_rk,4.284618_rk,0._rk,1._rk /)
   !
   !  Parameter table defining the [GJG] potentials, Table I of the paper.
   !
@@ -150,51 +153,51 @@ module potential_tools
   end type gjg75_pars
   !
   type(gjg75_pars), parameter :: gjg_tab(45) = (/ &
-    gjg75_pars(  2, "1s2",  2.625, 12.996, 1.770, 11.402), &
-    gjg75_pars(  3, "2s1",  2.164,  9.764, 1.750,  6.821), &
-    gjg75_pars(  4, "2s2",  1.300,  6.465, 1.880,  5.547), &
-    gjg75_pars(  5, "2p1",  1.031,  4.924, 2.000,  4.939), &
-    gjg75_pars(  6, "2p2",  1.065,  4.800, 2.130,  4.434), &
-    gjg75_pars(  7, "2p3",  1.179,  4.677, 2.270,  4.143), &
-    gjg75_pars(  8, "2p4",  1.360,  4.613, 2.410,  3.925), &
-    gjg75_pars(  9, "2p5",  1.508,  4.602, 2.590,  3.755), &
-    gjg75_pars( 10, "2p6",  1.792,  4.515, 2.710,  3.671), &
-    gjg75_pars( 11, "3s1",  1.712,  3.923, 2.850,  3.469), &
-    gjg75_pars( 12, "3s2",  1.492,  3.452, 3.010,  3.269), &
-    gjg75_pars( 13, "3p1",  1.170,  3.191, 3.170,  3.087), &
-    gjg75_pars( 14, "3p2",  1.012,  2.933, 3.260,  2.958), &
-    gjg75_pars( 15, "3p3",  0.954,  2.659, 3.330,  2.857), &
-    gjg75_pars( 16, "3p4",  0.926,  2.478, 3.392,  2.739), &
-    gjg75_pars( 17, "3p5",  0.933,  2.368, 3.447,  2.633), &
-    gjg75_pars( 18, "3p6",  0.957,  2.165, 3.500,  2.560), &
-    gjg75_pars( 19, "3d1",  0.964,  2.151, 3.516,  2.509), &
-    gjg75_pars( 20, "3d2",  0.941,  2.248, 3.570,  2.404), &
-    gjg75_pars( 21, "3d3",  0.950,  2.324, 3.627,  2.328), &
-    gjg75_pars( 22, "3d4",  0.998,  2.345, 3.667,  2.238), &
-    gjg75_pars( 23, "3d5",  1.061,  2.243, 3.709,  2.171), &
-    gjg75_pars( 24, "3d6",  1.138,  2.291, 3.745,  2.187), &
-    gjg75_pars( 25, "3d7",  1.207,  2.408, 3.803,  2.090), &
-    gjg75_pars( 26, "3d8",  1.308,  2.391, 3.840,  2.088), &
-    gjg75_pars( 27, "3d9",  1.397,  2.462, 3.891,  2.048), &
-    gjg75_pars( 28, "3d10", 1.455,  2.397, 3.973,  1.925), &
-    gjg75_pars( 29, "4s1",  1.520,  2.246, 4.000,  1.985), &
-    gjg75_pars( 30, "4s2",  1.538,  2.106, 4.050,  1.378), &
-    gjg75_pars( 31, "4p1",  1.541,  1.988, 4.110,  2.001), &
-    gjg75_pars( 32, "4p2",  1.512,  1.914, 4.182,  1.897), &
-    gjg75_pars( 33, "4p3",  1.492,  1.990, 4.230,  1.782), &
-    gjg75_pars( 34, "4p4",  1.460,  1.857, 4.290,  1.772), &
-    gjg75_pars( 35, "4p5",  1.407,  1.897, 4.369,  1.686), &
-    gjg75_pars( 36, "4p6",  1.351,  1.872, 4.418,  1.611), &
-    gjg75_pars( 37, "4d1",  1.286,  1.686, 4.494,  1.619), &
-    gjg75_pars( 39, "4d3",  1.129,  1.784, 4.618,  1.509), &
-    gjg75_pars( 41, "4d5",  1.139,  1.702, 4.680,  1.485), &
-    gjg75_pars( 42, "4d6",  1.136,  1.694, 4.749,  1.412), &
-    gjg75_pars( 44, "4d8",  1.197,  1.601, 4.769,  1.435), &
-    gjg75_pars( 46, "4d10", 1.246,  1.587, 4.829,  1.397), &
-    gjg75_pars( 48, "5s2",  1.205,  1.358, 4.904,  1.414), &
-    gjg75_pars( 50, "5p2",  1.130,  1.395, 4.990,  1.324), &
-    gjg75_pars( 52, "5p4",  1.050,  1.354, 5.050,  1.314), &
-    gjg75_pars( 54, "5p6",  1.044,  1.107, 5.101,  1.316)  &
+    gjg75_pars(  2_ik, "1s2",  2.625_rk, 12.996_rk, 1.770_rk, 11.402_rk), &
+    gjg75_pars(  3_ik, "2s1",  2.164_rk,  9.764_rk, 1.750_rk,  6.821_rk), &
+    gjg75_pars(  4_ik, "2s2",  1.300_rk,  6.465_rk, 1.880_rk,  5.547_rk), &
+    gjg75_pars(  5_ik, "2p1",  1.031_rk,  4.924_rk, 2.000_rk,  4.939_rk), &
+    gjg75_pars(  6_ik, "2p2",  1.065_rk,  4.800_rk, 2.130_rk,  4.434_rk), &
+    gjg75_pars(  7_ik, "2p3",  1.179_rk,  4.677_rk, 2.270_rk,  4.143_rk), &
+    gjg75_pars(  8_ik, "2p4",  1.360_rk,  4.613_rk, 2.410_rk,  3.925_rk), &
+    gjg75_pars(  9_ik, "2p5",  1.508_rk,  4.602_rk, 2.590_rk,  3.755_rk), &
+    gjg75_pars( 10_ik, "2p6",  1.792_rk,  4.515_rk, 2.710_rk,  3.671_rk), &
+    gjg75_pars( 11_ik, "3s1",  1.712_rk,  3.923_rk, 2.850_rk,  3.469_rk), &
+    gjg75_pars( 12_ik, "3s2",  1.492_rk,  3.452_rk, 3.010_rk,  3.269_rk), &
+    gjg75_pars( 13_ik, "3p1",  1.170_rk,  3.191_rk, 3.170_rk,  3.087_rk), &
+    gjg75_pars( 14_ik, "3p2",  1.012_rk,  2.933_rk, 3.260_rk,  2.958_rk), &
+    gjg75_pars( 15_ik, "3p3",  0.954_rk,  2.659_rk, 3.330_rk,  2.857_rk), &
+    gjg75_pars( 16_ik, "3p4",  0.926_rk,  2.478_rk, 3.392_rk,  2.739_rk), &
+    gjg75_pars( 17_ik, "3p5",  0.933_rk,  2.368_rk, 3.447_rk,  2.633_rk), &
+    gjg75_pars( 18_ik, "3p6",  0.957_rk,  2.165_rk, 3.500_rk,  2.560_rk), &
+    gjg75_pars( 19_ik, "3d1",  0.964_rk,  2.151_rk, 3.516_rk,  2.509_rk), &
+    gjg75_pars( 20_ik, "3d2",  0.941_rk,  2.248_rk, 3.570_rk,  2.404_rk), &
+    gjg75_pars( 21_ik, "3d3",  0.950_rk,  2.324_rk, 3.627_rk,  2.328_rk), &
+    gjg75_pars( 22_ik, "3d4",  0.998_rk,  2.345_rk, 3.667_rk,  2.238_rk), &
+    gjg75_pars( 23_ik, "3d5",  1.061_rk,  2.243_rk, 3.709_rk,  2.171_rk), &
+    gjg75_pars( 24_ik, "3d6",  1.138_rk,  2.291_rk, 3.745_rk,  2.187_rk), &
+    gjg75_pars( 25_ik, "3d7",  1.207_rk,  2.408_rk, 3.803_rk,  2.090_rk), &
+    gjg75_pars( 26_ik, "3d8",  1.308_rk,  2.391_rk, 3.840_rk,  2.088_rk), &
+    gjg75_pars( 27_ik, "3d9",  1.397_rk,  2.462_rk, 3.891_rk,  2.048_rk), &
+    gjg75_pars( 28_ik, "3d10", 1.455_rk,  2.397_rk, 3.973_rk,  1.925_rk), &
+    gjg75_pars( 29_ik, "4s1",  1.520_rk,  2.246_rk, 4.000_rk,  1.985_rk), &
+    gjg75_pars( 30_ik, "4s2",  1.538_rk,  2.106_rk, 4.050_rk,  1.378_rk), &
+    gjg75_pars( 31_ik, "4p1",  1.541_rk,  1.988_rk, 4.110_rk,  2.001_rk), &
+    gjg75_pars( 32_ik, "4p2",  1.512_rk,  1.914_rk, 4.182_rk,  1.897_rk), &
+    gjg75_pars( 33_ik, "4p3",  1.492_rk,  1.990_rk, 4.230_rk,  1.782_rk), &
+    gjg75_pars( 34_ik, "4p4",  1.460_rk,  1.857_rk, 4.290_rk,  1.772_rk), &
+    gjg75_pars( 35_ik, "4p5",  1.407_rk,  1.897_rk, 4.369_rk,  1.686_rk), &
+    gjg75_pars( 36_ik, "4p6",  1.351_rk,  1.872_rk, 4.418_rk,  1.611_rk), &
+    gjg75_pars( 37_ik, "4d1",  1.286_rk,  1.686_rk, 4.494_rk,  1.619_rk), &
+    gjg75_pars( 39_ik, "4d3",  1.129_rk,  1.784_rk, 4.618_rk,  1.509_rk), &
+    gjg75_pars( 41_ik, "4d5",  1.139_rk,  1.702_rk, 4.680_rk,  1.485_rk), &
+    gjg75_pars( 42_ik, "4d6",  1.136_rk,  1.694_rk, 4.749_rk,  1.412_rk), &
+    gjg75_pars( 44_ik, "4d8",  1.197_rk,  1.601_rk, 4.769_rk,  1.435_rk), &
+    gjg75_pars( 46_ik, "4d10", 1.246_rk,  1.587_rk, 4.829_rk,  1.397_rk), &
+    gjg75_pars( 48_ik, "5s2",  1.205_rk,  1.358_rk, 4.904_rk,  1.414_rk), &
+    gjg75_pars( 50_ik, "5p2",  1.130_rk,  1.395_rk, 4.990_rk,  1.324_rk), &
+    gjg75_pars( 52_ik, "5p4",  1.050_rk,  1.354_rk, 5.050_rk,  1.314_rk), &
+    gjg75_pars( 54_ik, "5p6",  1.044_rk,  1.107_rk, 5.101_rk,  1.316_rk)  &
     /)
   !
   contains
@@ -231,7 +234,7 @@ module potential_tools
     v = -a(0)
     terms: do i=1,ubound(a,dim=1),3
       c = a(i+0) ; xi = a(i+1) ; eta = a(i+2)
-      if (c==0) cycle terms
+      if (c==0._rk) cycle terms
       v = v + c / ( 1 + (eta/xi) * (exp(xi*r)-1) )
     end do terms
     v = v / r
@@ -494,7 +497,7 @@ module potential_tools
     !  Add the universal centrifugal term. Nominally, that's a kinetic energy contribution, but ...
     !
     if (centrifugal) then
-      v = v + (1._rk/(2._rk*electron_mass)) * l*(l+1) / r**2
+      v = v + (1._rk/(2._rk*electron_mass)) * real(l,kind=rk)*real(l+1,kind=rk) / r**2
     end if
     !
   end function pt_evaluate_potential

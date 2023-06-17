@@ -1,8 +1,27 @@
-Last updated: 2022 September 26
+Last updated: 2023 June 16
 ------------
 
 Change log
 ----------
+
+2023 Jun 16
+
+ - Updated effective potentials in potential_tools.f90 to use kind-rk real
+   constants, rather than the default real kind as before. This should 
+   produce more consistent results by eliminating intermediate rounding
+   (exact float to default real to kind-rk real), but changes the results
+   slightly for the internally-tabulated potentials.
+
+ - Added support for approximate left wavefunctions (fake_left_propagation
+   and reconstruct_left), which could improve the performance at the cost
+   of lower accuracy (see manual). 
+
+ - Added option composition_max_energy, which may speed-up composition 
+   analysis in some cases. 
+
+ - Added option wt_enable_memory_caches, which may improve performance for
+   repeated calls to analysis routines, at the cost of increased memory
+   footprint.
 
 2022 Sep 26
 

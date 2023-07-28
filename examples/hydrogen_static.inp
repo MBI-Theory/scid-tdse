@@ -1,0 +1,32 @@
+ &sph_tdse
+   comment                = "Hydrogen 1S static-field ionization, F=0.05"
+   verbose                = 1
+   omp_num_threads        = 6
+   initial_wfn            = 'single'
+   initial_wfn_index      = 0, 0, 1
+   initial_wfn_energy     = (-0.5,0.0)
+   sd_nradial             = 200
+   sd_lmax                = 150
+   sd_mmin                =   0
+   sd_mmax                =   0
+   sd_rgrid               = 'uniform'
+   sd_rgrid_zeta          = 1.0
+   sd_rgrid_dr            = 0.20
+   pot_name               = 'hydrogenic'
+   pot_param              = 1.0
+   cap_param(1)           = 0.5
+   task                   = 'real time'
+   dt                     = 0.001
+   timesteps              = 120000
+   dt_subdivision         = 'off'
+   vp_shape               = 'z linear'
+   vp_scale               = 0.050
+   vp_param(3)            = 1.0
+   vp_as_is               = .true.
+   skip_tests             = .T.
+   output_each            = 200
+   composition_threshold  = -1,     ! Composition analysis invalid due to non-zero final A!
+   field_preview          = ' '
+   wt_atomic_cache_prefix = ' '
+   detail_output          = ' '
+ /

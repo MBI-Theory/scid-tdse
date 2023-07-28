@@ -1,0 +1,1341 @@
+Version: Optimized gfortran-13 (ZEN/EPYC), built on balrog.mbi-berlin.de at Fri 28 Jul 2023 02:41:14 PM CEST
+
+    $Id: hydrogen_static.out_ref,v 1.1 2023/07/28 14:05:38 ps Exp ps $
+    $Id: hydrogen_static.out_ref,v 1.1 2023/07/28 14:05:38 ps Exp ps $
+    $Id: hydrogen_static.out_ref,v 1.1 2023/07/28 14:05:38 ps Exp ps $
+    $Id: hydrogen_static.out_ref,v 1.1 2023/07/28 14:05:38 ps Exp ps $
+    $Id: hydrogen_static.out_ref,v 1.1 2023/07/28 14:05:38 ps Exp ps $
+    $Id: hydrogen_static.out_ref,v 1.1 2023/07/28 14:05:38 ps Exp ps $
+    $Id: hydrogen_static.out_ref,v 1.1 2023/07/28 14:05:38 ps Exp ps $
+    $Id: hydrogen_static.out_ref,v 1.1 2023/07/28 14:05:38 ps Exp ps $
+    $Id: hydrogen_static.out_ref,v 1.1 2023/07/28 14:05:38 ps Exp ps $
+    $Id: hydrogen_static.out_ref,v 1.1 2023/07/28 14:05:38 ps Exp ps $
+    $Id: hydrogen_static.out_ref,v 1.1 2023/07/28 14:05:38 ps Exp ps $
+    $Id: hydrogen_static.out_ref,v 1.1 2023/07/28 14:05:38 ps Exp ps $
+    $Id: hydrogen_static.out_ref,v 1.1 2023/07/28 14:05:38 ps Exp ps $
+    $Id: hydrogen_static.out_ref,v 1.1 2023/07/28 14:05:38 ps Exp ps $
+    $Id: hydrogen_static.out_ref,v 1.1 2023/07/28 14:05:38 ps Exp ps $
+    $Id: hydrogen_static.out_ref,v 1.1 2023/07/28 14:05:38 ps Exp ps $
+    $Id: hydrogen_static.out_ref,v 1.1 2023/07/28 14:05:38 ps Exp ps $
+    $Id: hydrogen_static.out_ref,v 1.1 2023/07/28 14:05:38 ps Exp ps $
+    $Id: hydrogen_static.out_ref,v 1.1 2023/07/28 14:05:38 ps Exp ps $
+    $Id: hydrogen_static.out_ref,v 1.1 2023/07/28 14:05:38 ps Exp ps $
+    $Id: hydrogen_static.out_ref,v 1.1 2023/07/28 14:05:38 ps Exp ps $
+    $Id: hydrogen_static.out_ref,v 1.1 2023/07/28 14:05:38 ps Exp ps $
+    $Id: hydrogen_static.out_ref,v 1.1 2023/07/28 14:05:38 ps Exp ps $
+    $Id: hydrogen_static.out_ref,v 1.1 2023/07/28 14:05:38 ps Exp ps $
+    $Id: hydrogen_static.out_ref,v 1.1 2023/07/28 14:05:38 ps Exp ps $
+    $Id: hydrogen_static.out_ref,v 1.1 2023/07/28 14:05:38 ps Exp ps $
+    $Id: hydrogen_static.out_ref,v 1.1 2023/07/28 14:05:38 ps Exp ps $
+
+    Integer kind = 4 (9 decimals)
+       Real kind = 8 (15 decimals)
+  Aux. real kind = 8 (15 decimals)
+Max. LAPACK kind = 8 (15 decimals)
+
+ ===== begin simulation parameters ===== 
+&SPH_TDSE
+ VERBOSE=1          ,
+ COMMENT="Hydrogen 1S static-field ionization, F=0.05                                                                                                                                                                                                                    ",
+ OMP_NUM_THREADS=6          ,
+ INITIAL_WFN="single                                                                                                                                                                                                                                                         ",
+ INITIAL_WFN_INDEX= 2*0          ,1          ,
+ INITIAL_WFN_ENERGY=(-0.50000000000000000,0.0000000000000000),
+ INITIAL_WFN_FILE="                                                                                                                                                                                                                                                               ",
+ TASK="real time                                                                                                                                                                                                                                                      ",
+ DT=  1.0000000000000000E-003,
+ DT_SUBDIVISION="off                                                                                                                                                                                                                                                            ",
+ DT_MAX_LA=  2.0000000000000000     ,
+ DT_INTERPOLANT_WIDTH=5          ,
+ TIMESTEPS=120000     ,
+ ROTATION_MODE="auto                                                                                                                                                                                                                                                           ",
+ FIELD_UNWRAP=T,
+ UNWRAP_THRESHOLD=  1.0000000000000000E-008,
+ FIELD_PREVIEW="                                                                                                                                                                                                                                                               ",
+ SKIP_TESTS=T,
+ OUTPUT_EACH=200        ,
+ DETAIL_FREQUENCY=1          ,
+ DETAIL_OUTPUT="                                                                                                                                                                                                                                                               ",
+ COMPOSITION_THRESHOLD= -1.0000000000000000     ,
+ COMPOSITION_MAX_ENERGY=  1.7976931348623157E+308,
+ FINAL_WF_DUMP_PREFIX="                                                                                                                                                                                                                                                               ",
+ INITIAL_WF_DUMP_PREFIX="                                                                                                                                                                                                                                                               ",
+ VP_AS_IS=T,
+ DO_DIPOLE= 3*T,
+ DO_DIPOLE_PLASMA=T,
+ VISUALIZE_PREFIX="                                                                                                                                                                                                                                                               ",
+ VISUALIZE_EACH=1000       ,
+ VISUALIZE_1STSEQ=1          ,
+ SKIP_LEFT_PROPAGATION=F,
+ FAKE_LEFT_PROPAGATION=T,
+ RECONSTRUCT_LEFT=F,
+ SD_NRADIAL=200        ,
+ SD_NSPIN=1          ,
+ SD_LMAX=150        ,
+ SD_MMIN=0          ,
+ SD_MMAX=0          ,
+ SD_ADAPTIVE_L=T,
+ SD_TOLERANCE_L= 2*-1.0000000000000000      ,
+ SD_ADAPTIVE_R=T,
+ SD_TOLERANCE_R= 2*-1.0000000000000000      ,
+ SD_NRADIAL_SCL=  1.1000000000000001     ,
+ SD_RADIAL_EDGE=-1         ,
+ SD_RGRID="uniform                                                                                                                                                                                                                                                        ",
+ SD_RGRID_ZETA=  1.0000000000000000     ,
+ SD_RGRID_RMIN=  0.0000000000000000     ,
+ SD_RGRID_DR= 0.20000000000000001     ,
+ SD_RGRID_R0=  1.0000000000000000E-002,
+ SD_RGRID_SCALE=  1.0500000000000000     ,
+ SD_RGRID_NPAD=-1         ,
+ SD_RGRID_FILE="grid.dat                                                                                                                                                                                                                                                       ",
+ SD_RGRID_REPORT="                                                                                                                                                                                                                                                               ",
+ SD_RGRID_GRAD_DELTA=  1.0000000000000000E-002,
+ SD_OPERATORS="channel                                                                                                                                                                                                                                                        ",
+ POT_NAME="hydrogenic          ",
+ POT_PARAM=  1.0000000000000000     , 4*0.0000000000000000       ,
+ POT_MASK="none                ",
+ POT_MASK_R0=  1000.0000000000000     ,
+ POT_MASK_RX=  2000.0000000000000     ,
+ POT_SHIFT=  0.0000000000000000     ,
+ POT_LMAX=0          ,
+ POT_TONG05= 45*0.0000000000000000       ,
+ POT_INPUT= 80*0.0000000000000000       ,
+ PT_MIX_SOLVER="default             ",
+ PT_CHUNK=1          ,
+ PT_SENSE_REAL=T,
+ PT_EPS_DT= -1.0000000000000000     ,
+ PT_FORCE_PAR_L=F,
+ VP_SCALE=  5.0000000000000003E-002,
+ VP_SCALE_X=  0.0000000000000000     ,
+ VP_SHAPE="z linear                                                                                                                                                                                                                                                       ",
+ VP_PARAM= 2*0.0000000000000000       ,  1.0000000000000000     , 17*0.0000000000000000       ,
+ VP_PARAM_X= 20*0.0000000000000000       ,
+ VP_TABLE="vp.table                                                                                                                                                                                                                                                       ",
+ TIMER_DISABLE=F,
+ BICG_FAILTRACE=T,
+ BICG_EPSILON=  0.0000000000000000     ,
+ BICG_MAXITER=8          ,
+ RT_MAX_ROT=  1.0000000000000000E-003,
+ RT_BLOCKSIZE=16         ,
+ RT_SENSE_REAL=T,
+ RT_NSTEP_MAX=100        ,
+ WT_ATOMIC_CACHE_PREFIX="                                                                                                                                                                                                                                                               ",
+ WT_ITERATIVE_IMPROVEMENT=T,
+ WT_DISABLE_ORTHOGONALIZATION=F,
+ WT_MAX_SOLUTION_ITERATIONS=20         ,
+ WT_ENABLE_MEMORY_CACHES= 2*F,
+ CAP_NAME="manolopoulos                                                                                                                                                                                                                                                   ",
+ CAP_PARAM= 0.50000000000000000     , 0.20000000000000001     ,
+ STS_VOLKOV=F,
+ STS_VOLKOV_ATEND=F,
+ STS_COULOMB_ATEND=F,
+ STS_STEP_FREQUENCY=8          ,
+ STS_VERBOSE=1          ,
+ STS_RMATCH= -10.000000000000000     ,
+ STS_KGRID="uniform                                                                                                                                                                                                                                                        ",
+ STS_DGRID="product                                                                                                                                                                                                                                                        ",
+ STS_KGRID_MIN=  0.0000000000000000     ,
+ STS_KGRID_MAX=  3.0000000000000000     ,
+ STS_KGRID_COUNT=100        ,
+ STS_KGRID_FILE="km.table                                                                                                                                                                                                                                                       ",
+ STS_DGRID_NTHETA=15         ,
+ STS_DGRID_NPHI=30         ,
+ STS_DGRID_COUNT=0          ,
+ STS_DGRID_FILE="kd.table                                                                                                                                                                                                                                                       ",
+ STS_ASYMPTOTIC_Q=  1.0000000000000000     ,
+ STS_VOLKOV_TABLE="                                                                                                                                                                                                                                                               ",
+ STS_VOLKOV_OPENDX="tsurf.dx                                                                                                                                                                                                                                                       ",
+ STS_COULOMB_WAVES="                                                                                                                                                                                                                                                               ",
+ STS_COULOMB_TABLE="                                                                                                                                                                                                                                                               ",
+ STS_COULOMB_OPENDX="coulomb.dx                                                                                                                                                                                                                                                     ",
+ STS_ATEND_BLOCK=32         ,
+ STS_R2R_SCALE= -1.0000000000000000     ,
+ STS_ATEND_MODE="direct                                                                                                                                                                                                                                                         ",
+ M3D_SOLVER="unpivoted ",
+ M3D_ITERATIONS=2          ,
+ CKPT_SAVE_BASENAME="                                                                                                                                                                                                                                                               ",
+ CKPT_LOAD_FILENAME="                                                                                                                                                                                                                                                               ",
+ CKPT_MAX_CHECKPOINTS=3          ,
+ CKPT_INTERVAL=10000      ,
+ CA_MAXRAM=  0.0000000000000000     ,
+ NT_NODE_OUTPUT="node_                                                                                                                                                                                                                                                          ",
+ NT_REBALANCE_INTERVAL=500        ,
+ NT_USE_MULTINODE=F,
+ NT_VERBOSE=2          ,
+ NT_MAX_REQUESTS=128        ,
+ /
+ ====== end simulation parameters ====== 
+
+Hydrogen 1S static-field ionization, F=0.05
+
+Forcing number of OpenMP threads to 6
+Maximum number of OpenMP threads for this run is 6
+Coulombic nuclear potential. Nuclear charge =       1.000000000000    
+
+Using absorbing outer boundary from: D.E. Manolopoulos, JCP 117, 9552 (2002)
+     delta =      0.2000000000000    
+      kmin =      0.5000000000000    
+     width =       13.11028777146    
+     scale =      0.1250000000000    
+
+sd_radial_edge reset to     64
+
+Creating uniform grid with step      0.2000000000000     Bohr
+
+        Number of radial grid points = 200
+                The world starts at r=       0.000000000000    
+    First explicit grid point is at r=      0.2000000000000    
+      Last explicit grid point s at r=       40.00000000000    
+                  The world ends at r=       40.20000000000    
+Effective nuclear charge for L=0 grid=       1.000000000000    
+
+Right/left adaptive tolerance (L) =   0.138778E-16  0.277556E-17
+Right/left adaptive tolerance (R) =   0.138778E-16  0.277556E-17
+
+L>=1 channel d1(1,1)=       0.000000000000     m1(1,1)=      0.6666666666667    
+ L=0 channel d1(1,1)=      -1.503759398496     m1(1,1)=      0.5413533834586    
+L>=1 channel d2(1,1)=      -57.14285714286     m2(1,1)=      0.7619047619048    
+ L=0 channel d2(1,1)=      -49.05660377358     m2(1,1)=      0.8427672955975    
+
+Complex absorbing potential starts at grid point 136 r=       27.20000000000    
+Wavefunction requires        0.916 Mbytes of memory
+Choosing atomic solution with L=0 M=0 I=1
+Solving for atomic eigenvector L=0 E(guess)=       -0.500000000000              0.00000000000     using inverse iterations.
+ Iteration 1 E=    -0.500018438101972995113442         -0.592766932917202449472020E-022  change =  -0.184381E-004  -0.592767E-022
+ Iteration 2 E=    -0.500018438101973772269560         -0.592766932917428026837943E-022  change =  -0.777156E-015  -0.225577E-034
+ Final iteration E=    -0.500018438101972995113442         -0.592766932917202684570890E-022  change =   0.777156E-015   0.225342E-034
+Final energy    -0.500018438101972995113442         -0.592766932917202684570890E-022
+Energy of the atomic solution is     -0.5000184381019730          -0.5927669329172027E-022 Hartree
+        Initial wavefunction norm was      1.000000000000         -0.1472674016390E-035
+Right wavefunction Cartesian norm was      1.000000000000     
+                  Left/Right Lmax was    1   1
+               Left/Right nradial was      200     200
+
+ Right to real-space wavefunction conversion factor:    2.24209384965029245861956    
+
+
+Done with initialization
+
+
+              Timing data at 2023/07/28 15:54:57
+
+                                                       Total time (seconds)           Self time (seconds)
+ Timer                                   Calls         --------------------           -------------------
+ -----                                   -----           Real           CPU            Real           CPU
+
+ start                          *           1.            0.0           0.0             0.0           0.0
+ Initialization                             1.            0.0           0.0             0.0           0.0
+ Grid (re-)initialization                   1.            0.0           0.0             0.0           0.0
+ Initial wavefunction                       1.            0.0           0.0             0.0           0.0
+ Atomic solution (single)                   1.            0.0           0.0             0.0           0.0
+ WF normalize                               1.            0.0           0.0             0.0           0.0
+ WT reset_lrmax                             2.            0.0           0.0             0.0           0.0
+
+ (  2 timers contributing less than 1% are not shown)
+
+
+Real-time propagation
+
+
+Chosen rotation_mode = 'none'
+
+
+Using linearly-growing vector-potential along Z
+      Startig time =       1.000000000000     [a.u. time]
+    Electric field =     -0.5000000000000E-01 [a.u. field]
+
+WARNING: Vector potential at time steps <= 0 and/or the end of the simulation is not zero
+WARNING: USING VECTOR-POTENTIAL AS IS. THE RESULTS ARE LIKELY UNPHYSICAL.
+
+
+Skipping vector-potential unwrapping
+
+
+Detailed output is not enabled; will not calculate dipole velocity or acceleration
+
+@         0 t=       0.0000 a=       0.000000 th=      0.000 ph=      0.000 <l|r>=       1.00000000000          0.161630E-37 <l|h|r>=     -0.500018438102         -0.592767E-22 |d|=       0.00000000    
+@       200 t=       0.2000 a=       0.000000 th=      0.000 ph=      0.000 <l|r>=       1.00000000000         -0.100043E-15 <l|h|r>=     -0.500018438102          0.219949E-16 |d|=       0.00000000    
+@       400 t=       0.4000 a=       0.000000 th=      0.000 ph=      0.000 <l|r>=       1.00000000000         -0.392364E-15 <l|h|r>=     -0.500018438102          0.148974E-15 |d|=       0.00000000    
+@       600 t=       0.6000 a=       0.000000 th=      0.000 ph=      0.000 <l|r>=       1.00000000000         -0.323322E-15 <l|h|r>=     -0.500018438102          0.578134E-16 |d|=       0.00000000    
+@       800 t=       0.8000 a=       0.000000 th=      0.000 ph=      0.000 <l|r>=       1.00000000000         -0.960764E-15 <l|h|r>=     -0.500018438102          0.542446E-15 |d|=       0.00000000    
+@      1000 t=       1.0000 a=       0.000000 th=      0.000 ph=      0.000 <l|r>=       1.00000000000         -0.277869E-14 <l|h|r>=     -0.500018438102          0.165772E-14 |d|=       0.00000000    
+wt_update_lmax: L increased from 1 max_val =       0.474989360047E-08      0.329062428315    
+wt_update_lmax: L increased from 1 max_val =       0.474548358188E-08      0.329034745348    
+wt_update_lmax: L increased from 2 max_val =       0.101075299608E-14      0.189995851239E-07
+wt_update_lmax: L increased from 2 max_val =       0.938313395221E-15      0.189820134904E-07
+wt_update_lmax: L increased from 3 max_val =       0.429526223859E-17      0.113496762610E-11
+wt_update_lmax: L increased from 3 max_val =       0.206705212490E-16      0.321374904159E-11
+wt_update_lmax: L increased from 4 max_val =       0.297649962809E-17      0.404814175451E-13
+wt_update_lmax: L increased from 4 max_val =       0.141366118918E-16      0.131886520490E-12
+wt_update_lmax: L increased from 5 max_val =       0.282147527756E-17      0.673171868962E-14
+wt_update_lmax: L increased from 5 max_val =       0.142892423410E-16      0.248594178683E-13
+@      1200 t=       1.2000 a=       0.010000 th=      0.000 ph=      0.000 <l|r>=       1.00000000000         -0.455812E-14 <l|h|r>=     -0.499968589472          0.193413E-14 |d|=      0.996977871E-03
+wt_update_lmax: L increased from 6 max_val =       0.277633576072E-17      0.203948968080E-14
+wt_update_lmax: L increased from 6 max_val =       0.141205408949E-16      0.827057477010E-14
+@      1400 t=       1.4000 a=       0.020000 th=      0.000 ph=      0.000 <l|r>=       1.00000000000         -0.411377E-14 <l|h|r>=     -0.499820534351         -0.907905E-14 |d|=      0.395808838E-02
+wt_update_lmax: L increased from 7 max_val =       0.282981968537E-17      0.909156237452E-15
+@      1600 t=       1.6000 a=       0.030000 th=      0.000 ph=      0.000 <l|r>=       1.00000000000         -0.409993E-14 <l|h|r>=     -0.499577951088         -0.886070E-13 |d|=      0.880976763E-02
+wt_update_lmax: L increased from 7 max_val =       0.140165822227E-16      0.356385680473E-14
+@      1800 t=       1.8000 a=       0.040000 th=      0.000 ph=      0.000 <l|r>=       1.00000000000         -0.683052E-14 <l|h|r>=     -0.499245883368         -0.380245E-12 |d|=      0.154511404E-01
+wt_update_lmax: L increased from 8 max_val =       0.278376279333E-17      0.391517490555E-15
+@      2000 t=       2.0000 a=       0.050000 th=      0.000 ph=      0.000 <l|r>=       1.00000000000         -0.656077E-14 <l|h|r>=     -0.498830305971         -0.115533E-11 |d|=      0.237627101E-01
+wt_update_lmax: L increased from 8 max_val =       0.140604024196E-16      0.151819866220E-14
+wt_update_lmax: L increased from 9 max_val =       0.280666212509E-17      0.159077386557E-15
+@      2200 t=       2.2000 a=       0.060000 th=      0.000 ph=      0.000 <l|r>=       1.00000000000         -0.687383E-14 <l|h|r>=     -0.498337839667         -0.283739E-11 |d|=      0.336120582E-01
+wt_update_lmax: L increased from 9 max_val =       0.139573749626E-16      0.642595766513E-15
+@      2400 t=       2.4000 a=       0.070000 th=      0.000 ph=      0.000 <l|r>=       1.00000000000         -0.612774E-14 <l|h|r>=     -0.497775544085         -0.603798E-11 |d|=      0.448579904E-01
+wt_update_lmax: L increased from 10 max_val =       0.279049112809E-17      0.109210509661E-15
+@      2600 t=       2.6000 a=       0.080000 th=      0.000 ph=      0.000 <l|r>=       1.00000000000         -0.706242E-14 <l|h|r>=     -0.497150758946         -0.115759E-10 |d|=      0.573537089E-01
+wt_update_lmax: L increased from 10 max_val =       0.139664766028E-16      0.459540130738E-15
+@      2800 t=       2.8000 a=       0.090000 th=      0.000 ph=      0.000 <l|r>=       1.00000000000         -0.721577E-14 <l|h|r>=     -0.496470977907         -0.205063E-10 |d|=      0.709493384E-01
+wt_update_lmax: L increased from 11 max_val =       0.277565362995E-17      0.826776253538E-16
+wt_update_lmax: L increased from 11 max_val =       0.139549409933E-16      0.353564673477E-15
+@      3000 t=       3.0000 a=       0.100000 th=      0.000 ph=      0.000 <l|r>=       1.00000000000         -0.729498E-14 <l|h|r>=     -0.495743746007         -0.341322E-10 |d|=      0.854939749E-01
+wt_update_lmax: L increased from 12 max_val =       0.278222358588E-17      0.661733169939E-16
+@      3200 t=       3.2000 a=       0.110000 th=      0.000 ph=      0.000 <l|r>=      0.999999999999         -0.749410E-14 <l|h|r>=     -0.494976574752         -0.540173E-10 |d|=      0.100837386    
+wt_update_lmax: L increased from 12 max_val =       0.139499475455E-16      0.286439736074E-15
+@      3400 t=       3.4000 a=       0.120000 th=      0.000 ph=      0.000 <l|r>=      0.999999999999         -0.785273E-14 <l|h|r>=     -0.494176871023         -0.820028E-10 |d|=      0.116831431    
+wt_update_lmax: L increased from 13 max_val =       0.279180525699E-17      0.551262097551E-16
+@      3600 t=       3.6000 a=       0.130000 th=      0.000 ph=      0.000 <l|r>=      0.999999999999         -0.715739E-14 <l|h|r>=     -0.493351876982         -0.120193E-09 |d|=      0.133331265    
+wt_update_lmax: L increased from 13 max_val =       0.139034000144E-16      0.241963602133E-15
+wt_update_lmax: L increased from 14 max_val =       0.278894300840E-17      0.473244395119E-16
+@      3800 t=       3.8000 a=       0.140000 th=      0.000 ph=      0.000 <l|r>=      0.999999999999         -0.714520E-14 <l|h|r>=     -0.492508619073         -0.170978E-09 |d|=      0.150196355    
+wt_update_lmax: L increased from 14 max_val =       0.139900876737E-16      0.210279866262E-15
+@      4000 t=       4.0000 a=       0.150000 th=      0.000 ph=      0.000 <l|r>=      0.999999999999         -0.826977E-14 <l|h|r>=     -0.491653864594         -0.236995E-09 |d|=      0.167291354    
+wt_update_lmax: L increased from 15 max_val =       0.280070583650E-17      0.417236317708E-16
+@      4200 t=       4.2000 a=       0.160000 th=      0.000 ph=      0.000 <l|r>=      0.999999999999         -0.929911E-14 <l|h|r>=     -0.490794084783         -0.321160E-09 |d|=      0.184486834    
+wt_update_lmax: L increased from 15 max_val =       0.138872878755E-16      0.185551505968E-15
+wt_update_lmax: L increased from 16 max_val =       0.279429684138E-17      0.374370774083E-16
+@      4400 t=       4.4000 a=       0.170000 th=      0.000 ph=      0.000 <l|r>=      0.999999999999         -0.102999E-13 <l|h|r>=     -0.489935423538         -0.426592E-09 |d|=      0.201659916    
+wt_update_lmax: L increased from 16 max_val =       0.138844565712E-16      0.167955745619E-15
+@      4600 t=       4.6000 a=       0.180000 th=      0.000 ph=      0.000 <l|r>=      0.999999999999         -0.111980E-13 <l|h|r>=     -0.489083671133         -0.556676E-09 |d|=      0.218694791    
+wt_update_lmax: L increased from 17 max_val =       0.278764920389E-17      0.338734227351E-16
+@      4800 t=       4.8000 a=       0.190000 th=      0.000 ph=      0.000 <l|r>=      0.999999999999         -0.122435E-13 <l|h|r>=     -0.488244242406         -0.714949E-09 |d|=      0.235483160    
+wt_update_lmax: L increased from 17 max_val =       0.139666578222E-16      0.154216309305E-15
+wt_update_lmax: L increased from 18 max_val =       0.278260775298E-17      0.310669112780E-16
+@      5000 t=       5.0000 a=       0.200000 th=      0.000 ph=      0.000 <l|r>=      0.999999999999         -0.117015E-13 <l|h|r>=     -0.487422158986         -0.905166E-09 |d|=      0.251924590    
+wt_update_lmax: L increased from 18 max_val =       0.139047418493E-16      0.141878301176E-15
+@      5200 t=       5.2000 a=       0.210000 th=      0.000 ph=      0.000 <l|r>=      0.999999999999         -0.116331E-13 <l|h|r>=     -0.486622035256         -0.113115E-08 |d|=      0.267926790    
+wt_update_lmax: L increased from 19 max_val =       0.279080867872E-17      0.288206436535E-16
+@      5400 t=       5.4000 a=       0.220000 th=      0.000 ph=      0.000 <l|r>=      0.999999999999         -0.123270E-13 <l|h|r>=     -0.485848067731         -0.139691E-08 |d|=      0.283405829    
+wt_update_lmax: L increased from 19 max_val =       0.139143739911E-16      0.131698981604E-15
+wt_update_lmax: L increased from 20 max_val =       0.277691414278E-17      0.267451434278E-16
+@      5600 t=       5.6000 a=       0.230000 th=      0.000 ph=      0.000 <l|r>=      0.999999999998         -0.976534E-14 <l|h|r>=     -0.485104027672         -0.170646E-08 |d|=      0.298286279    
+wt_update_lmax: L increased from 20 max_val =       0.139261951068E-16      0.122009400321E-15
+@      5800 t=       5.8000 a=       0.240000 th=      0.000 ph=      0.000 <l|r>=      0.999999999998         -0.103543E-13 <l|h|r>=     -0.484393256673         -0.206398E-08 |d|=      0.312501307    
+wt_update_lmax: L increased from 21 max_val =       0.278449970243E-17      0.247519705197E-16
+@      6000 t=       6.0000 a=       0.250000 th=      0.000 ph=      0.000 <l|r>=      0.999999999996         -0.986165E-14 <l|h|r>=     -0.483718665128         -0.247344E-08 |d|=      0.325992703    
+wt_update_lmax: L increased from 21 max_val =       0.138998114630E-16      0.105351604480E-15
+@      6200 t=       6.2000 a=       0.260000 th=      0.000 ph=      0.000 <l|r>=      0.999999999994         -0.875552E-14 <l|h|r>=     -0.483082733324         -0.293849E-08 |d|=      0.338710862    
+wt_update_lmax: L increased from 22 max_val =       0.277733134358E-17      0.212558746512E-16
+@      6400 t=       6.4000 a=       0.270000 th=      0.000 ph=      0.000 <l|r>=      0.999999999991         -0.683197E-14 <l|h|r>=     -0.482487515146         -0.346334E-08 |d|=      0.350614702    
+@      6600 t=       6.6000 a=       0.280000 th=      0.000 ph=      0.000 <l|r>=      0.999999999987         -0.393317E-14 <l|h|r>=     -0.481934644133         -0.405176E-08 |d|=      0.361671553    
+wt_update_lmax: L increased from 22 max_val =       0.138844219746E-16      0.957125451384E-16
+wt_update_lmax: L increased from 23 max_val =       0.278930552157E-17      0.194775310634E-16
+@      6800 t=       6.8000 a=       0.290000 th=      0.000 ph=      0.000 <l|r>=      0.999999999980          0.736734E-16 <l|h|r>=     -0.481425341870         -0.470731E-08 |d|=      0.371856981    
+@      7000 t=       7.0000 a=       0.300000 th=      0.000 ph=      0.000 <l|r>=      0.999999999971          0.412865E-14 <l|h|r>=     -0.480960428484         -0.543348E-08 |d|=      0.381154583    
+wt_update_lmax: L increased from 23 max_val =       0.138871753419E-16      0.895398037474E-16
+@      7200 t=       7.2000 a=       0.310000 th=      0.000 ph=      0.000 <l|r>=      0.999999999958          0.939484E-14 <l|h|r>=     -0.480540335252         -0.623342E-08 |d|=      0.389555732    
+wt_update_lmax: L increased from 24 max_val =       0.277642928170E-17      0.183699230633E-16
+@      7400 t=       7.4000 a=       0.320000 th=      0.000 ph=      0.000 <l|r>=      0.999999999939          0.177447E-13 <l|h|r>=     -0.480165119041         -0.711018E-08 |d|=      0.397059292    
+@      7600 t=       7.6000 a=       0.330000 th=      0.000 ph=      0.000 <l|r>=      0.999999999913          0.270245E-13 <l|h|r>=     -0.479834478618         -0.806643E-08 |d|=      0.403671284    
+wt_update_lmax: L increased from 24 max_val =       0.139200603598E-16      0.858012485676E-16
+wt_update_lmax: L increased from 25 max_val =       0.279021262761E-17      0.174579019599E-16
+@      7800 t=       7.8000 a=       0.340000 th=      0.000 ph=      0.000 <l|r>=      0.999999999878          0.376210E-13 <l|h|r>=     -0.479547772533         -0.910473E-08 |d|=      0.409404539    
+@      8000 t=       8.0000 a=       0.350000 th=      0.000 ph=      0.000 <l|r>=      0.999999999831          0.519147E-13 <l|h|r>=     -0.479304038605         -0.102273E-07 |d|=      0.414278298    
+wt_update_lmax: L increased from 25 max_val =       0.139921709221E-16      0.826335288070E-16
+@      8200 t=       8.2000 a=       0.360000 th=      0.000 ph=      0.000 <l|r>=      0.999999999769          0.682973E-13 <l|h|r>=     -0.479102014706         -0.114362E-07 |d|=      0.418317804    
+wt_update_lmax: L increased from 26 max_val =       0.277562566261E-17      0.161523363289E-16
+@      8400 t=       8.4000 a=       0.370000 th=      0.000 ph=      0.000 <l|r>=      0.999999999686          0.872179E-13 <l|h|r>=     -0.478940160862         -0.127332E-07 |d|=      0.421553857    
+@      8600 t=       8.6000 a=       0.380000 th=      0.000 ph=      0.000 <l|r>=      0.999999999577          0.110688E-12 <l|h|r>=     -0.478816682355         -0.141202E-07 |d|=      0.424022350    
+wt_update_lmax: L increased from 26 max_val =       0.139073034179E-16      0.774581040631E-16
+wt_update_lmax: L increased from 27 max_val =       0.278683172616E-17      0.158281689918E-16
+@      8800 t=       8.8000 a=       0.390000 th=      0.000 ph=      0.000 <l|r>=      0.999999999436          0.139022E-12 <l|h|r>=     -0.478729553839         -0.155988E-07 |d|=      0.425763791    
+@      9000 t=       9.0000 a=       0.400000 th=      0.000 ph=      0.000 <l|r>=      0.999999999253          0.171271E-12 <l|h|r>=     -0.478676544145         -0.171705E-07 |d|=      0.426822804    
+wt_update_lmax: L increased from 27 max_val =       0.140046916661E-16      0.740016397427E-16
+@      9200 t=       9.2000 a=       0.410000 th=      0.000 ph=      0.000 <l|r>=      0.999999999019          0.209927E-12 <l|h|r>=     -0.478655241774         -0.188373E-07 |d|=      0.427247617    
+wt_update_lmax: L increased from 28 max_val =       0.278134300025E-17      0.148030173542E-16
+@      9400 t=       9.4000 a=       0.420000 th=      0.000 ph=      0.000 <l|r>=      0.999999998722          0.254567E-12 <l|h|r>=     -0.478663080755         -0.206011E-07 |d|=      0.427089552    
+@      9600 t=       9.6000 a=       0.430000 th=      0.000 ph=      0.000 <l|r>=      0.999999998345          0.306653E-12 <l|h|r>=     -0.478697366853         -0.224644E-07 |d|=      0.426402492    
+wt_update_lmax: L increased from 28 max_val =       0.139073975261E-16      0.679223614191E-16
+wt_update_lmax: L increased from 29 max_val =       0.279821883048E-17      0.141425777911E-16
+@      9800 t=       9.8000 a=       0.440000 th=      0.000 ph=      0.000 <l|r>=      0.999999997871          0.365910E-12 <l|h|r>=     -0.478755303804         -0.244301E-07 |d|=      0.425242366    
+@     10000 t=      10.0000 a=       0.450000 th=      0.000 ph=      0.000 <l|r>=      0.999999997277          0.433878E-12 <l|h|r>=     -0.478834019567         -0.265022E-07 |d|=      0.423666613    
+wt_update_lmax: L increased from 29 max_val =       0.139029938160E-16      0.639838843237E-16
+@     10200 t=      10.2000 a=       0.460000 th=      0.000 ph=      0.000 <l|r>=      0.999999996539          0.511291E-12 <l|h|r>=     -0.478930592260         -0.286853E-07 |d|=      0.421733673    
+wt_update_lmax: L increased from 30 max_val =       0.278163876079E-17      0.132736890229E-16
+@     10400 t=      10.4000 a=       0.470000 th=      0.000 ph=      0.000 <l|r>=      0.999999995623          0.602963E-12 <l|h|r>=     -0.479042075769         -0.309857E-07 |d|=      0.419502469    
+@     10600 t=      10.6000 a=       0.480000 th=      0.000 ph=      0.000 <l|r>=      0.999999994495          0.707102E-12 <l|h|r>=     -0.479165524723         -0.334110E-07 |d|=      0.417031910    
+wt_update_lmax: L increased from 30 max_val =       0.139276691477E-16      0.612929318265E-16
+wt_update_lmax: L increased from 31 max_val =       0.277684855766E-17      0.124736679668E-16
+@     10800 t=      10.8000 a=       0.490000 th=      0.000 ph=      0.000 <l|r>=      0.999999993109          0.824021E-12 <l|h|r>=     -0.479298018804         -0.359713E-07 |d|=      0.414380403    
+@     11000 t=      11.0000 a=       0.500000 th=      0.000 ph=      0.000 <l|r>=      0.999999991415          0.955736E-12 <l|h|r>=     -0.479436686118         -0.386783E-07 |d|=      0.411605389    
+wt_update_lmax: L increased from 31 max_val =       0.139328938700E-16      0.581294090849E-16
+wt_update_lmax: L increased from 32 max_val =       0.277942075007E-17      0.117558833036E-16
+@     11200 t=      11.2000 a=       0.510000 th=      0.000 ph=      0.000 <l|r>=      0.999999989353          0.110601E-11 <l|h|r>=     -0.479578725591         -0.415474E-07 |d|=      0.408762890    
+wt_update_lmax: L increased from 33 max_val =       0.279058679244E-17      0.974038936101E-17
+@     11400 t=      11.4000 a=       0.520000 th=      0.000 ph=      0.000 <l|r>=      0.999999986850          0.127523E-11 <l|h|r>=     -0.479721428133         -0.445968E-07 |d|=      0.405907091    
+wt_update_lmax: L increased from 32 max_val =       0.139119617849E-16      0.408097668062E-16
+wt_update_lmax: L increased from 34 max_val =       0.278336544906E-17      0.107503633588E-16
+@     11600 t=      11.6000 a=       0.530000 th=      0.000 ph=      0.000 <l|r>=      0.999999983825          0.146503E-11 <l|h|r>=     -0.479862196557         -0.478491E-07 |d|=      0.403089938    
+wt_update_lmax: L increased from 33 max_val =       0.138799268998E-16      0.491166601853E-16
+wt_update_lmax: L increased from 35 max_val =       0.278731252603E-17      0.111007295144E-16
+@     11800 t=      11.8000 a=       0.540000 th=      0.000 ph=      0.000 <l|r>=      0.999999980180          0.167865E-11 <l|h|r>=     -0.479998564018         -0.513308E-07 |d|=      0.400360770    
+wt_update_lmax: L increased from 34 max_val =       0.139829554303E-16      0.521718017025E-16
+wt_update_lmax: L increased from 36 max_val =       0.279405276438E-17      0.111966387678E-16
+@     12000 t=      12.0000 a=       0.550000 th=      0.000 ph=      0.000 <l|r>=      0.999999975804          0.191883E-11 <l|h|r>=     -0.480128210957         -0.550747E-07 |d|=      0.397765982    
+wt_update_lmax: L increased from 35 max_val =       0.139453340263E-16      0.530257897124E-16
+wt_update_lmax: L increased from 37 max_val =       0.278751767576E-17      0.111415409846E-16
+@     12200 t=      12.2000 a=       0.560000 th=      0.000 ph=      0.000 <l|r>=      0.999999970565          0.218549E-11 <l|h|r>=     -0.480248980362         -0.591186E-07 |d|=      0.395348717    
+wt_update_lmax: L increased from 36 max_val =       0.139983717572E-16      0.529379781621E-16
+wt_update_lmax: L increased from 38 max_val =       0.278048424952E-17      0.110132246938E-16
+@     12400 t=      12.4000 a=       0.570000 th=      0.000 ph=      0.000 <l|r>=      0.999999964312          0.248371E-11 <l|h|r>=     -0.480358891343         -0.635083E-07 |d|=      0.393148597    
+wt_update_lmax: L increased from 37 max_val =       0.139954145350E-16      0.521465174045E-16
+wt_update_lmax: L increased from 39 max_val =       0.278907117953E-17      0.108082117959E-16
+@     12600 t=      12.6000 a=       0.580000 th=      0.000 ph=      0.000 <l|r>=      0.999999956871          0.281520E-11 <l|h|r>=     -0.480456150869         -0.682966E-07 |d|=      0.391201486    
+wt_update_lmax: L increased from 38 max_val =       0.139835332505E-16      0.506248538818E-16
+wt_update_lmax: L increased from 40 max_val =       0.277707355163E-17      0.102693054559E-16
+@     12800 t=      12.8000 a=       0.590000 th=      0.000 ph=      0.000 <l|r>=      0.999999948039          0.318317E-11 <l|h|r>=     -0.480539163670         -0.735461E-07 |d|=      0.389539295    
+wt_update_lmax: L increased from 39 max_val =       0.138834162852E-16      0.461558201761E-16
+@     13000 t=      13.0000 a=       0.600000 th=      0.000 ph=      0.000 <l|r>=      0.999999937585          0.359137E-11 <l|h|r>=     -0.480606540207         -0.793290E-07 |d|=      0.388189819    
+wt_update_lmax: L increased from 41 max_val =       0.278250583516E-17      0.873152776495E-17
+wt_update_lmax: L increased from 40 max_val =       0.139003714607E-16      0.390750282767E-16
+@     13200 t=      13.2000 a=       0.610000 th=      0.000 ph=      0.000 <l|r>=      0.999999925240          0.404350E-11 <l|h|r>=     -0.480657102723         -0.857296E-07 |d|=      0.387176618    
+wt_update_lmax: L increased from 42 max_val =       0.277733893588E-17      0.796138456373E-17
+@     13400 t=      13.4000 a=       0.620000 th=      0.000 ph=      0.000 <l|r>=      0.999999910698          0.454463E-11 <l|h|r>=     -0.480689889319         -0.928442E-07 |d|=      0.386518937    
+wt_update_lmax: L increased from 41 max_val =       0.138805600967E-16      0.368363404446E-16
+wt_update_lmax: L increased from 43 max_val =       0.278373247038E-17      0.740775181141E-17
+@     13600 t=      13.6000 a=       0.630000 th=      0.000 ph=      0.000 <l|r>=      0.999999893608          0.509708E-11 <l|h|r>=     -0.480704156089         -0.100785E-06 |d|=      0.386231661    
+wt_update_lmax: L increased from 42 max_val =       0.139244035717E-16      0.349248823102E-16
+@     13800 t=      13.8000 a=       0.640000 th=      0.000 ph=      0.000 <l|r>=      0.999999873567          0.570529E-11 <l|h|r>=     -0.480699377300         -0.109678E-06 |d|=      0.386325312    
+wt_update_lmax: L increased from 44 max_val =       0.277786159271E-17      0.722305909730E-17
+@     14000 t=      14.0000 a=       0.650000 th=      0.000 ph=      0.000 <l|r>=      0.999999850117          0.637447E-11 <l|h|r>=     -0.480675243678         -0.119670E-06 |d|=      0.386806083    
+wt_update_lmax: L increased from 43 max_val =       0.139543524535E-16      0.389766881010E-16
+wt_update_lmax: L increased from 45 max_val =       0.278290954200E-17      0.844087454550E-17
+@     14200 t=      14.2000 a=       0.660000 th=      0.000 ph=      0.000 <l|r>=      0.999999822733          0.710974E-11 <l|h|r>=     -0.480631658803         -0.130927E-06 |d|=      0.387675911    
+wt_update_lmax: L increased from 44 max_val =       0.139198443303E-16      0.469537869276E-16
+wt_update_lmax: L increased from 46 max_val =       0.279414448687E-17      0.985609953248E-17
+wt_update_lmax: L increased from 45 max_val =       0.139521614050E-16      0.501574533558E-16
+@     14400 t=      14.4000 a=       0.670000 th=      0.000 ph=      0.000 <l|r>=      0.999999790821          0.791719E-11 <l|h|r>=     -0.480568733723         -0.143637E-06 |d|=      0.388932586    
+wt_update_lmax: L increased from 47 max_val =       0.279095877625E-17      0.104124330064E-16
+wt_update_lmax: L increased from 46 max_val =       0.139380184872E-16      0.517389332590E-16
+wt_update_lmax: L increased from 48 max_val =       0.278458190011E-17      0.106851980019E-16
+@     14600 t=      14.6000 a=       0.680000 th=      0.000 ph=      0.000 <l|r>=      0.999999753702          0.880265E-11 <l|h|r>=     -0.480486779816         -0.158013E-06 |d|=      0.390569891    
+wt_update_lmax: L increased from 47 max_val =       0.139973245406E-16      0.527123527141E-16
+wt_update_lmax: L increased from 49 max_val =       0.277965224721E-17      0.108065037629E-16
+@     14800 t=      14.8000 a=       0.690000 th=      0.000 ph=      0.000 <l|r>=      0.999999710606          0.977340E-11 <l|h|r>=     -0.480386300021         -0.174296E-06 |d|=      0.392577778    
+wt_update_lmax: L increased from 48 max_val =       0.139196245428E-16      0.529451348671E-16
+wt_update_lmax: L increased from 50 max_val =       0.280384192734E-17      0.109173809050E-16
+wt_update_lmax: L increased from 49 max_val =       0.139729684150E-16      0.532179658079E-16
+@     15000 t=      15.0000 a=       0.700000 th=      0.000 ph=      0.000 <l|r>=      0.999999660662          0.108363E-10 <l|h|r>=     -0.480267978515         -0.192758E-06 |d|=      0.394942577    
+wt_update_lmax: L increased from 51 max_val =       0.280647880298E-17      0.109619180800E-16
+wt_update_lmax: L increased from 50 max_val =       0.138957913541E-16      0.530178256740E-16
+wt_update_lmax: L increased from 52 max_val =       0.280854607203E-17      0.109458865828E-16
+@     15200 t=      15.2000 a=       0.710000 th=      0.000 ph=      0.000 <l|r>=      0.999999602881          0.119956E-10 <l|h|r>=     -0.480132668962         -0.213705E-06 |d|=      0.397647228    
+wt_update_lmax: L increased from 51 max_val =       0.139418773651E-16      0.528875239429E-16
+wt_update_lmax: L increased from 53 max_val =       0.279935199751E-17      0.108811814897E-16
+@     15400 t=      15.4000 a=       0.720000 th=      0.000 ph=      0.000 <l|r>=      0.999999536147          0.132611E-10 <l|h|r>=     -0.479981381452         -0.237479E-06 |d|=      0.400671545    
+wt_update_lmax: L increased from 52 max_val =       0.138858523698E-16      0.524302982600E-16
+wt_update_lmax: L increased from 54 max_val =       0.278944257390E-17      0.107627231414E-16
+wt_update_lmax: L increased from 53 max_val =       0.139070870169E-16      0.518708225878E-16
+@     15600 t=      15.6000 a=       0.730000 th=      0.000 ph=      0.000 <l|r>=      0.999999459196          0.146397E-10 <l|h|r>=     -0.479815268274         -0.264465E-06 |d|=      0.403992499    
+wt_update_lmax: L increased from 55 max_val =       0.278354967134E-17      0.105960219760E-16
+wt_update_lmax: L increased from 54 max_val =       0.139187332654E-16      0.509512027284E-16
+wt_update_lmax: L increased from 56 max_val =       0.278629094758E-17      0.103703051893E-16
+@     15800 t=      15.8000 a=       0.740000 th=      0.000 ph=      0.000 <l|r>=      0.999999370607          0.161408E-10 <l|h|r>=     -0.479635608639         -0.295092E-06 |d|=      0.407584524    
+wt_update_lmax: L increased from 55 max_val =       0.139253302532E-16      0.493268935076E-16
+wt_update_lmax: L increased from 57 max_val =       0.279137194079E-17      0.996968239017E-17
+@     16000 t=      16.0000 a=       0.750000 th=      0.000 ph=      0.000 <l|r>=      0.999999268777          0.177734E-10 <l|h|r>=     -0.479443792534         -0.329842E-06 |d|=      0.411419838    
+wt_update_lmax: L increased from 56 max_val =       0.139534382212E-16      0.460802615956E-16
+wt_update_lmax: L increased from 58 max_val =       0.279129343271E-17      0.913528272387E-17
+@     16200 t=      16.2000 a=       0.760000 th=      0.000 ph=      0.000 <l|r>=      0.999999151901          0.195469E-10 <l|h|r>=     -0.479241303836         -0.369250E-06 |d|=      0.415468786    
+wt_update_lmax: L increased from 57 max_val =       0.139096313309E-16      0.388699449134E-16
+wt_update_lmax: L increased from 59 max_val =       0.278829801979E-17      0.767519454421E-17
+@     16400 t=      16.4000 a=       0.770000 th=      0.000 ph=      0.000 <l|r>=      0.999999017951          0.214712E-10 <l|h|r>=     -0.479029702885         -0.413911E-06 |d|=      0.419700184    
+wt_update_lmax: L increased from 58 max_val =       0.139052979009E-16      0.372759348554E-16
+wt_update_lmax: L increased from 60 max_val =       0.278930031613E-17      0.752271957971E-17
+@     16600 t=      16.6000 a=       0.780000 th=      0.000 ph=      0.000 <l|r>=      0.999998864654          0.235575E-10 <l|h|r>=     -0.478810608629         -0.464489E-06 |d|=      0.424081677    
+wt_update_lmax: L increased from 59 max_val =       0.139436194979E-16      0.344039330465E-16
+wt_update_lmax: L increased from 61 max_val =       0.277603228244E-17      0.702112564782E-17
+@     16800 t=      16.8000 a=       0.790000 th=      0.000 ph=      0.000 <l|r>=      0.999998689456          0.258182E-10 <l|h|r>=     -0.478585680559         -0.521719E-06 |d|=      0.428580101    
+wt_update_lmax: L increased from 60 max_val =       0.139213512458E-16      0.327152168177E-16
+@     17000 t=      17.0000 a=       0.800000 th=      0.000 ph=      0.000 <l|r>=      0.999998489500          0.282634E-10 <l|h|r>=     -0.478356600538         -0.586416E-06 |d|=      0.433161847    
+wt_update_lmax: L increased from 62 max_val =       0.278263451105E-17      0.669457896841E-17
+@     17200 t=      17.2000 a=       0.810000 th=      0.000 ph=      0.000 <l|r>=      0.999998261591          0.309066E-10 <l|h|r>=     -0.478125054780         -0.659484E-06 |d|=      0.437793221    
+wt_update_lmax: L increased from 61 max_val =       0.138893817761E-16      0.316212189479E-16
+wt_update_lmax: L increased from 63 max_val =       0.278724170162E-17      0.649055115010E-17
+@     17400 t=      17.4000 a=       0.820000 th=      0.000 ph=      0.000 <l|r>=      0.999998002157          0.337601E-10 <l|h|r>=     -0.477892716072         -0.741919E-06 |d|=      0.442440800    
+wt_update_lmax: L increased from 62 max_val =       0.139175977196E-16      0.308528192425E-16
+wt_update_lmax: L increased from 64 max_val =       0.278428103645E-17      0.632198247747E-17
+@     17600 t=      17.6000 a=       0.830000 th=      0.000 ph=      0.000 <l|r>=      0.999997707211          0.368382E-10 <l|h|r>=     -0.477661226448         -0.834825E-06 |d|=      0.447071776    
+wt_update_lmax: L increased from 63 max_val =       0.139257745064E-16      0.301449977259E-16
+wt_update_lmax: L increased from 65 max_val =       0.278084415288E-17      0.620330572840E-17
+@     17800 t=      17.8000 a=       0.840000 th=      0.000 ph=      0.000 <l|r>=      0.999997372310          0.401548E-10 <l|h|r>=     -0.477432180396         -0.939416E-06 |d|=      0.451654297    
+wt_update_lmax: L increased from 64 max_val =       0.138878735916E-16      0.295923920634E-16
+@     18000 t=      18.0000 a=       0.850000 th=      0.000 ph=      0.000 <l|r>=      0.999996992505          0.437241E-10 <l|h|r>=     -0.477207108850         -0.105703E-05 |d|=      0.456157781    
+wt_update_lmax: L increased from 66 max_val =       0.278100752623E-17      0.611534794463E-17
+@     18200 t=      18.2000 a=       0.860000 th=      0.000 ph=      0.000 <l|r>=      0.999996562292          0.475633E-10 <l|h|r>=     -0.476987464022         -0.118914E-05 |d|=      0.460553225    
+wt_update_lmax: L increased from 65 max_val =       0.139336347595E-16      0.292176758332E-16
+wt_update_lmax: L increased from 67 max_val =       0.278035453436E-17      0.600820375498E-17
+@     18400 t=      18.4000 a=       0.870000 th=      0.000 ph=      0.000 <l|r>=      0.999996075553          0.516877E-10 <l|h|r>=     -0.476774605311         -0.133736E-05 |d|=      0.464813483    
+wt_update_lmax: L increased from 66 max_val =       0.138836036296E-16      0.287179456990E-16
+wt_update_lmax: L increased from 68 max_val =       0.278435677092E-17      0.592697284042E-17
+@     18600 t=      18.6000 a=       0.880000 th=      0.000 ph=      0.000 <l|r>=      0.999995525502          0.561149E-10 <l|h|r>=     -0.476569786283         -0.150348E-05 |d|=      0.468913529    
+wt_update_lmax: L increased from 67 max_val =       0.138973176394E-16      0.282783355388E-16
+@     18800 t=      18.8000 a=       0.890000 th=      0.000 ph=      0.000 <l|r>=      0.999994904611          0.608613E-10 <l|h|r>=     -0.476374142972         -0.168942E-05 |d|=      0.472830687    
+wt_update_lmax: L increased from 69 max_val =       0.277660942425E-17      0.583244359189E-17
+@     19000 t=      19.0000 a=       0.900000 th=      0.000 ph=      0.000 <l|r>=      0.999994204546          0.659459E-10 <l|h|r>=     -0.476188683454         -0.189733E-05 |d|=      0.476544845    
+wt_update_lmax: L increased from 68 max_val =       0.139258558159E-16      0.279408465593E-16
+wt_update_lmax: L increased from 70 max_val =       0.278306228507E-17      0.575363959344E-17
+@     19200 t=      19.2000 a=       0.910000 th=      0.000 ph=      0.000 <l|r>=      0.999993416088          0.713861E-10 <l|h|r>=     -0.476014278945         -0.212952E-05 |d|=      0.480038629    
+wt_update_lmax: L increased from 69 max_val =       0.139027876858E-16      0.275639908677E-16
+wt_update_lmax: L increased from 71 max_val =       0.277964125709E-17      0.567517249582E-17
+@     19400 t=      19.4000 a=       0.920000 th=      0.000 ph=      0.000 <l|r>=      0.999992529051          0.772021E-10 <l|h|r>=     -0.475851656349         -0.238854E-05 |d|=      0.483297550    
+@     19600 t=      19.6000 a=       0.930000 th=      0.000 ph=      0.000 <l|r>=      0.999991532191          0.834138E-10 <l|h|r>=     -0.475701392465         -0.267716E-05 |d|=      0.486310128    
+wt_update_lmax: L increased from 70 max_val =       0.138961078052E-16      0.272052004564E-16
+wt_update_lmax: L increased from 72 max_val =       0.278100844376E-17      0.560407995987E-17
+@     19800 t=      19.8000 a=       0.940000 th=      0.000 ph=      0.000 <l|r>=      0.999990413116          0.900407E-10 <l|h|r>=     -0.475563909730         -0.299840E-05 |d|=      0.489067965    
+wt_update_lmax: L increased from 71 max_val =       0.139231683736E-16      0.268968223134E-16
+wt_update_lmax: L increased from 73 max_val =       0.278399208340E-17      0.553974248965E-17
+@     20000 t=      20.0000 a=       0.950000 th=      0.000 ph=      0.000 <l|r>=      0.999989158178          0.971037E-10 <l|h|r>=     -0.475439473720         -0.335552E-05 |d|=      0.491565806    
+wt_update_lmax: L increased from 72 max_val =       0.139069702172E-16      0.265652407944E-16
+@     20200 t=      20.2000 a=       0.960000 th=      0.000 ph=      0.000 <l|r>=      0.999987752368          0.104623E-09 <l|h|r>=     -0.475328192227         -0.375210E-05 |d|=      0.493801550    
+wt_update_lmax: L increased from 74 max_val =       0.277710952024E-17      0.546889674828E-17
+@     20400 t=      20.4000 a=       0.970000 th=      0.000 ph=      0.000 <l|r>=      0.999986179199          0.112620E-09 <l|h|r>=     -0.475230016115         -0.419198E-05 |d|=      0.495776233    
+wt_update_lmax: L increased from 73 max_val =       0.139065215762E-16      0.262476258857E-16
+wt_update_lmax: L increased from 75 max_val =       0.278034200502E-17      0.540066742331E-17
+@     20600 t=      20.6000 a=       0.980000 th=      0.000 ph=      0.000 <l|r>=      0.999984420581          0.121115E-09 <l|h|r>=     -0.475144741720         -0.467934E-05 |d|=      0.497493985    
+wt_update_lmax: L increased from 74 max_val =       0.139064714829E-16      0.259497372669E-16
+wt_update_lmax: L increased from 76 max_val =       0.278265136867E-17      0.534009480607E-17
+@     20800 t=      20.8000 a=       0.990000 th=      0.000 ph=      0.000 <l|r>=      0.999982456690          0.130131E-09 <l|h|r>=     -0.475072014971         -0.521870E-05 |d|=      0.498961939    
+@     21000 t=      21.0000 a=       1.000000 th=      0.000 ph=      0.000 <l|r>=      0.999980265832          0.139688E-09 <l|h|r>=     -0.475011336968         -0.581491E-05 |d|=      0.500190126    
+wt_update_lmax: L increased from 75 max_val =       0.139010789323E-16      0.256622047278E-16
+wt_update_lmax: L increased from 77 max_val =       0.278325321859E-17      0.528330634011E-17
+@     21200 t=      21.2000 a=       1.010000 th=      0.000 ph=      0.000 <l|r>=      0.999977824295          0.149808E-09 <l|h|r>=     -0.474962071173         -0.647321E-05 |d|=      0.501191324    
+wt_update_lmax: L increased from 76 max_val =       0.139256454507E-16      0.254154560916E-16
+wt_update_lmax: L increased from 78 max_val =       0.278014751039E-17      0.522413561675E-17
+@     21400 t=      21.4000 a=       1.020000 th=      0.000 ph=      0.000 <l|r>=      0.999975106193          0.160510E-09 <l|h|r>=     -0.474923451936         -0.719924E-05 |d|=      0.501980894    
+wt_update_lmax: L increased from 77 max_val =       0.139154161277E-16      0.251582420920E-16
+@     21600 t=      21.6000 a=       1.030000 th=      0.000 ph=      0.000 <l|r>=      0.999972083313          0.171814E-09 <l|h|r>=     -0.474894594468         -0.799902E-05 |d|=      0.502576573    
+wt_update_lmax: L increased from 79 max_val =       0.278212745070E-17      0.517114433313E-17
+@     21800 t=      21.8000 a=       1.040000 th=      0.000 ph=      0.000 <l|r>=      0.999968724940          0.183740E-09 <l|h|r>=     -0.474874505947         -0.887901E-05 |d|=      0.502998253    
+wt_update_lmax: L increased from 78 max_val =       0.139182160556E-16      0.249125387972E-16
+wt_update_lmax: L increased from 80 max_val =       0.278267864277E-17      0.512036299613E-17
+@     22000 t=      22.0000 a=       1.050000 th=      0.000 ph=      0.000 <l|r>=      0.999964997688          0.196305E-09 <l|h|r>=     -0.474862097822         -0.984613E-05 |d|=      0.503267737    
+wt_update_lmax: L increased from 79 max_val =       0.139206939210E-16      0.246650435677E-16
+@     22200 t=      22.2000 a=       1.060000 th=      0.000 ph=      0.000 <l|r>=      0.999960865321          0.209527E-09 <l|h|r>=     -0.474856198988         -0.109077E-04 |d|=      0.503408470    
+wt_update_lmax: L increased from 81 max_val =       0.278239951691E-17      0.507131005534E-17
+@     22400 t=      22.4000 a=       1.070000 th=      0.000 ph=      0.000 <l|r>=      0.999956288567          0.223422E-09 <l|h|r>=     -0.474855569860         -0.120716E-04 |d|=      0.503445257    
+wt_update_lmax: L increased from 80 max_val =       0.139162757305E-16      0.243882900815E-16
+wt_update_lmax: L increased from 82 max_val =       0.277617080471E-17      0.501547414864E-17
+@     22600 t=      22.6000 a=       1.080000 th=      0.000 ph=      0.000 <l|r>=      0.999951224934          0.238005E-09 <l|h|r>=     -0.474858917053         -0.133460E-04 |d|=      0.503403973    
+wt_update_lmax: L increased from 81 max_val =       0.138799429229E-16      0.240710902560E-16
+@     22800 t=      22.8000 a=       1.090000 th=      0.000 ph=      0.000 <l|r>=      0.999945628514          0.253289E-09 <l|h|r>=     -0.474864908639         -0.147397E-04 |d|=      0.503311248    
+wt_update_lmax: L increased from 83 max_val =       0.278138941247E-17      0.496294383217E-17
+@     23000 t=      23.0000 a=       1.100000 th=      0.000 ph=      0.000 <l|r>=      0.999939449798          0.269283E-09 <l|h|r>=     -0.474872189718         -0.162620E-04 |d|=      0.503194162    
+wt_update_lmax: L increased from 82 max_val =       0.139055955043E-16      0.238034302344E-16
+wt_update_lmax: L increased from 84 max_val =       0.278125552312E-17      0.490530681731E-17
+@     23200 t=      23.2000 a=       1.110000 th=      0.000 ph=      0.000 <l|r>=      0.999932635476          0.285997E-09 <l|h|r>=     -0.474879398223         -0.179227E-04 |d|=      0.503079921    
+wt_update_lmax: L increased from 83 max_val =       0.138886304356E-16      0.235721115015E-16
+@     23400 t=      23.4000 a=       1.120000 th=      0.000 ph=      0.000 <l|r>=      0.999925128255          0.303434E-09 <l|h|r>=     -0.474885180713         -0.197317E-04 |d|=      0.502995543    
+wt_update_lmax: L increased from 85 max_val =       0.278201081984E-17      0.485063683111E-17
+@     23600 t=      23.6000 a=       1.130000 th=      0.000 ph=      0.000 <l|r>=      0.999916866662          0.321598E-09 <l|h|r>=     -0.474888208005         -0.217000E-04 |d|=      0.502967545    
+wt_update_lmax: L increased from 84 max_val =       0.138820342785E-16      0.233519589919E-16
+wt_update_lmax: L increased from 86 max_val =       0.277630091586E-17      0.480200333407E-17
+@     23800 t=      23.8000 a=       1.140000 th=      0.000 ph=      0.000 <l|r>=      0.999907784871          0.340488E-09 <l|h|r>=     -0.474887190485         -0.238384E-04 |d|=      0.503021629    
+@     24000 t=      24.0000 a=       1.150000 th=      0.000 ph=      0.000 <l|r>=      0.999897812522          0.360099E-09 <l|h|r>=     -0.474880892867         -0.261586E-04 |d|=      0.503182391    
+wt_update_lmax: L increased from 85 max_val =       0.139022554265E-16      0.231810113274E-16
+wt_update_lmax: L increased from 87 max_val =       0.278013999565E-17      0.475918888899E-17
+@     24200 t=      24.2000 a=       1.160000 th=      0.000 ph=      0.000 <l|r>=      0.999886874561          0.380427E-09 <l|h|r>=     -0.474868148347         -0.286725E-04 |d|=      0.503473034    
+wt_update_lmax: L increased from 86 max_val =       0.138969828026E-16      0.230074057940E-16
+@     24400 t=      24.4000 a=       1.170000 th=      0.000 ph=      0.000 <l|r>=      0.999874891085          0.401458E-09 <l|h|r>=     -0.474847871860         -0.313924E-04 |d|=      0.503915098    
+wt_update_lmax: L increased from 88 max_val =       0.278254311523E-17      0.473071925230E-17
+@     24600 t=      24.6000 a=       1.180000 th=      0.000 ph=      0.000 <l|r>=      0.999861777207          0.423177E-09 <l|h|r>=     -0.474819072444         -0.343308E-04 |d|=      0.504528215    
+wt_update_lmax: L increased from 87 max_val =       0.139101282918E-16      0.228550310072E-16
+wt_update_lmax: L increased from 89 max_val =       0.277774044525E-17      0.470979667167E-17
+@     24800 t=      24.8000 a=       1.190000 th=      0.000 ph=      0.000 <l|r>=      0.999847442935          0.445563E-09 <l|h|r>=     -0.474780864404         -0.375006E-04 |d|=      0.505329881    
+@     25000 t=      25.0000 a=       1.200000 th=      0.000 ph=      0.000 <l|r>=      0.999831793077          0.468588E-09 <l|h|r>=     -0.474732477335         -0.409149E-04 |d|=      0.506335254    
+wt_update_lmax: L increased from 88 max_val =       0.138794842753E-16      0.227285609656E-16
+wt_update_lmax: L increased from 90 max_val =       0.277838390045E-17      0.471801604895E-17
+@     25200 t=      25.2000 a=       1.210000 th=      0.000 ph=      0.000 <l|r>=      0.999814727166          0.492225E-09 <l|h|r>=     -0.474673264663         -0.445870E-04 |d|=      0.507556984    
+@     25400 t=      25.4000 a=       1.220000 th=      0.000 ph=      0.000 <l|r>=      0.999796139412          0.516437E-09 <l|h|r>=     -0.474602710870         -0.485302E-04 |d|=      0.509005060    
+wt_update_lmax: L increased from 89 max_val =       0.138949087919E-16      0.227913478240E-16
+wt_update_lmax: L increased from 91 max_val =       0.277684569002E-17      0.479469718148E-17
+@     25600 t=      25.6000 a=       1.230000 th=      0.000 ph=      0.000 <l|r>=      0.999775918687          0.541185E-09 <l|h|r>=     -0.474520437064         -0.527578E-04 |d|=      0.510686705    
+@     25800 t=      25.8000 a=       1.240000 th=      0.000 ph=      0.000 <l|r>=      0.999753948544          0.566423E-09 <l|h|r>=     -0.474426205081         -0.572830E-04 |d|=      0.512606286    
+wt_update_lmax: L increased from 90 max_val =       0.138940933054E-16      0.236573884326E-16
+@     26000 t=      26.0000 a=       1.250000 th=      0.000 ph=      0.000 <l|r>=      0.999730107266          0.592097E-09 <l|h|r>=     -0.474319919881         -0.621189E-04 |d|=      0.514765267    
+wt_update_lmax: L increased from 92 max_val =       0.278187469213E-17      0.495328032950E-17
+@     26200 t=      26.2000 a=       1.260000 th=      0.000 ph=      0.000 <l|r>=      0.999704267965          0.618153E-09 <l|h|r>=     -0.474201630386         -0.672783E-04 |d|=      0.517162191    
+wt_update_lmax: L increased from 91 max_val =       0.138978710325E-16      0.212554159788E-16
+wt_update_lmax: L increased from 93 max_val =       0.278654373622E-17      0.470021355780E-17
+@     26400 t=      26.4000 a=       1.270000 th=      0.000 ph=      0.000 <l|r>=      0.999676298717          0.644526E-09 <l|h|r>=     -0.474071528625         -0.727734E-04 |d|=      0.519792696    
+wt_update_lmax: L increased from 94 max_val =       0.278564413999E-17      0.489464707636E-17
+wt_update_lmax: L increased from 92 max_val =       0.138823832359E-16      0.227275814386E-16
+@     26600 t=      26.6000 a=       1.280000 th=      0.000 ph=      0.000 <l|r>=      0.999646062741          0.671148E-09 <l|h|r>=     -0.473929947294         -0.786163E-04 |d|=      0.522649562    
+wt_update_lmax: L increased from 95 max_val =       0.279062994622E-17      0.506820267580E-17
+wt_update_lmax: L increased from 93 max_val =       0.139052928996E-16      0.239409406336E-16
+@     26800 t=      26.8000 a=       1.290000 th=      0.000 ph=      0.000 <l|r>=      0.999613418633          0.697948E-09 <l|h|r>=     -0.473777355724         -0.848181E-04 |d|=      0.525722792    
+wt_update_lmax: L increased from 96 max_val =       0.278473562864E-17      0.514877430466E-17
+wt_update_lmax: L increased from 94 max_val =       0.139014174294E-16      0.246835592674E-16
+@     27000 t=      27.0000 a=       1.300000 th=      0.000 ph=      0.000 <l|r>=      0.999578220648          0.724848E-09 <l|h|r>=     -0.473614354293         -0.913892E-04 |d|=      0.528999721    
+wt_update_lmax: L increased from 97 max_val =       0.278104915880E-17      0.522100379278E-17
+wt_update_lmax: L increased from 95 max_val =       0.139092101681E-16      0.252118246614E-16
+@     27200 t=      27.2000 a=       1.310000 th=      0.000 ph=      0.000 <l|r>=      0.999540319026          0.751764E-09 <l|h|r>=     -0.473441667437         -0.983393E-04 |d|=      0.532465159    
+wt_update_lmax: L increased from 98 max_val =       0.278480584100E-17      0.525046147725E-17
+wt_update_lmax: L increased from 96 max_val =       0.139466431605E-16      0.255927392203E-16
+@     27400 t=      27.4000 a=       1.320000 th=      0.000 ph=      0.000 <l|r>=      0.999499560392          0.778610E-09 <l|h|r>=     -0.473260135237         -0.105677E-03 |d|=      0.536101558    
+wt_update_lmax: L increased from 99 max_val =       0.277610184096E-17      0.526338699294E-17
+wt_update_lmax: L increased from 97 max_val =       0.139072970524E-16      0.257367069333E-16
+@     27600 t=      27.6000 a=       1.330000 th=      0.000 ph=      0.000 <l|r>=      0.999455788187          0.805295E-09 <l|h|r>=     -0.473070703880         -0.113409E-03 |d|=      0.539889202    
+wt_update_lmax: L increased from 100 max_val =       0.279085823802E-17      0.529733313790E-17
+wt_update_lmax: L increased from 98 max_val =       0.139170686165E-16      0.258854526216E-16
+@     27800 t=      27.8000 a=       1.340000 th=      0.000 ph=      0.000 <l|r>=      0.999408843179          0.831725E-09 <l|h|r>=     -0.472874414909         -0.121542E-03 |d|=      0.543806425    
+wt_update_lmax: L increased from 101 max_val =       0.279181130658E-17      0.530778370704E-17
+wt_update_lmax: L increased from 99 max_val =       0.139632341087E-16      0.259877490643E-16
+@     28000 t=      28.0000 a=       1.350000 th=      0.000 ph=      0.000 <l|r>=      0.999358564013          0.857802E-09 <l|h|r>=     -0.472672393660         -0.130081E-03 |d|=      0.547829843    
+wt_update_lmax: L increased from 102 max_val =       0.278262217597E-17      0.530143703678E-17
+wt_update_lmax: L increased from 100 max_val =       0.139292939283E-16      0.260373288262E-16
+wt_update_lmax: L increased from 103 max_val =       0.278939619711E-17      0.526333092643E-17
+@     28200 t=      28.2000 a=       1.360000 th=      0.000 ph=      0.000 <l|r>=      0.999304787830          0.883427E-09 <l|h|r>=     -0.472465836794         -0.139027E-03 |d|=      0.551934603    
+wt_update_lmax: L increased from 101 max_val =       0.139564409154E-16      0.259574054108E-16
+wt_update_lmax: L increased from 104 max_val =       0.279009112296E-17      0.528877477104E-17
+wt_update_lmax: L increased from 102 max_val =       0.138848981227E-16      0.259088963797E-16
+@     28400 t=      28.4000 a=       1.370000 th=      0.000 ph=      0.000 <l|r>=      0.999247350938          0.908495E-09 <l|h|r>=     -0.472255999336         -0.148384E-03 |d|=      0.556094648    
+wt_update_lmax: L increased from 105 max_val =       0.278698672479E-17      0.527526983470E-17
+wt_update_lmax: L increased from 103 max_val =       0.138836511516E-16      0.259082200428E-16
+@     28600 t=      28.6000 a=       1.380000 th=      0.000 ph=      0.000 <l|r>=      0.999186089535          0.932907E-09 <l|h|r>=     -0.472044181161         -0.158149E-03 |d|=      0.560282987    
+wt_update_lmax: L increased from 106 max_val =       0.278725499348E-17      0.524625429439E-17
+wt_update_lmax: L increased from 104 max_val =       0.139619706570E-16      0.258607180330E-16
+@     28800 t=      28.8000 a=       1.390000 th=      0.000 ph=      0.000 <l|r>=      0.999120840493          0.956557E-09 <l|h|r>=     -0.471831713294         -0.168320E-03 |d|=      0.564471975    
+wt_update_lmax: L increased from 107 max_val =       0.278860266376E-17      0.522139860097E-17
+wt_update_lmax: L increased from 105 max_val =       0.139405919303E-16      0.257500013172E-16
+@     29000 t=      29.0000 a=       1.400000 th=      0.000 ph=      0.000 <l|r>=      0.999051442181          0.979345E-09 <l|h|r>=     -0.471619944067         -0.178893E-03 |d|=      0.568633588    
+wt_update_lmax: L increased from 108 max_val =       0.277683722634E-17      0.522705191054E-17
+wt_update_lmax: L increased from 106 max_val =       0.139419269461E-16      0.257111307148E-16
+wt_update_lmax: L increased from 109 max_val =       0.277885417888E-17      0.520546196930E-17
+@     29200 t=      29.2000 a=       1.410000 th=      0.000 ph=      0.000 <l|r>=      0.998977735353          0.100117E-08 <l|h|r>=     -0.471410225378         -0.189860E-03 |d|=      0.572739707    
+wt_update_lmax: L increased from 107 max_val =       0.139619697988E-16      0.257429059545E-16
+wt_update_lmax: L increased from 110 max_val =       0.277662747862E-17      0.519379880786E-17
+@     29400 t=      29.4000 a=       1.420000 th=      0.000 ph=      0.000 <l|r>=      0.998899564059          0.102194E-08 <l|h|r>=     -0.471203899238         -0.201211E-03 |d|=      0.576762390    
+wt_update_lmax: L increased from 108 max_val =       0.139075486872E-16      0.256004902964E-16
+wt_update_lmax: L increased from 111 max_val =       0.278542381913E-17      0.518760080294E-17
+wt_update_lmax: L increased from 109 max_val =       0.139744558797E-16      0.255499328527E-16
+@     29600 t=      29.6000 a=       1.430000 th=      0.000 ph=      0.000 <l|r>=      0.998816776613          0.104155E-08 <l|h|r>=     -0.471002284701         -0.212936E-03 |d|=      0.580674136    
+wt_update_lmax: L increased from 112 max_val =       0.279084531820E-17      0.517794092361E-17
+wt_update_lmax: L increased from 110 max_val =       0.139776661847E-16      0.254863012176E-16
+@     29800 t=      29.8000 a=       1.440000 th=      0.000 ph=      0.000 <l|r>=      0.998729226585          0.105991E-08 <l|h|r>=     -0.470806665480         -0.225019E-03 |d|=      0.584448140    
+wt_update_lmax: L increased from 113 max_val =       0.277714042335E-17      0.515680932019E-17
+wt_update_lmax: L increased from 111 max_val =       0.139666693715E-16      0.254560501753E-16
+@     30000 t=      30.0000 a=       1.450000 th=      0.000 ph=      0.000 <l|r>=      0.998636773825          0.107694E-08 <l|h|r>=     -0.470618278201         -0.237444E-03 |d|=      0.588058533    
+wt_update_lmax: L increased from 114 max_val =       0.279554244462E-17      0.514239288758E-17
+wt_update_lmax: L increased from 112 max_val =       0.139404477730E-16      0.253816347880E-16
+wt_update_lmax: L increased from 115 max_val =       0.277984243696E-17      0.513068417627E-17
+@     30200 t=      30.2000 a=       1.460000 th=      0.000 ph=      0.000 <l|r>=      0.998539285506          0.109256E-08 <l|h|r>=     -0.470438301656         -0.250191E-03 |d|=      0.591480601    
+wt_update_lmax: L increased from 113 max_val =       0.138795096522E-16      0.252049054550E-16
+wt_update_lmax: L increased from 116 max_val =       0.278018234920E-17      0.509682862690E-17
+wt_update_lmax: L increased from 114 max_val =       0.138936643891E-16      0.251469196005E-16
+@     30400 t=      30.4000 a=       1.470000 th=      0.000 ph=      0.000 <l|r>=      0.998436637185          0.110670E-08 <l|h|r>=     -0.470267846931         -0.263238E-03 |d|=      0.594690993    
+wt_update_lmax: L increased from 117 max_val =       0.277740469622E-17      0.508107540012E-17
+wt_update_lmax: L increased from 115 max_val =       0.139014850011E-16      0.250156732539E-16
+@     30600 t=      30.6000 a=       1.480000 th=      0.000 ph=      0.000 <l|r>=      0.998328713868          0.111930E-08 <l|h|r>=     -0.470107948717         -0.276559E-03 |d|=      0.597667894    
+wt_update_lmax: L increased from 118 max_val =       0.278706590543E-17      0.506648550357E-17
+wt_update_lmax: L increased from 116 max_val =       0.138889276008E-16      0.249016282277E-16
+@     30800 t=      30.8000 a=       1.490000 th=      0.000 ph=      0.000 <l|r>=      0.998215411074          0.113031E-08 <l|h|r>=     -0.469959557691         -0.290128E-03 |d|=      0.600391193    
+wt_update_lmax: L increased from 119 max_val =       0.278351759936E-17      0.504405597751E-17
+wt_update_lmax: L increased from 117 max_val =       0.139429251085E-16      0.248205620928E-16
+wt_update_lmax: L increased from 120 max_val =       0.277652758562E-17      0.500867077276E-17
+@     31000 t=      31.0000 a=       1.500000 th=      0.000 ph=      0.000 <l|r>=      0.998096635890          0.113968E-08 <l|h|r>=     -0.469823534145         -0.303913E-03 |d|=      0.602842607    
+wt_update_lmax: L increased from 118 max_val =       0.139581870299E-16      0.247147007877E-16
+wt_update_lmax: L increased from 121 max_val =       0.279028378267E-17      0.497896765944E-17
+wt_update_lmax: L increased from 119 max_val =       0.139031800309E-16      0.246031497333E-16
+@     31200 t=      31.2000 a=       1.510000 th=      0.000 ph=      0.000 <l|r>=      0.997972308011          0.114740E-08 <l|h|r>=     -0.469700642840         -0.317883E-03 |d|=      0.605005802    
+wt_update_lmax: L increased from 122 max_val =       0.278975930589E-17      0.495736259638E-17
+wt_update_lmax: L increased from 120 max_val =       0.139566987013E-16      0.244513652722E-16
+@     31400 t=      31.4000 a=       1.520000 th=      0.000 ph=      0.000 <l|r>=      0.997842360740          0.115343E-08 <l|h|r>=     -0.469591549071         -0.332002E-03 |d|=      0.606866470    
+wt_update_lmax: L increased from 123 max_val =       0.277871440500E-17      0.492513604591E-17
+wt_update_lmax: L increased from 121 max_val =       0.139178284319E-16      0.243288626003E-16
+wt_update_lmax: L increased from 124 max_val =       0.278334929015E-17      0.489318647060E-17
+@     31600 t=      31.6000 a=       1.530000 th=      0.000 ph=      0.000 <l|r>=      0.997706741969          0.115779E-08 <l|h|r>=     -0.469496816052         -0.346232E-03 |d|=      0.608412391    
+wt_update_lmax: L increased from 122 max_val =       0.139673874511E-16      0.241875866641E-16
+wt_update_lmax: L increased from 125 max_val =       0.279555261474E-17      0.486403523041E-17
+@     31800 t=      31.8000 a=       1.540000 th=      0.000 ph=      0.000 <l|r>=      0.997565415090          0.116049E-08 <l|h|r>=     -0.469416903417         -0.360533E-03 |d|=      0.609633473    
+wt_update_lmax: L increased from 123 max_val =       0.139377700683E-16      0.240424511702E-16
+wt_update_lmax: L increased from 126 max_val =       0.279048095337E-17      0.483469342676E-17
+wt_update_lmax: L increased from 124 max_val =       0.138806231716E-16      0.238911457527E-16
+@     32000 t=      32.0000 a=       1.550000 th=      0.000 ph=      0.000 <l|r>=      0.997418359866          0.116155E-08 <l|h|r>=     -0.469352167019         -0.374864E-03 |d|=      0.610521758    
+wt_update_lmax: L increased from 127 max_val =       0.277701230421E-17      0.479524703070E-17
+wt_update_lmax: L increased from 125 max_val =       0.138910794190E-16      0.237172178962E-16
+wt_update_lmax: L increased from 128 max_val =       0.279526526199E-17      0.476475082001E-17
+@     32200 t=      32.2000 a=       1.560000 th=      0.000 ph=      0.000 <l|r>=      0.997265573226          0.116103E-08 <l|h|r>=     -0.469302859708         -0.389181E-03 |d|=      0.611071419    
+wt_update_lmax: L increased from 126 max_val =       0.139445388901E-16      0.236006198828E-16
+wt_update_lmax: L increased from 129 max_val =       0.279211789566E-17      0.473274099133E-17
+@     32400 t=      32.4000 a=       1.570000 th=      0.000 ph=      0.000 <l|r>=      0.997107069988          0.115900E-08 <l|h|r>=     -0.469269133252         -0.403438E-03 |d|=      0.611278722    
+wt_update_lmax: L increased from 127 max_val =       0.138954591278E-16      0.234576841693E-16
+wt_update_lmax: L increased from 130 max_val =       0.279532324643E-17      0.469951711451E-17
+wt_update_lmax: L increased from 128 max_val =       0.139288209493E-16      0.233119018007E-16
+@     32600 t=      32.6000 a=       1.580000 th=      0.000 ph=      0.000 <l|r>=      0.996942883493          0.115554E-08 <l|h|r>=     -0.469251041102         -0.417588E-03 |d|=      0.611141983    
+wt_update_lmax: L increased from 131 max_val =       0.278680972730E-17      0.466097988197E-17
+wt_update_lmax: L increased from 129 max_val =       0.139640662710E-16      0.231977319560E-16
+wt_update_lmax: L increased from 132 max_val =       0.278775418980E-17      0.462530299316E-17
+@     32800 t=      32.8000 a=       1.590000 th=      0.000 ph=      0.000 <l|r>=      0.996773066147          0.115074E-08 <l|h|r>=     -0.469248542009         -0.431583E-03 |d|=      0.610661497    
+wt_update_lmax: L increased from 130 max_val =       0.139279340683E-16      0.230546454839E-16
+wt_update_lmax: L increased from 133 max_val =       0.277661793962E-17      0.458584011745E-17
+@     33000 t=      33.0000 a=       1.600000 th=      0.000 ph=      0.000 <l|r>=      0.996597689860          0.114475E-08 <l|h|r>=     -0.469261504362         -0.445374E-03 |d|=      0.609839459    
+wt_update_lmax: L increased from 131 max_val =       0.139428328291E-16      0.229266545986E-16
+wt_update_lmax: L increased from 134 max_val =       0.277870132076E-17      0.454749253895E-17
+wt_update_lmax: L increased from 132 max_val =       0.138891041503E-16      0.227664067921E-16
+@     33200 t=      33.2000 a=       1.610000 th=      0.000 ph=      0.000 <l|r>=      0.996416846370          0.113770E-08 <l|h|r>=     -0.469289711033         -0.458911E-03 |d|=      0.608679872    
+wt_update_lmax: L increased from 135 max_val =       0.278494869316E-17      0.451198228338E-17
+wt_update_lmax: L increased from 133 max_val =       0.138963518093E-16      0.226412656329E-16
+wt_update_lmax: L increased from 136 max_val =       0.277714105161E-17      0.447688971718E-17
+@     33400 t=      33.4000 a=       1.620000 th=      0.000 ph=      0.000 <l|r>=      0.996230647450          0.112977E-08 <l|h|r>=     -0.469332864770         -0.472143E-03 |d|=      0.607188445    
+wt_update_lmax: L increased from 134 max_val =       0.139239770565E-16      0.225135846498E-16
+wt_update_lmax: L increased from 137 max_val =       0.277911378914E-17      0.443661722468E-17
+@     33600 t=      33.6000 a=       1.630000 th=      0.000 ph=      0.000 <l|r>=      0.996039224993          0.112114E-08 <l|h|r>=     -0.469390593796         -0.485020E-03 |d|=      0.605372483    
+wt_update_lmax: L increased from 135 max_val =       0.139724097668E-16      0.224139615470E-16
+wt_update_lmax: L increased from 138 max_val =       0.278934861003E-17      0.440175645411E-17
+wt_update_lmax: L increased from 136 max_val =       0.139163097712E-16      0.223064283423E-16
+@     33800 t=      33.8000 a=       1.640000 th=      0.000 ph=      0.000 <l|r>=      0.995842730963          0.111203E-08 <l|h|r>=     -0.469462457731         -0.497493E-03 |d|=      0.603240773    
+wt_update_lmax: L increased from 139 max_val =       0.278183561441E-17      0.436449025876E-17
+wt_update_lmax: L increased from 137 max_val =       0.139327353387E-16      0.221674316007E-16
+wt_update_lmax: L increased from 140 max_val =       0.278620931341E-17      0.432502372154E-17
+@     34000 t=      34.0000 a=       1.650000 th=      0.000 ph=      0.000 <l|r>=      0.995641337214          0.110268E-08 <l|h|r>=     -0.469547953510         -0.509512E-03 |d|=      0.600803467    
+wt_update_lmax: L increased from 138 max_val =       0.139544147344E-16      0.220708642945E-16
+wt_update_lmax: L increased from 141 max_val =       0.278163701980E-17      0.428129561668E-17
+@     34200 t=      34.2000 a=       1.660000 th=      0.000 ph=      0.000 <l|r>=      0.995435235178          0.109333E-08 <l|h|r>=     -0.469646521370         -0.521028E-03 |d|=      0.598071969    
+wt_update_lmax: L increased from 139 max_val =       0.139073331920E-16      0.219450927801E-16
+wt_update_lmax: L increased from 142 max_val =       0.278768590122E-17      0.423837271862E-17
+wt_update_lmax: L increased from 140 max_val =       0.138966812169E-16      0.218206295868E-16
+@     34400 t=      34.4000 a=       1.670000 th=      0.000 ph=      0.000 <l|r>=      0.995224635401          0.108427E-08 <l|h|r>=     -0.469757550738         -0.531994E-03 |d|=      0.595058813    
+wt_update_lmax: L increased from 143 max_val =       0.278265444473E-17      0.419048980525E-17
+wt_update_lmax: L increased from 141 max_val =       0.139191211543E-16      0.216993160709E-16
+wt_update_lmax: L increased from 144 max_val =       0.279028946117E-17      0.414608950423E-17
+@     34600 t=      34.6000 a=       1.680000 th=      0.000 ph=      0.000 <l|r>=      0.995009766949          0.107581E-08 <l|h|r>=     -0.469880385924         -0.542366E-03 |d|=      0.591777551    
+wt_update_lmax: L increased from 142 max_val =       0.139359335579E-16      0.215694781552E-16
+wt_update_lmax: L increased from 145 max_val =       0.278279351563E-17      0.409563037485E-17
+@     34800 t=      34.8000 a=       1.690000 th=      0.000 ph=      0.000 <l|r>=      0.994790876665          0.106828E-08 <l|h|r>=     -0.470014331683         -0.552099E-03 |d|=      0.588242645    
+wt_update_lmax: L increased from 143 max_val =       0.139679292648E-16      0.214704757852E-16
+wt_update_lmax: L increased from 146 max_val =       0.278898817387E-17      0.404414268502E-17
+wt_update_lmax: L increased from 144 max_val =       0.138904584152E-16      0.213371773629E-16
+wt_update_lmax: L increased from 147 max_val =       0.277784930863E-17      0.399261281737E-17
+@     35000 t=      35.0000 a=       1.700000 th=      0.000 ph=      0.000 <l|r>=      0.994568228292          0.106201E-08 <l|h|r>=     -0.470158658400         -0.561152E-03 |d|=      0.584469358    
+wt_update_lmax: L increased from 145 max_val =       0.139630949613E-16      0.212085063856E-16
+wt_update_lmax: L increased from 148 max_val =       0.277828705325E-17      0.393449346931E-17
+@     35200 t=      35.2000 a=       1.710000 th=      0.000 ph=      0.000 <l|r>=      0.994342101453          0.105739E-08 <l|h|r>=     -0.470312607097         -0.569487E-03 |d|=      0.580473653    
+wt_update_lmax: L increased from 146 max_val =       0.138998549783E-16      0.210847149092E-16
+wt_update_lmax: L increased from 149 max_val =       0.278173108053E-17      0.388126926655E-17
+wt_update_lmax: L increased from 147 max_val =       0.139668332562E-16      0.209414718029E-16
+@     35400 t=      35.4000 a=       1.720000 th=      0.000 ph=      0.000 <l|r>=      0.994112790512          0.105481E-08 <l|h|r>=     -0.470475394013         -0.577070E-03 |d|=      0.576272102    
+wt_update_lmax: L increased from 148 max_val =       0.138962094813E-16      0.208116630688E-16
+@     35600 t=      35.6000 a=       1.730000 th=      0.000 ph=      0.000 <l|r>=      0.993880603297          0.105468E-08 <l|h|r>=     -0.470646214941         -0.583867E-03 |d|=      0.571881792    
+wt_update_lmax: L increased from 149 max_val =       0.139338810704E-16      0.206747675703E-16
+@     35800 t=      35.8000 a=       1.740000 th=      0.000 ph=      0.000 <l|r>=      0.993645859714          0.105745E-08 <l|h|r>=     -0.470824249246         -0.589850E-03 |d|=      0.567320240    
+@     36000 t=      36.0000 a=       1.750000 th=      0.000 ph=      0.000 <l|r>=      0.993408890243          0.106357E-08 <l|h|r>=     -0.471008663586         -0.594996E-03 |d|=      0.562605316    
+@     36200 t=      36.2000 a=       1.760000 th=      0.000 ph=      0.000 <l|r>=      0.993170034339          0.107353E-08 <l|h|r>=     -0.471198615498         -0.599283E-03 |d|=      0.557755165    
+@     36400 t=      36.4000 a=       1.770000 th=      0.000 ph=      0.000 <l|r>=      0.992929638734          0.108781E-08 <l|h|r>=     -0.471393256716         -0.602696E-03 |d|=      0.552788133    
+@     36600 t=      36.6000 a=       1.780000 th=      0.000 ph=      0.000 <l|r>=      0.992688055664          0.110693E-08 <l|h|r>=     -0.471591736500         -0.605222E-03 |d|=      0.547722692    
+@     36800 t=      36.8000 a=       1.790000 th=      0.000 ph=      0.000 <l|r>=      0.992445641032          0.113144E-08 <l|h|r>=     -0.471793204855         -0.606856E-03 |d|=      0.542577371    
+@     37000 t=      37.0000 a=       1.800000 th=      0.000 ph=      0.000 <l|r>=      0.992202752513          0.116187E-08 <l|h|r>=     -0.471996815821         -0.607596E-03 |d|=      0.537370679    
+@     37200 t=      37.2000 a=       1.810000 th=      0.000 ph=      0.000 <l|r>=      0.991959747622          0.119880E-08 <l|h|r>=     -0.472201730870         -0.607443E-03 |d|=      0.532121032    
+@     37400 t=      37.4000 a=       1.820000 th=      0.000 ph=      0.000 <l|r>=      0.991716981769          0.124281E-08 <l|h|r>=     -0.472407122388         -0.606406E-03 |d|=      0.526846667    
+@     37600 t=      37.6000 a=       1.830000 th=      0.000 ph=      0.000 <l|r>=      0.991474806291          0.129447E-08 <l|h|r>=     -0.472612177438         -0.604497E-03 |d|=      0.521565564    
+@     37800 t=      37.8000 a=       1.840000 th=      0.000 ph=      0.000 <l|r>=      0.991233566507          0.135441E-08 <l|h|r>=     -0.472816101633         -0.601735E-03 |d|=      0.516295357    
+@     38000 t=      38.0000 a=       1.850000 th=      0.000 ph=      0.000 <l|r>=      0.990993599779          0.142322E-08 <l|h|r>=     -0.473018123320         -0.598140E-03 |d|=      0.511053237    
+@     38200 t=      38.2000 a=       1.860000 th=      0.000 ph=      0.000 <l|r>=      0.990755233633          0.150154E-08 <l|h|r>=     -0.473217497934         -0.593740E-03 |d|=      0.505855857    
+@     38400 t=      38.4000 a=       1.870000 th=      0.000 ph=      0.000 <l|r>=      0.990518783916          0.158998E-08 <l|h|r>=     -0.473413512530         -0.588566E-03 |d|=      0.500719232    
+@     38600 t=      38.6000 a=       1.880000 th=      0.000 ph=      0.000 <l|r>=      0.990284553042          0.168917E-08 <l|h|r>=     -0.473605490524         -0.582655E-03 |d|=      0.495658633    
+@     38800 t=      38.8000 a=       1.890000 th=      0.000 ph=      0.000 <l|r>=      0.990052828315          0.179976E-08 <l|h|r>=     -0.473792796439         -0.576046E-03 |d|=      0.490688483    
+@     39000 t=      39.0000 a=       1.900000 th=      0.000 ph=      0.000 <l|r>=      0.989823880362          0.192236E-08 <l|h|r>=     -0.473974840756         -0.568781E-03 |d|=      0.485822249    
+@     39200 t=      39.2000 a=       1.910000 th=      0.000 ph=      0.000 <l|r>=      0.989597961679          0.205761E-08 <l|h|r>=     -0.474151084654         -0.560910E-03 |d|=      0.481072337    
+@     39400 t=      39.4000 a=       1.920000 th=      0.000 ph=      0.000 <l|r>=      0.989375305309          0.220613E-08 <l|h|r>=     -0.474321044605         -0.552481E-03 |d|=      0.476449996    
+@     39600 t=      39.6000 a=       1.930000 th=      0.000 ph=      0.000 <l|r>=      0.989156123658          0.236853E-08 <l|h|r>=     -0.474484296766         -0.543547E-03 |d|=      0.471965215    
+@     39800 t=      39.8000 a=       1.940000 th=      0.000 ph=      0.000 <l|r>=      0.988940607468          0.254541E-08 <l|h|r>=     -0.474640480928         -0.534164E-03 |d|=      0.467626642    
+@     40000 t=      40.0000 a=       1.950000 th=      0.000 ph=      0.000 <l|r>=      0.988728924942          0.273735E-08 <l|h|r>=     -0.474789304085         -0.524389E-03 |d|=      0.463441503    
+@     40200 t=      40.2000 a=       1.960000 th=      0.000 ph=      0.000 <l|r>=      0.988521221054          0.294493E-08 <l|h|r>=     -0.474930543350         -0.514282E-03 |d|=      0.459415535    
+@     40400 t=      40.4000 a=       1.970000 th=      0.000 ph=      0.000 <l|r>=      0.988317617024          0.316869E-08 <l|h|r>=     -0.475064048200         -0.503901E-03 |d|=      0.455552943    
+@     40600 t=      40.6000 a=       1.980000 th=      0.000 ph=      0.000 <l|r>=      0.988118209986          0.340916E-08 <l|h|r>=     -0.475189741949         -0.493307E-03 |d|=      0.451856355    
+@     40800 t=      40.8000 a=       1.990000 th=      0.000 ph=      0.000 <l|r>=      0.987923072841          0.366681E-08 <l|h|r>=     -0.475307622281         -0.482561E-03 |d|=      0.448326819    
+@     41000 t=      41.0000 a=       2.000000 th=      0.000 ph=      0.000 <l|r>=      0.987732254302          0.394212E-08 <l|h|r>=     -0.475417760905         -0.471723E-03 |d|=      0.444963796    
+@     41200 t=      41.2000 a=       2.010000 th=      0.000 ph=      0.000 <l|r>=      0.987545779133          0.423549E-08 <l|h|r>=     -0.475520302182         -0.460853E-03 |d|=      0.441765193    
+@     41400 t=      41.4000 a=       2.020000 th=      0.000 ph=      0.000 <l|r>=      0.987363648569          0.454731E-08 <l|h|r>=     -0.475615460751         -0.450009E-03 |d|=      0.438727408    
+@     41600 t=      41.6000 a=       2.030000 th=      0.000 ph=      0.000 <l|r>=      0.987185840932          0.487790E-08 <l|h|r>=     -0.475703518214         -0.439246E-03 |d|=      0.435845392    
+@     41800 t=      41.8000 a=       2.040000 th=      0.000 ph=      0.000 <l|r>=      0.987012312420          0.522755E-08 <l|h|r>=     -0.475784818805         -0.428620E-03 |d|=      0.433112741    
+@     42000 t=      42.0000 a=       2.050000 th=      0.000 ph=      0.000 <l|r>=      0.986842998076          0.559648E-08 <l|h|r>=     -0.475859764248         -0.418181E-03 |d|=      0.430521799    
+@     42200 t=      42.2000 a=       2.060000 th=      0.000 ph=      0.000 <l|r>=      0.986677812923          0.598484E-08 <l|h|r>=     -0.475928807789         -0.407979E-03 |d|=      0.428063777    
+@     42400 t=      42.4000 a=       2.070000 th=      0.000 ph=      0.000 <l|r>=      0.986516653262          0.639274E-08 <l|h|r>=     -0.475992447549         -0.398058E-03 |d|=      0.425728896    
+@     42600 t=      42.6000 a=       2.080000 th=      0.000 ph=      0.000 <l|r>=      0.986359398111          0.682022E-08 <l|h|r>=     -0.476051219380         -0.388460E-03 |d|=      0.423506527    
+@     42800 t=      42.8000 a=       2.090000 th=      0.000 ph=      0.000 <l|r>=      0.986205910788          0.726722E-08 <l|h|r>=     -0.476105689253         -0.379222E-03 |d|=      0.421385354    
+@     43000 t=      43.0000 a=       2.100000 th=      0.000 ph=      0.000 <l|r>=      0.986056040616          0.773363E-08 <l|h|r>=     -0.476156445466         -0.370376E-03 |d|=      0.419353531    
+@     43200 t=      43.2000 a=       2.110000 th=      0.000 ph=      0.000 <l|r>=      0.985909624728          0.821923E-08 <l|h|r>=     -0.476204090722         -0.361950E-03 |d|=      0.417398850    
+@     43400 t=      43.4000 a=       2.120000 th=      0.000 ph=      0.000 <l|r>=      0.985766489974          0.872375E-08 <l|h|r>=     -0.476249234274         -0.353969E-03 |d|=      0.415508903    
+@     43600 t=      43.6000 a=       2.130000 th=      0.000 ph=      0.000 <l|r>=      0.985626454894          0.924681E-08 <l|h|r>=     -0.476292484313         -0.346450E-03 |d|=      0.413671244    
+@     43800 t=      43.8000 a=       2.140000 th=      0.000 ph=      0.000 <l|r>=      0.985489331749          0.978793E-08 <l|h|r>=     -0.476334440653         -0.339407E-03 |d|=      0.411873539    
+@     44000 t=      44.0000 a=       2.150000 th=      0.000 ph=      0.000 <l|r>=      0.985354928587          0.103466E-07 <l|h|r>=     -0.476375687923         -0.332847E-03 |d|=      0.410103716    
+@     44200 t=      44.2000 a=       2.160000 th=      0.000 ph=      0.000 <l|r>=      0.985223051328          0.109220E-07 <l|h|r>=     -0.476416789304         -0.326773E-03 |d|=      0.408350091    
+@     44400 t=      44.4000 a=       2.170000 th=      0.000 ph=      0.000 <l|r>=      0.985093505848          0.115136E-07 <l|h|r>=     -0.476458280891         -0.321183E-03 |d|=      0.406601499    
+@     44600 t=      44.6000 a=       2.180000 th=      0.000 ph=      0.000 <l|r>=      0.984966100045          0.121204E-07 <l|h|r>=     -0.476500666788         -0.316068E-03 |d|=      0.404847389    
+@     44800 t=      44.8000 a=       2.190000 th=      0.000 ph=      0.000 <l|r>=      0.984840645856          0.127415E-07 <l|h|r>=     -0.476544414893         -0.311417E-03 |d|=      0.403077928    
+@     45000 t=      45.0000 a=       2.200000 th=      0.000 ph=      0.000 <l|r>=      0.984716961223          0.133758E-07 <l|h|r>=     -0.476589953444         -0.307212E-03 |d|=      0.401284071    
+@     45200 t=      45.2000 a=       2.210000 th=      0.000 ph=      0.000 <l|r>=      0.984594871974          0.140222E-07 <l|h|r>=     -0.476637668293         -0.303432E-03 |d|=      0.399457624    
+@     45400 t=      45.4000 a=       2.220000 th=      0.000 ph=      0.000 <l|r>=      0.984474213607          0.146795E-07 <l|h|r>=     -0.476687900852         -0.300049E-03 |d|=      0.397591297    
+@     45600 t=      45.6000 a=       2.230000 th=      0.000 ph=      0.000 <l|r>=      0.984354832955          0.153463E-07 <l|h|r>=     -0.476740946708         -0.297033E-03 |d|=      0.395678733    
+@     45800 t=      45.8000 a=       2.240000 th=      0.000 ph=      0.000 <l|r>=      0.984236589716          0.160213E-07 <l|h|r>=     -0.476797054791         -0.294351E-03 |d|=      0.393714538    
+@     46000 t=      46.0000 a=       2.250000 th=      0.000 ph=      0.000 <l|r>=      0.984119357832          0.167029E-07 <l|h|r>=     -0.476856427023         -0.291966E-03 |d|=      0.391694285    
+@     46200 t=      46.2000 a=       2.260000 th=      0.000 ph=      0.000 <l|r>=      0.984003026703          0.173896E-07 <l|h|r>=     -0.476919218400         -0.289836E-03 |d|=      0.389614527    
+@     46400 t=      46.4000 a=       2.270000 th=      0.000 ph=      0.000 <l|r>=      0.983887502216          0.180798E-07 <l|h|r>=     -0.476985537350         -0.287921E-03 |d|=      0.387472789    
+@     46600 t=      46.6000 a=       2.280000 th=      0.000 ph=      0.000 <l|r>=      0.983772707598          0.187717E-07 <l|h|r>=     -0.477055446331         -0.286176E-03 |d|=      0.385267562    
+@     46800 t=      46.8000 a=       2.290000 th=      0.000 ph=      0.000 <l|r>=      0.983658584051          0.194636E-07 <l|h|r>=     -0.477128962582         -0.284554E-03 |d|=      0.382998288    
+@     47000 t=      47.0000 a=       2.300000 th=      0.000 ph=      0.000 <l|r>=      0.983545091195          0.201539E-07 <l|h|r>=     -0.477206058949         -0.283011E-03 |d|=      0.380665351    
+@     47200 t=      47.2000 a=       2.310000 th=      0.000 ph=      0.000 <l|r>=      0.983432207294          0.208406E-07 <l|h|r>=     -0.477286664777         -0.281498E-03 |d|=      0.378270056    
+@     47400 t=      47.4000 a=       2.320000 th=      0.000 ph=      0.000 <l|r>=      0.983319929263          0.215220E-07 <l|h|r>=     -0.477370666839         -0.279971E-03 |d|=      0.375814611    
+@     47600 t=      47.6000 a=       2.330000 th=      0.000 ph=      0.000 <l|r>=      0.983208272455          0.221962E-07 <l|h|r>=     -0.477457910296         -0.278382E-03 |d|=      0.373302111    
+@     47800 t=      47.8000 a=       2.340000 th=      0.000 ph=      0.000 <l|r>=      0.983097270242          0.228614E-07 <l|h|r>=     -0.477548199767         -0.276687E-03 |d|=      0.370736512    
+@     48000 t=      48.0000 a=       2.350000 th=      0.000 ph=      0.000 <l|r>=      0.982986973368          0.235159E-07 <l|h|r>=     -0.477641300499         -0.274845E-03 |d|=      0.368122605    
+@     48200 t=      48.2000 a=       2.360000 th=      0.000 ph=      0.000 <l|r>=      0.982877449102          0.241578E-07 <l|h|r>=     -0.477736939756         -0.272815E-03 |d|=      0.365465988    
+@     48400 t=      48.4000 a=       2.370000 th=      0.000 ph=      0.000 <l|r>=      0.982768780191          0.247856E-07 <l|h|r>=     -0.477834808476         -0.270560E-03 |d|=      0.362773028    
+@     48600 t=      48.6000 a=       2.380000 th=      0.000 ph=      0.000 <l|r>=      0.982661063627          0.253974E-07 <l|h|r>=     -0.477934563264         -0.268046E-03 |d|=      0.360050817    
+@     48800 t=      48.8000 a=       2.390000 th=      0.000 ph=      0.000 <l|r>=      0.982554409239          0.259919E-07 <l|h|r>=     -0.478035828819         -0.265242E-03 |d|=      0.357307116    
+@     49000 t=      49.0000 a=       2.400000 th=      0.000 ph=      0.000 <l|r>=      0.982448938134          0.265676E-07 <l|h|r>=     -0.478138200829         -0.262123E-03 |d|=      0.354550297    
+@     49200 t=      49.2000 a=       2.410000 th=      0.000 ph=      0.000 <l|r>=      0.982344780999          0.271229E-07 <l|h|r>=     -0.478241249380         -0.258667E-03 |d|=      0.351789263    
+@     49400 t=      49.4000 a=       2.420000 th=      0.000 ph=      0.000 <l|r>=      0.982242076289          0.276569E-07 <l|h|r>=     -0.478344522906         -0.254856E-03 |d|=      0.349033366    
+@     49600 t=      49.6000 a=       2.430000 th=      0.000 ph=      0.000 <l|r>=      0.982140968326          0.281682E-07 <l|h|r>=     -0.478447552659         -0.250679E-03 |d|=      0.346292311    
+@     49800 t=      49.8000 a=       2.440000 th=      0.000 ph=      0.000 <l|r>=      0.982041605319          0.286559E-07 <l|h|r>=     -0.478549857666         -0.246129E-03 |d|=      0.343576048    
+@     50000 t=      50.0000 a=       2.450000 th=      0.000 ph=      0.000 <l|r>=      0.981944137349          0.291193E-07 <l|h|r>=     -0.478650950112         -0.241202E-03 |d|=      0.340894658    
+@     50200 t=      50.2000 a=       2.460000 th=      0.000 ph=      0.000 <l|r>=      0.981848714330          0.295577E-07 <l|h|r>=     -0.478750341049         -0.235903E-03 |d|=      0.338258232    
+@     50400 t=      50.4000 a=       2.470000 th=      0.000 ph=      0.000 <l|r>=      0.981755483973          0.299705E-07 <l|h|r>=     -0.478847546332         -0.230239E-03 |d|=      0.335676745    
+@     50600 t=      50.6000 a=       2.480000 th=      0.000 ph=      0.000 <l|r>=      0.981664589786          0.303574E-07 <l|h|r>=     -0.478942092636         -0.224223E-03 |d|=      0.333159930    
+@     50800 t=      50.8000 a=       2.490000 th=      0.000 ph=      0.000 <l|r>=      0.981576169128          0.307183E-07 <l|h|r>=     -0.479033523416         -0.217873E-03 |d|=      0.330717150    
+@     51000 t=      51.0000 a=       2.500000 th=      0.000 ph=      0.000 <l|r>=      0.981490351351          0.310532E-07 <l|h|r>=     -0.479121404672         -0.211211E-03 |d|=      0.328357281    
+@     51200 t=      51.2000 a=       2.510000 th=      0.000 ph=      0.000 <l|r>=      0.981407256046          0.313622E-07 <l|h|r>=     -0.479205330356         -0.204263E-03 |d|=      0.326088592    
+@     51400 t=      51.4000 a=       2.520000 th=      0.000 ph=      0.000 <l|r>=      0.981326991432          0.316459E-07 <l|h|r>=     -0.479284927294         -0.197061E-03 |d|=      0.323918648    
+@     51600 t=      51.6000 a=       2.530000 th=      0.000 ph=      0.000 <l|r>=      0.981249652887          0.319047E-07 <l|h|r>=     -0.479359859497         -0.189637E-03 |d|=      0.321854216    
+@     51800 t=      51.8000 a=       2.540000 th=      0.000 ph=      0.000 <l|r>=      0.981175321674          0.321394E-07 <l|h|r>=     -0.479429831761         -0.182028E-03 |d|=      0.319901189    
+@     52000 t=      52.0000 a=       2.550000 th=      0.000 ph=      0.000 <l|r>=      0.981104063853          0.323507E-07 <l|h|r>=     -0.479494592475         -0.174274E-03 |d|=      0.318064532    
+@     52200 t=      52.2000 a=       2.560000 th=      0.000 ph=      0.000 <l|r>=      0.981035929398          0.325399E-07 <l|h|r>=     -0.479553935599         -0.166416E-03 |d|=      0.316348231    
+@     52400 t=      52.4000 a=       2.570000 th=      0.000 ph=      0.000 <l|r>=      0.980970951546          0.327079E-07 <l|h|r>=     -0.479607701783         -0.158496E-03 |d|=      0.314755279    
+@     52600 t=      52.6000 a=       2.580000 th=      0.000 ph=      0.000 <l|r>=      0.980909146369          0.328561E-07 <l|h|r>=     -0.479655778644         -0.150558E-03 |d|=      0.313287663    
+@     52800 t=      52.8000 a=       2.590000 th=      0.000 ph=      0.000 <l|r>=      0.980850512571          0.329859E-07 <l|h|r>=     -0.479698100259         -0.142644E-03 |d|=      0.311946379    
+@     53000 t=      53.0000 a=       2.600000 th=      0.000 ph=      0.000 <l|r>=      0.980795031529          0.330988E-07 <l|h|r>=     -0.479734645913         -0.134798E-03 |d|=      0.310731452    
+@     53200 t=      53.2000 a=       2.610000 th=      0.000 ph=      0.000 <l|r>=      0.980742667547          0.331962E-07 <l|h|r>=     -0.479765438218         -0.127062E-03 |d|=      0.309641982    
+@     53400 t=      53.4000 a=       2.620000 th=      0.000 ph=      0.000 <l|r>=      0.980693368334          0.332799E-07 <l|h|r>=     -0.479790540706         -0.119478E-03 |d|=      0.308676191    
+@     53600 t=      53.6000 a=       2.630000 th=      0.000 ph=      0.000 <l|r>=      0.980647065696          0.333515E-07 <l|h|r>=     -0.479810055008         -0.112083E-03 |d|=      0.307831482    
+@     53800 t=      53.8000 a=       2.640000 th=      0.000 ph=      0.000 <l|r>=      0.980603676413          0.334126E-07 <l|h|r>=     -0.479824117744         -0.104913E-03 |d|=      0.307104506    
+@     54000 t=      54.0000 a=       2.650000 th=      0.000 ph=      0.000 <l|r>=      0.980563103294          0.334648E-07 <l|h|r>=     -0.479832897254         -0.980035E-04 |d|=      0.306491234    
+@     54200 t=      54.2000 a=       2.660000 th=      0.000 ph=      0.000 <l|r>=      0.980525236396          0.335100E-07 <l|h|r>=     -0.479836590260         -0.913833E-04 |d|=      0.305987023    
+@     54400 t=      54.4000 a=       2.670000 th=      0.000 ph=      0.000 <l|r>=      0.980489954374          0.335495E-07 <l|h|r>=     -0.479835418573         -0.850795E-04 |d|=      0.305586694    
+@     54600 t=      54.6000 a=       2.680000 th=      0.000 ph=      0.000 <l|r>=      0.980457125941          0.335851E-07 <l|h|r>=     -0.479829625903         -0.791149E-04 |d|=      0.305284595    
+@     54800 t=      54.8000 a=       2.690000 th=      0.000 ph=      0.000 <l|r>=      0.980426611421          0.336180E-07 <l|h|r>=     -0.479819474818         -0.735086E-04 |d|=      0.305074673    
+@     55000 t=      55.0000 a=       2.700000 th=      0.000 ph=      0.000 <l|r>=      0.980398264350          0.336498E-07 <l|h|r>=     -0.479805243880         -0.682755E-04 |d|=      0.304950531    
+@     55200 t=      55.2000 a=       2.710000 th=      0.000 ph=      0.000 <l|r>=      0.980371933121          0.336817E-07 <l|h|r>=     -0.479787224956         -0.634264E-04 |d|=      0.304905495    
+@     55400 t=      55.4000 a=       2.720000 th=      0.000 ph=      0.000 <l|r>=      0.980347462620          0.337149E-07 <l|h|r>=     -0.479765720652         -0.589681E-04 |d|=      0.304932666    
+@     55600 t=      55.6000 a=       2.730000 th=      0.000 ph=      0.000 <l|r>=      0.980324695842          0.337503E-07 <l|h|r>=     -0.479741041859         -0.549033E-04 |d|=      0.305024975    
+@     55800 t=      55.8000 a=       2.740000 th=      0.000 ph=      0.000 <l|r>=      0.980303475454          0.337888E-07 <l|h|r>=     -0.479713505328         -0.512309E-04 |d|=      0.305175240    
+@     56000 t=      56.0000 a=       2.750000 th=      0.000 ph=      0.000 <l|r>=      0.980283645278          0.338312E-07 <l|h|r>=     -0.479683431227         -0.479462E-04 |d|=      0.305376220    
+@     56200 t=      56.2000 a=       2.760000 th=      0.000 ph=      0.000 <l|r>=      0.980265051675          0.338780E-07 <l|h|r>=     -0.479651140628         -0.450414E-04 |d|=      0.305620665    
+@     56400 t=      56.4000 a=       2.770000 th=      0.000 ph=      0.000 <l|r>=      0.980247544812          0.339298E-07 <l|h|r>=     -0.479616952886         -0.425054E-04 |d|=      0.305901381    
+@     56600 t=      56.6000 a=       2.780000 th=      0.000 ph=      0.000 <l|r>=      0.980230979785          0.339867E-07 <l|h|r>=     -0.479581182894         -0.403246E-04 |d|=      0.306211285    
+@     56800 t=      56.8000 a=       2.790000 th=      0.000 ph=      0.000 <l|r>=      0.980215217601          0.340489E-07 <l|h|r>=     -0.479544138231         -0.384831E-04 |d|=      0.306543465    
+@     57000 t=      57.0000 a=       2.800000 th=      0.000 ph=      0.000 <l|r>=      0.980200126002          0.341165E-07 <l|h|r>=     -0.479506116249         -0.369632E-04 |d|=      0.306891246    
+@     57200 t=      57.2000 a=       2.810000 th=      0.000 ph=      0.000 <l|r>=      0.980185580131          0.341892E-07 <l|h|r>=     -0.479467401164         -0.357457E-04 |d|=      0.307248248    
+@     57400 t=      57.4000 a=       2.820000 th=      0.000 ph=      0.000 <l|r>=      0.980171463032          0.342669E-07 <l|h|r>=     -0.479428261257         -0.348104E-04 |d|=      0.307608446    
+@     57600 t=      57.6000 a=       2.830000 th=      0.000 ph=      0.000 <l|r>=      0.980157666003          0.343492E-07 <l|h|r>=     -0.479388946308         -0.341363E-04 |d|=      0.307966224    
+@     57800 t=      57.8000 a=       2.840000 th=      0.000 ph=      0.000 <l|r>=      0.980144088791          0.344356E-07 <l|h|r>=     -0.479349685359         -0.337021E-04 |d|=      0.308316422    
+@     58000 t=      58.0000 a=       2.850000 th=      0.000 ph=      0.000 <l|r>=      0.980130639659          0.345256E-07 <l|h|r>=     -0.479310684954         -0.334867E-04 |d|=      0.308654371    
+@     58200 t=      58.2000 a=       2.860000 th=      0.000 ph=      0.000 <l|r>=      0.980117235321          0.346186E-07 <l|h|r>=     -0.479272127926         -0.334690E-04 |d|=      0.308975917    
+@     58400 t=      58.4000 a=       2.870000 th=      0.000 ph=      0.000 <l|r>=      0.980103800768          0.347139E-07 <l|h|r>=     -0.479234172813         -0.336287E-04 |d|=      0.309277439    
+@     58600 t=      58.6000 a=       2.880000 th=      0.000 ph=      0.000 <l|r>=      0.980090269009          0.348108E-07 <l|h|r>=     -0.479196953919         -0.339461E-04 |d|=      0.309555841    
+@     58800 t=      58.8000 a=       2.890000 th=      0.000 ph=      0.000 <l|r>=      0.980076580723          0.349085E-07 <l|h|r>=     -0.479160581997         -0.344025E-04 |d|=      0.309808542    
+@     59000 t=      59.0000 a=       2.900000 th=      0.000 ph=      0.000 <l|r>=      0.980062683878          0.350063E-07 <l|h|r>=     -0.479125145501         -0.349803E-04 |d|=      0.310033449    
+@     59200 t=      59.2000 a=       2.910000 th=      0.000 ph=      0.000 <l|r>=      0.980048533289          0.351035E-07 <l|h|r>=     -0.479090712273         -0.356628E-04 |d|=      0.310228922    
+@     59400 t=      59.4000 a=       2.920000 th=      0.000 ph=      0.000 <l|r>=      0.980034090184          0.351994E-07 <l|h|r>=     -0.479057331549         -0.364346E-04 |d|=      0.310393734    
+@     59600 t=      59.6000 a=       2.930000 th=      0.000 ph=      0.000 <l|r>=      0.980019321749          0.352933E-07 <l|h|r>=     -0.479025036092         -0.372813E-04 |d|=      0.310527026    
+@     59800 t=      59.8000 a=       2.940000 th=      0.000 ph=      0.000 <l|r>=      0.980004200705          0.353844E-07 <l|h|r>=     -0.478993844309         -0.381896E-04 |d|=      0.310628261    
+@     60000 t=      60.0000 a=       2.950000 th=      0.000 ph=      0.000 <l|r>=      0.979988704908          0.354723E-07 <l|h|r>=     -0.478963762174         -0.391472E-04 |d|=      0.310697189    
+@     60200 t=      60.2000 a=       2.960000 th=      0.000 ph=      0.000 <l|r>=      0.979972816989          0.355564E-07 <l|h|r>=     -0.478934784854         -0.401424E-04 |d|=      0.310733806    
+@     60400 t=      60.4000 a=       2.970000 th=      0.000 ph=      0.000 <l|r>=      0.979956524050          0.356362E-07 <l|h|r>=     -0.478906897917         -0.411646E-04 |d|=      0.310738332    
+@     60600 t=      60.6000 a=       2.980000 th=      0.000 ph=      0.000 <l|r>=      0.979939817402          0.357114E-07 <l|h|r>=     -0.478880078113         -0.422034E-04 |d|=      0.310711193    
+@     60800 t=      60.8000 a=       2.990000 th=      0.000 ph=      0.000 <l|r>=      0.979922692369          0.357815E-07 <l|h|r>=     -0.478854293724         -0.432490E-04 |d|=      0.310653008    
+@     61000 t=      61.0000 a=       3.000000 th=      0.000 ph=      0.000 <l|r>=      0.979905148134          0.358465E-07 <l|h|r>=     -0.478829504539         -0.442918E-04 |d|=      0.310564594    
+@     61200 t=      61.2000 a=       3.010000 th=      0.000 ph=      0.000 <l|r>=      0.979887187632          0.359061E-07 <l|h|r>=     -0.478805661569         -0.453227E-04 |d|=      0.310446960    
+@     61400 t=      61.4000 a=       3.020000 th=      0.000 ph=      0.000 <l|r>=      0.979868817485          0.359602E-07 <l|h|r>=     -0.478782706610         -0.463325E-04 |d|=      0.310301322    
+@     61600 t=      61.6000 a=       3.030000 th=      0.000 ph=      0.000 <l|r>=      0.979850047952          0.360089E-07 <l|h|r>=     -0.478760571808         -0.473120E-04 |d|=      0.310129105    
+@     61800 t=      61.8000 a=       3.040000 th=      0.000 ph=      0.000 <l|r>=      0.979830892903          0.360522E-07 <l|h|r>=     -0.478739179343         -0.482524E-04 |d|=      0.309931945    
+@     62000 t=      62.0000 a=       3.050000 th=      0.000 ph=      0.000 <l|r>=      0.979811369777          0.360903E-07 <l|h|r>=     -0.478718441363         -0.491447E-04 |d|=      0.309711695    
+@     62200 t=      62.2000 a=       3.060000 th=      0.000 ph=      0.000 <l|r>=      0.979791499541          0.361235E-07 <l|h|r>=     -0.478698260230         -0.499802E-04 |d|=      0.309470410    
+@     62400 t=      62.4000 a=       3.070000 th=      0.000 ph=      0.000 <l|r>=      0.979771306606          0.361520E-07 <l|h|r>=     -0.478678529133         -0.507505E-04 |d|=      0.309210336    
+@     62600 t=      62.6000 a=       3.080000 th=      0.000 ph=      0.000 <l|r>=      0.979750818708          0.361762E-07 <l|h|r>=     -0.478659133063         -0.514473E-04 |d|=      0.308933888    
+@     62800 t=      62.8000 a=       3.090000 th=      0.000 ph=      0.000 <l|r>=      0.979730066741          0.361966E-07 <l|h|r>=     -0.478639950107         -0.520632E-04 |d|=      0.308643624    
+@     63000 t=      63.0000 a=       3.100000 th=      0.000 ph=      0.000 <l|r>=      0.979709084524          0.362136E-07 <l|h|r>=     -0.478620852991         -0.525910E-04 |d|=      0.308342208    
+@     63200 t=      63.2000 a=       3.110000 th=      0.000 ph=      0.000 <l|r>=      0.979687908509          0.362279E-07 <l|h|r>=     -0.478601710789         -0.530246E-04 |d|=      0.308032376    
+@     63400 t=      63.4000 a=       3.120000 th=      0.000 ph=      0.000 <l|r>=      0.979666577417          0.362399E-07 <l|h|r>=     -0.478582390681         -0.533589E-04 |d|=      0.307716902    
+@     63600 t=      63.6000 a=       3.130000 th=      0.000 ph=      0.000 <l|r>=      0.979645131812          0.362503E-07 <l|h|r>=     -0.478562759685         -0.535898E-04 |d|=      0.307398557    
+@     63800 t=      63.8000 a=       3.140000 th=      0.000 ph=      0.000 <l|r>=      0.979623613617          0.362599E-07 <l|h|r>=     -0.478542686270         -0.537146E-04 |d|=      0.307080075    
+@     64000 t=      64.0000 a=       3.150000 th=      0.000 ph=      0.000 <l|r>=      0.979602065562          0.362693E-07 <l|h|r>=     -0.478522041812         -0.537320E-04 |d|=      0.306764130    
+@     64200 t=      64.2000 a=       3.160000 th=      0.000 ph=      0.000 <l|r>=      0.979580530601          0.362793E-07 <l|h|r>=     -0.478500701856         -0.536422E-04 |d|=      0.306453299    
+@     64400 t=      64.4000 a=       3.170000 th=      0.000 ph=      0.000 <l|r>=      0.979559051284          0.362908E-07 <l|h|r>=     -0.478478547197         -0.534470E-04 |d|=      0.306150047    
+@     64600 t=      64.6000 a=       3.180000 th=      0.000 ph=      0.000 <l|r>=      0.979537669122          0.363044E-07 <l|h|r>=     -0.478455464805         -0.531498E-04 |d|=      0.305856705    
+@     64800 t=      64.8000 a=       3.190000 th=      0.000 ph=      0.000 <l|r>=      0.979516423934          0.363210E-07 <l|h|r>=     -0.478431348641         -0.527557E-04 |d|=      0.305575452    
+@     65000 t=      65.0000 a=       3.200000 th=      0.000 ph=      0.000 <l|r>=      0.979495353223          0.363415E-07 <l|h|r>=     -0.478406100416         -0.522711E-04 |d|=      0.305308302    
+@     65200 t=      65.2000 a=       3.210000 th=      0.000 ph=      0.000 <l|r>=      0.979474491575          0.363667E-07 <l|h|r>=     -0.478379630335         -0.517041E-04 |d|=      0.305057083    
+@     65400 t=      65.4000 a=       3.220000 th=      0.000 ph=      0.000 <l|r>=      0.979453870105          0.363974E-07 <l|h|r>=     -0.478351857866         -0.510640E-04 |d|=      0.304823428    
+@     65600 t=      65.6000 a=       3.230000 th=      0.000 ph=      0.000 <l|r>=      0.979433515976          0.364344E-07 <l|h|r>=     -0.478322712547         -0.503613E-04 |d|=      0.304608755    
+@     65800 t=      65.8000 a=       3.240000 th=      0.000 ph=      0.000 <l|r>=      0.979413451993          0.364786E-07 <l|h|r>=     -0.478292134825         -0.496072E-04 |d|=      0.304414249    
+@     66000 t=      66.0000 a=       3.250000 th=      0.000 ph=      0.000 <l|r>=      0.979393696289          0.365306E-07 <l|h|r>=     -0.478260076886         -0.488138E-04 |d|=      0.304240848    
+@     66200 t=      66.2000 a=       3.260000 th=      0.000 ph=      0.000 <l|r>=      0.979374262115          0.365912E-07 <l|h|r>=     -0.478226503432         -0.479933E-04 |d|=      0.304089226    
+@     66400 t=      66.4000 a=       3.270000 th=      0.000 ph=      0.000 <l|r>=      0.979355157736          0.366611E-07 <l|h|r>=     -0.478191392345         -0.471584E-04 |d|=      0.303959779    
+@     66600 t=      66.6000 a=       3.280000 th=      0.000 ph=      0.000 <l|r>=      0.979336386439          0.367409E-07 <l|h|r>=     -0.478154735151         -0.463214E-04 |d|=      0.303852617    
+@     66800 t=      66.8000 a=       3.290000 th=      0.000 ph=      0.000 <l|r>=      0.979317946645          0.368311E-07 <l|h|r>=     -0.478116537239         -0.454941E-04 |d|=      0.303767559    
+@     67000 t=      67.0000 a=       3.300000 th=      0.000 ph=      0.000 <l|r>=      0.979299832127          0.369322E-07 <l|h|r>=     -0.478076817770         -0.446879E-04 |d|=      0.303704135    
+@     67200 t=      67.2000 a=       3.310000 th=      0.000 ph=      0.000 <l|r>=      0.979282032312          0.370445E-07 <l|h|r>=     -0.478035609254         -0.439133E-04 |d|=      0.303661595    
+@     67400 t=      67.4000 a=       3.320000 th=      0.000 ph=      0.000 <l|r>=      0.979264532667          0.371683E-07 <l|h|r>=     -0.477992956793         -0.431794E-04 |d|=      0.303638922    
+@     67600 t=      67.6000 a=       3.330000 th=      0.000 ph=      0.000 <l|r>=      0.979247315145          0.373038E-07 <l|h|r>=     -0.477948916996         -0.424946E-04 |d|=      0.303634858    
+@     67800 t=      67.8000 a=       3.340000 th=      0.000 ph=      0.000 <l|r>=      0.979230358671          0.374511E-07 <l|h|r>=     -0.477903556638         -0.418658E-04 |d|=      0.303647926    
+@     68000 t=      68.0000 a=       3.350000 th=      0.000 ph=      0.000 <l|r>=      0.979213639662          0.376101E-07 <l|h|r>=     -0.477856951109         -0.412986E-04 |d|=      0.303676468    
+@     68200 t=      68.2000 a=       3.360000 th=      0.000 ph=      0.000 <l|r>=      0.979197132544          0.377807E-07 <l|h|r>=     -0.477809182736         -0.407973E-04 |d|=      0.303718670    
+@     68400 t=      68.4000 a=       3.370000 th=      0.000 ph=      0.000 <l|r>=      0.979180810271          0.379625E-07 <l|h|r>=     -0.477760339073         -0.403649E-04 |d|=      0.303772608    
+@     68600 t=      68.6000 a=       3.380000 th=      0.000 ph=      0.000 <l|r>=      0.979164644809          0.381553E-07 <l|h|r>=     -0.477710511230         -0.400035E-04 |d|=      0.303836271    
+@     68800 t=      68.8000 a=       3.390000 th=      0.000 ph=      0.000 <l|r>=      0.979148607598          0.383585E-07 <l|h|r>=     -0.477659792304         -0.397136E-04 |d|=      0.303907605    
+@     69000 t=      69.0000 a=       3.400000 th=      0.000 ph=      0.000 <l|r>=      0.979132669958          0.385715E-07 <l|h|r>=     -0.477608275982         -0.394953E-04 |d|=      0.303984531    
+@     69200 t=      69.2000 a=       3.410000 th=      0.000 ph=      0.000 <l|r>=      0.979116803455          0.387938E-07 <l|h|r>=     -0.477556055332         -0.393473E-04 |d|=      0.304064979    
+@     69400 t=      69.4000 a=       3.420000 th=      0.000 ph=      0.000 <l|r>=      0.979100980208          0.390246E-07 <l|h|r>=     -0.477503221800         -0.392681E-04 |d|=      0.304146905    
+@     69600 t=      69.6000 a=       3.430000 th=      0.000 ph=      0.000 <l|r>=      0.979085173153          0.392631E-07 <l|h|r>=     -0.477449864402         -0.392553E-04 |d|=      0.304228311    
+@     69800 t=      69.8000 a=       3.440000 th=      0.000 ph=      0.000 <l|r>=      0.979069356256          0.395083E-07 <l|h|r>=     -0.477396069088         -0.393060E-04 |d|=      0.304307259    
+@     70000 t=      70.0000 a=       3.450000 th=      0.000 ph=      0.000 <l|r>=      0.979053504690          0.397595E-07 <l|h|r>=     -0.477341918239         -0.394171E-04 |d|=      0.304381880    
+@     70200 t=      70.2000 a=       3.460000 th=      0.000 ph=      0.000 <l|r>=      0.979037594972          0.400156E-07 <l|h|r>=     -0.477287490264         -0.395851E-04 |d|=      0.304450386    
+@     70400 t=      70.4000 a=       3.470000 th=      0.000 ph=      0.000 <l|r>=      0.979021605078          0.402756E-07 <l|h|r>=     -0.477232859249         -0.398062E-04 |d|=      0.304511081    
+@     70600 t=      70.6000 a=       3.480000 th=      0.000 ph=      0.000 <l|r>=      0.979005514534          0.405386E-07 <l|h|r>=     -0.477178094621         -0.400763E-04 |d|=      0.304562362    
+@     70800 t=      70.8000 a=       3.490000 th=      0.000 ph=      0.000 <l|r>=      0.978989304503          0.408036E-07 <l|h|r>=     -0.477123260814         -0.403914E-04 |d|=      0.304602733    
+@     71000 t=      71.0000 a=       3.500000 th=      0.000 ph=      0.000 <l|r>=      0.978972957855          0.410695E-07 <l|h|r>=     -0.477068416912         -0.407471E-04 |d|=      0.304630812    
+@     71200 t=      71.2000 a=       3.510000 th=      0.000 ph=      0.000 <l|r>=      0.978956459240          0.413354E-07 <l|h|r>=     -0.477013616265         -0.411387E-04 |d|=      0.304645335    
+@     71400 t=      71.4000 a=       3.520000 th=      0.000 ph=      0.000 <l|r>=      0.978939795164          0.416004E-07 <l|h|r>=     -0.476958906088         -0.415617E-04 |d|=      0.304645173    
+@     71600 t=      71.6000 a=       3.530000 th=      0.000 ph=      0.000 <l|r>=      0.978922954064          0.418635E-07 <l|h|r>=     -0.476904327062         -0.420109E-04 |d|=      0.304629334    
+@     71800 t=      71.8000 a=       3.540000 th=      0.000 ph=      0.000 <l|r>=      0.978905926384          0.421238E-07 <l|h|r>=     -0.476849912938         -0.424815E-04 |d|=      0.304596973    
+@     72000 t=      72.0000 a=       3.550000 th=      0.000 ph=      0.000 <l|r>=      0.978888704665          0.423805E-07 <l|h|r>=     -0.476795690191         -0.429679E-04 |d|=      0.304547402    
+@     72200 t=      72.2000 a=       3.560000 th=      0.000 ph=      0.000 <l|r>=      0.978871283615          0.426329E-07 <l|h|r>=     -0.476741677723         -0.434647E-04 |d|=      0.304480093    
+@     72400 t=      72.4000 a=       3.570000 th=      0.000 ph=      0.000 <l|r>=      0.978853660196          0.428802E-07 <l|h|r>=     -0.476687886634         -0.439661E-04 |d|=      0.304394685    
+@     72600 t=      72.6000 a=       3.580000 th=      0.000 ph=      0.000 <l|r>=      0.978835833686          0.431217E-07 <l|h|r>=     -0.476634320090         -0.444663E-04 |d|=      0.304290985    
+@     72800 t=      72.8000 a=       3.590000 th=      0.000 ph=      0.000 <l|r>=      0.978817805735          0.433569E-07 <l|h|r>=     -0.476580973271         -0.449593E-04 |d|=      0.304168972    
+@     73000 t=      73.0000 a=       3.600000 th=      0.000 ph=      0.000 <l|r>=      0.978799580403          0.435853E-07 <l|h|r>=     -0.476527833422         -0.454391E-04 |d|=      0.304028792    
+@     73200 t=      73.2000 a=       3.610000 th=      0.000 ph=      0.000 <l|r>=      0.978781164166          0.438063E-07 <l|h|r>=     -0.476474879999         -0.458995E-04 |d|=      0.303870758    
+@     73400 t=      73.4000 a=       3.620000 th=      0.000 ph=      0.000 <l|r>=      0.978762565892          0.440197E-07 <l|h|r>=     -0.476422084906         -0.463348E-04 |d|=      0.303695341    
+@     73600 t=      73.6000 a=       3.630000 th=      0.000 ph=      0.000 <l|r>=      0.978743796783          0.442250E-07 <l|h|r>=     -0.476369412827         -0.467391E-04 |d|=      0.303503168    
+@     73800 t=      73.8000 a=       3.640000 th=      0.000 ph=      0.000 <l|r>=      0.978724870264          0.444222E-07 <l|h|r>=     -0.476316821642         -0.471071E-04 |d|=      0.303295011    
+@     74000 t=      74.0000 a=       3.650000 th=      0.000 ph=      0.000 <l|r>=      0.978705801835          0.446109E-07 <l|h|r>=     -0.476264262936         -0.474339E-04 |d|=      0.303071774    
+@     74200 t=      74.2000 a=       3.660000 th=      0.000 ph=      0.000 <l|r>=      0.978686608872          0.447912E-07 <l|h|r>=     -0.476211682588         -0.477150E-04 |d|=      0.302834483    
+@     74400 t=      74.4000 a=       3.670000 th=      0.000 ph=      0.000 <l|r>=      0.978667310376          0.449629E-07 <l|h|r>=     -0.476159021438         -0.479467E-04 |d|=      0.302584272    
+@     74600 t=      74.6000 a=       3.680000 th=      0.000 ph=      0.000 <l|r>=      0.978647926692          0.451263E-07 <l|h|r>=     -0.476106216030         -0.481260E-04 |d|=      0.302322368    
+@     74800 t=      74.8000 a=       3.690000 th=      0.000 ph=      0.000 <l|r>=      0.978628479180          0.452813E-07 <l|h|r>=     -0.476053199416         -0.482508E-04 |d|=      0.302050072    
+@     75000 t=      75.0000 a=       3.700000 th=      0.000 ph=      0.000 <l|r>=      0.978608989878          0.454282E-07 <l|h|r>=     -0.475999902011         -0.483200E-04 |d|=      0.301768745    
+@     75200 t=      75.2000 a=       3.710000 th=      0.000 ph=      0.000 <l|r>=      0.978589481143          0.455673E-07 <l|h|r>=     -0.475946252472         -0.483330E-04 |d|=      0.301479787    
+@     75400 t=      75.4000 a=       3.720000 th=      0.000 ph=      0.000 <l|r>=      0.978569975299          0.456990E-07 <l|h|r>=     -0.475892178575         -0.482905E-04 |d|=      0.301184618    
+@     75600 t=      75.6000 a=       3.730000 th=      0.000 ph=      0.000 <l|r>=      0.978550494316          0.458236E-07 <l|h|r>=     -0.475837608073         -0.481936E-04 |d|=      0.300884667    
+@     75800 t=      75.8000 a=       3.740000 th=      0.000 ph=      0.000 <l|r>=      0.978531059504          0.459415E-07 <l|h|r>=     -0.475782469490         -0.480445E-04 |d|=      0.300581345    
+@     76000 t=      76.0000 a=       3.750000 th=      0.000 ph=      0.000 <l|r>=      0.978511691276          0.460534E-07 <l|h|r>=     -0.475726692834         -0.478455E-04 |d|=      0.300276038    
+@     76200 t=      76.2000 a=       3.760000 th=      0.000 ph=      0.000 <l|r>=      0.978492408949          0.461597E-07 <l|h|r>=     -0.475670210192         -0.475997E-04 |d|=      0.299970091    
+@     76400 t=      76.4000 a=       3.770000 th=      0.000 ph=      0.000 <l|r>=      0.978473230614          0.462610E-07 <l|h|r>=     -0.475612956210         -0.473101E-04 |d|=      0.299664796    
+@     76600 t=      76.6000 a=       3.780000 th=      0.000 ph=      0.000 <l|r>=      0.978454173064          0.463579E-07 <l|h|r>=     -0.475554868436         -0.469802E-04 |d|=      0.299361383    
+@     76800 t=      76.8000 a=       3.790000 th=      0.000 ph=      0.000 <l|r>=      0.978435251777          0.464511E-07 <l|h|r>=     -0.475495887533         -0.466131E-04 |d|=      0.299061016    
+@     77000 t=      77.0000 a=       3.800000 th=      0.000 ph=      0.000 <l|r>=      0.978416480935          0.465411E-07 <l|h|r>=     -0.475435957388         -0.462120E-04 |d|=      0.298764788    
+@     77200 t=      77.2000 a=       3.810000 th=      0.000 ph=      0.000 <l|r>=      0.978397873479          0.466285E-07 <l|h|r>=     -0.475375025134         -0.457801E-04 |d|=      0.298473718    
+@     77400 t=      77.4000 a=       3.820000 th=      0.000 ph=      0.000 <l|r>=      0.978379441174          0.467139E-07 <l|h|r>=     -0.475313041119         -0.453201E-04 |d|=      0.298188749    
+@     77600 t=      77.6000 a=       3.830000 th=      0.000 ph=      0.000 <l|r>=      0.978361194673          0.467979E-07 <l|h|r>=     -0.475249958867         -0.448347E-04 |d|=      0.297910749    
+@     77800 t=      77.8000 a=       3.840000 th=      0.000 ph=      0.000 <l|r>=      0.978343143555          0.468808E-07 <l|h|r>=     -0.475185735052         -0.443266E-04 |d|=      0.297640508    
+@     78000 t=      78.0000 a=       3.850000 th=      0.000 ph=      0.000 <l|r>=      0.978325296343          0.469633E-07 <l|h|r>=     -0.475120329525         -0.437985E-04 |d|=      0.297378741    
+@     78200 t=      78.2000 a=       3.860000 th=      0.000 ph=      0.000 <l|r>=      0.978307660476          0.470457E-07 <l|h|r>=     -0.475053705417         -0.432532E-04 |d|=      0.297126080    
+@     78400 t=      78.4000 a=       3.870000 th=      0.000 ph=      0.000 <l|r>=      0.978290242250          0.471284E-07 <l|h|r>=     -0.474985829319         -0.426935E-04 |d|=      0.296883075    
+@     78600 t=      78.6000 a=       3.880000 th=      0.000 ph=      0.000 <l|r>=      0.978273046722          0.472117E-07 <l|h|r>=     -0.474916671537         -0.421228E-04 |d|=      0.296650188    
+@     78800 t=      78.8000 a=       3.890000 th=      0.000 ph=      0.000 <l|r>=      0.978256077589          0.472960E-07 <l|h|r>=     -0.474846206405         -0.415446E-04 |d|=      0.296427787    
+@     79000 t=      79.0000 a=       3.900000 th=      0.000 ph=      0.000 <l|r>=      0.978239337057          0.473813E-07 <l|h|r>=     -0.474774412632         -0.409628E-04 |d|=      0.296216143    
+@     79200 t=      79.2000 a=       3.910000 th=      0.000 ph=      0.000 <l|r>=      0.978222825718          0.474680E-07 <l|h|r>=     -0.474701273638         -0.403816E-04 |d|=      0.296015421    
+@     79400 t=      79.4000 a=       3.920000 th=      0.000 ph=      0.000 <l|r>=      0.978206542447          0.475561E-07 <l|h|r>=     -0.474626777848         -0.398054E-04 |d|=      0.295825679    
+@     79600 t=      79.6000 a=       3.930000 th=      0.000 ph=      0.000 <l|r>=      0.978190484337          0.476456E-07 <l|h|r>=     -0.474550918897         -0.392386E-04 |d|=      0.295646865    
+@     79800 t=      79.8000 a=       3.940000 th=      0.000 ph=      0.000 <l|r>=      0.978174646685          0.477366E-07 <l|h|r>=     -0.474473695729         -0.386858E-04 |d|=      0.295478812    
+@     80000 t=      80.0000 a=       3.950000 th=      0.000 ph=      0.000 <l|r>=      0.978159023030          0.478289E-07 <l|h|r>=     -0.474395112546         -0.381512E-04 |d|=      0.295321244    
+@     80200 t=      80.2000 a=       3.960000 th=      0.000 ph=      0.000 <l|r>=      0.978143605260          0.479225E-07 <l|h|r>=     -0.474315178622         -0.376388E-04 |d|=      0.295173780    
+@     80400 t=      80.4000 a=       3.970000 th=      0.000 ph=      0.000 <l|r>=      0.978128383761          0.480172E-07 <l|h|r>=     -0.474233907968         -0.371520E-04 |d|=      0.295035936    
+@     80600 t=      80.6000 a=       3.980000 th=      0.000 ph=      0.000 <l|r>=      0.978113347623          0.481127E-07 <l|h|r>=     -0.474151318869         -0.366940E-04 |d|=      0.294907141    
+@     80800 t=      80.8000 a=       3.990000 th=      0.000 ph=      0.000 <l|r>=      0.978098484871          0.482087E-07 <l|h|r>=     -0.474067433325         -0.362669E-04 |d|=      0.294786742    
+@     81000 t=      81.0000 a=       4.000000 th=      0.000 ph=      0.000 <l|r>=      0.978083782717          0.483048E-07 <l|h|r>=     -0.473982276434         -0.358726E-04 |d|=      0.294674018    
+@     81200 t=      81.2000 a=       4.010000 th=      0.000 ph=      0.000 <l|r>=      0.978069227811          0.484006E-07 <l|h|r>=     -0.473895875740         -0.355121E-04 |d|=      0.294568194    
+@     81400 t=      81.4000 a=       4.020000 th=      0.000 ph=      0.000 <l|r>=      0.978054806481          0.484957E-07 <l|h|r>=     -0.473808260599         -0.351859E-04 |d|=      0.294468451    
+@     81600 t=      81.6000 a=       4.030000 th=      0.000 ph=      0.000 <l|r>=      0.978040504940          0.485896E-07 <l|h|r>=     -0.473719461593         -0.348942E-04 |d|=      0.294373941    
+@     81800 t=      81.8000 a=       4.040000 th=      0.000 ph=      0.000 <l|r>=      0.978026309461          0.486817E-07 <l|h|r>=     -0.473629510009         -0.346365E-04 |d|=      0.294283793    
+@     82000 t=      82.0000 a=       4.050000 th=      0.000 ph=      0.000 <l|r>=      0.978012206514          0.487714E-07 <l|h|r>=     -0.473538437402         -0.344122E-04 |d|=      0.294197128    
+@     82200 t=      82.2000 a=       4.060000 th=      0.000 ph=      0.000 <l|r>=      0.977998182854          0.488582E-07 <l|h|r>=     -0.473446275249         -0.342206E-04 |d|=      0.294113062    
+@     82400 t=      82.4000 a=       4.070000 th=      0.000 ph=      0.000 <l|r>=      0.977984225587          0.489416E-07 <l|h|r>=     -0.473353054677         -0.340607E-04 |d|=      0.294030716    
+@     82600 t=      82.6000 a=       4.080000 th=      0.000 ph=      0.000 <l|r>=      0.977970322195          0.490208E-07 <l|h|r>=     -0.473258806261         -0.339315E-04 |d|=      0.293949220    
+@     82800 t=      82.8000 a=       4.090000 th=      0.000 ph=      0.000 <l|r>=      0.977956460557          0.490955E-07 <l|h|r>=     -0.473163559866         -0.338321E-04 |d|=      0.293867716    
+@     83000 t=      83.0000 a=       4.100000 th=      0.000 ph=      0.000 <l|r>=      0.977942628948          0.491648E-07 <l|h|r>=     -0.473067344511         -0.337614E-04 |d|=      0.293785364    
+@     83200 t=      83.2000 a=       4.110000 th=      0.000 ph=      0.000 <l|r>=      0.977928816057          0.492284E-07 <l|h|r>=     -0.472970188231         -0.337183E-04 |d|=      0.293701347    
+@     83400 t=      83.4000 a=       4.120000 th=      0.000 ph=      0.000 <l|r>=      0.977915010999          0.492857E-07 <l|h|r>=     -0.472872117927         -0.337019E-04 |d|=      0.293614871    
+@     83600 t=      83.6000 a=       4.130000 th=      0.000 ph=      0.000 <l|r>=      0.977901203352          0.493361E-07 <l|h|r>=     -0.472773159188         -0.337108E-04 |d|=      0.293525172    
+@     83800 t=      83.8000 a=       4.140000 th=      0.000 ph=      0.000 <l|r>=      0.977887383206          0.493792E-07 <l|h|r>=     -0.472673336078         -0.337437E-04 |d|=      0.293431520    
+@     84000 t=      84.0000 a=       4.150000 th=      0.000 ph=      0.000 <l|r>=      0.977873541225          0.494143E-07 <l|h|r>=     -0.472572670904         -0.337990E-04 |d|=      0.293333225    
+@     84200 t=      84.2000 a=       4.160000 th=      0.000 ph=      0.000 <l|r>=      0.977859668728          0.494412E-07 <l|h|r>=     -0.472471183956         -0.338751E-04 |d|=      0.293229639    
+@     84400 t=      84.4000 a=       4.170000 th=      0.000 ph=      0.000 <l|r>=      0.977845757759          0.494593E-07 <l|h|r>=     -0.472368893248         -0.339700E-04 |d|=      0.293120165    
+@     84600 t=      84.6000 a=       4.180000 th=      0.000 ph=      0.000 <l|r>=      0.977831801169          0.494682E-07 <l|h|r>=     -0.472265814278         -0.340816E-04 |d|=      0.293004260    
+@     84800 t=      84.8000 a=       4.190000 th=      0.000 ph=      0.000 <l|r>=      0.977817792679          0.494676E-07 <l|h|r>=     -0.472161959811         -0.342077E-04 |d|=      0.292881437    
+@     85000 t=      85.0000 a=       4.200000 th=      0.000 ph=      0.000 <l|r>=      0.977803726931          0.494570E-07 <l|h|r>=     -0.472057339712         -0.343458E-04 |d|=      0.292751272    
+@     85200 t=      85.2000 a=       4.210000 th=      0.000 ph=      0.000 <l|r>=      0.977789599518          0.494363E-07 <l|h|r>=     -0.471951960825         -0.344937E-04 |d|=      0.292613405    
+@     85400 t=      85.4000 a=       4.220000 th=      0.000 ph=      0.000 <l|r>=      0.977775406988          0.494050E-07 <l|h|r>=     -0.471845826930         -0.346489E-04 |d|=      0.292467540    
+@     85600 t=      85.6000 a=       4.230000 th=      0.000 ph=      0.000 <l|r>=      0.977761146839          0.493629E-07 <l|h|r>=     -0.471738938742         -0.348091E-04 |d|=      0.292313446    
+@     85800 t=      85.8000 a=       4.240000 th=      0.000 ph=      0.000 <l|r>=      0.977746817478          0.493098E-07 <l|h|r>=     -0.471631293974         -0.349720E-04 |d|=      0.292150955    
+@     86000 t=      86.0000 a=       4.250000 th=      0.000 ph=      0.000 <l|r>=      0.977732418178          0.492456E-07 <l|h|r>=     -0.471522887441         -0.351356E-04 |d|=      0.291979961    
+@     86200 t=      86.2000 a=       4.260000 th=      0.000 ph=      0.000 <l|r>=      0.977717949019          0.491701E-07 <l|h|r>=     -0.471413711198         -0.352979E-04 |d|=      0.291800419    
+@     86400 t=      86.4000 a=       4.270000 th=      0.000 ph=      0.000 <l|r>=      0.977703410828          0.490831E-07 <l|h|r>=     -0.471303754691         -0.354572E-04 |d|=      0.291612338    
+@     86600 t=      86.6000 a=       4.280000 th=      0.000 ph=      0.000 <l|r>=      0.977688805113          0.489846E-07 <l|h|r>=     -0.471193004918         -0.356118E-04 |d|=      0.291415781    
+@     86800 t=      86.8000 a=       4.290000 th=      0.000 ph=      0.000 <l|r>=      0.977674134015          0.488746E-07 <l|h|r>=     -0.471081446589         -0.357601E-04 |d|=      0.291210861    
+@     87000 t=      87.0000 a=       4.300000 th=      0.000 ph=      0.000 <l|r>=      0.977659400246          0.487530E-07 <l|h|r>=     -0.470969062263         -0.359008E-04 |d|=      0.290997738    
+@     87200 t=      87.2000 a=       4.310000 th=      0.000 ph=      0.000 <l|r>=      0.977644607059          0.486199E-07 <l|h|r>=     -0.470855832482         -0.360327E-04 |d|=      0.290776616    
+@     87400 t=      87.4000 a=       4.320000 th=      0.000 ph=      0.000 <l|r>=      0.977629758204          0.484753E-07 <l|h|r>=     -0.470741735885         -0.361545E-04 |d|=      0.290547739    
+@     87600 t=      87.6000 a=       4.330000 th=      0.000 ph=      0.000 <l|r>=      0.977614857902          0.483193E-07 <l|h|r>=     -0.470626749318         -0.362650E-04 |d|=      0.290311389    
+@     87800 t=      87.8000 a=       4.340000 th=      0.000 ph=      0.000 <l|r>=      0.977599910821          0.481520E-07 <l|h|r>=     -0.470510847935         -0.363632E-04 |d|=      0.290067886    
+@     88000 t=      88.0000 a=       4.350000 th=      0.000 ph=      0.000 <l|r>=      0.977584922039          0.479735E-07 <l|h|r>=     -0.470394005312         -0.364481E-04 |d|=      0.289817582    
+@     88200 t=      88.2000 a=       4.360000 th=      0.000 ph=      0.000 <l|r>=      0.977569897023          0.477839E-07 <l|h|r>=     -0.470276193566         -0.365188E-04 |d|=      0.289560857    
+@     88400 t=      88.4000 a=       4.370000 th=      0.000 ph=      0.000 <l|r>=      0.977554841579          0.475833E-07 <l|h|r>=     -0.470157383498         -0.365744E-04 |d|=      0.289298121    
+@     88600 t=      88.6000 a=       4.380000 th=      0.000 ph=      0.000 <l|r>=      0.977539761817          0.473721E-07 <l|h|r>=     -0.470037544756         -0.366144E-04 |d|=      0.289029806    
+@     88800 t=      88.8000 a=       4.390000 th=      0.000 ph=      0.000 <l|r>=      0.977524664084          0.471502E-07 <l|h|r>=     -0.469916646028         -0.366381E-04 |d|=      0.288756360    
+@     89000 t=      89.0000 a=       4.400000 th=      0.000 ph=      0.000 <l|r>=      0.977509554910          0.469180E-07 <l|h|r>=     -0.469794655246         -0.366452E-04 |d|=      0.288478250    
+@     89200 t=      89.2000 a=       4.410000 th=      0.000 ph=      0.000 <l|r>=      0.977494440933          0.466755E-07 <l|h|r>=     -0.469671539823         -0.366356E-04 |d|=      0.288195950    
+@     89400 t=      89.4000 a=       4.420000 th=      0.000 ph=      0.000 <l|r>=      0.977479328826          0.464231E-07 <l|h|r>=     -0.469547266891         -0.366092E-04 |d|=      0.287909939    
+@     89600 t=      89.6000 a=       4.430000 th=      0.000 ph=      0.000 <l|r>=      0.977464225223          0.461609E-07 <l|h|r>=     -0.469421803554         -0.365663E-04 |d|=      0.287620695    
+@     89800 t=      89.8000 a=       4.440000 th=      0.000 ph=      0.000 <l|r>=      0.977449136644          0.458891E-07 <l|h|r>=     -0.469295117126         -0.365072E-04 |d|=      0.287328690    
+@     90000 t=      90.0000 a=       4.450000 th=      0.000 ph=      0.000 <l|r>=      0.977434069427          0.456078E-07 <l|h|r>=     -0.469167175373         -0.364324E-04 |d|=      0.287034387    
+@     90200 t=      90.2000 a=       4.460000 th=      0.000 ph=      0.000 <l|r>=      0.977419029665          0.453174E-07 <l|h|r>=     -0.469037946727         -0.363427E-04 |d|=      0.286738233    
+@     90400 t=      90.4000 a=       4.470000 th=      0.000 ph=      0.000 <l|r>=      0.977404023149          0.450178E-07 <l|h|r>=     -0.468907400489         -0.362389E-04 |d|=      0.286440653    
+@     90600 t=      90.6000 a=       4.480000 th=      0.000 ph=      0.000 <l|r>=      0.977389055327          0.447094E-07 <l|h|r>=     -0.468775507000         -0.361219E-04 |d|=      0.286142052    
+@     90800 t=      90.8000 a=       4.490000 th=      0.000 ph=      0.000 <l|r>=      0.977374131257          0.443921E-07 <l|h|r>=     -0.468642237798         -0.359926E-04 |d|=      0.285842806    
+@     91000 t=      91.0000 a=       4.500000 th=      0.000 ph=      0.000 <l|r>=      0.977359255586          0.440662E-07 <l|h|r>=     -0.468507565746         -0.358523E-04 |d|=      0.285543263    
+@     91200 t=      91.2000 a=       4.510000 th=      0.000 ph=      0.000 <l|r>=      0.977344432517          0.437316E-07 <l|h|r>=     -0.468371465140         -0.357019E-04 |d|=      0.285243735    
+@     91400 t=      91.4000 a=       4.520000 th=      0.000 ph=      0.000 <l|r>=      0.977329665794          0.433885E-07 <l|h|r>=     -0.468233911799         -0.355428E-04 |d|=      0.284944505    
+@     91600 t=      91.6000 a=       4.530000 th=      0.000 ph=      0.000 <l|r>=      0.977314958686          0.430369E-07 <l|h|r>=     -0.468094883142         -0.353760E-04 |d|=      0.284645816    
+@     91800 t=      91.8000 a=       4.540000 th=      0.000 ph=      0.000 <l|r>=      0.977300313970          0.426767E-07 <l|h|r>=     -0.467954358252         -0.352029E-04 |d|=      0.284347874    
+@     92000 t=      92.0000 a=       4.550000 th=      0.000 ph=      0.000 <l|r>=      0.977285733925          0.423080E-07 <l|h|r>=     -0.467812317924         -0.350247E-04 |d|=      0.284050848    
+@     92200 t=      92.2000 a=       4.560000 th=      0.000 ph=      0.000 <l|r>=      0.977271220317          0.419306E-07 <l|h|r>=     -0.467668744708         -0.348427E-04 |d|=      0.283754865    
+@     92400 t=      92.4000 a=       4.570000 th=      0.000 ph=      0.000 <l|r>=      0.977256774394          0.415444E-07 <l|h|r>=     -0.467523622935         -0.346583E-04 |d|=      0.283460015    
+@     92600 t=      92.6000 a=       4.580000 th=      0.000 ph=      0.000 <l|r>=      0.977242396882          0.411492E-07 <l|h|r>=     -0.467376938731         -0.344726E-04 |d|=      0.283166345    
+@     92800 t=      92.8000 a=       4.590000 th=      0.000 ph=      0.000 <l|r>=      0.977228087981          0.407450E-07 <l|h|r>=     -0.467228680018         -0.342871E-04 |d|=      0.282873864    
+@     93000 t=      93.0000 a=       4.600000 th=      0.000 ph=      0.000 <l|r>=      0.977213847372          0.403314E-07 <l|h|r>=     -0.467078836500         -0.341030E-04 |d|=      0.282582540    
+@     93200 t=      93.2000 a=       4.610000 th=      0.000 ph=      0.000 <l|r>=      0.977199674222          0.399082E-07 <l|h|r>=     -0.466927399621         -0.339216E-04 |d|=      0.282292303    
+@     93400 t=      93.4000 a=       4.620000 th=      0.000 ph=      0.000 <l|r>=      0.977185567205          0.394752E-07 <l|h|r>=     -0.466774362509         -0.337441E-04 |d|=      0.282003047    
+@     93600 t=      93.6000 a=       4.630000 th=      0.000 ph=      0.000 <l|r>=      0.977171524519          0.390319E-07 <l|h|r>=     -0.466619719902         -0.335717E-04 |d|=      0.281714628    
+@     93800 t=      93.8000 a=       4.640000 th=      0.000 ph=      0.000 <l|r>=      0.977157543920          0.385782E-07 <l|h|r>=     -0.466463468044         -0.334053E-04 |d|=      0.281426869    
+@     94000 t=      94.0000 a=       4.650000 th=      0.000 ph=      0.000 <l|r>=      0.977143622758          0.381135E-07 <l|h|r>=     -0.466305604570         -0.332461E-04 |d|=      0.281139565    
+@     94200 t=      94.2000 a=       4.660000 th=      0.000 ph=      0.000 <l|r>=      0.977129758017          0.376375E-07 <l|h|r>=     -0.466146128370         -0.330948E-04 |d|=      0.280852479    
+@     94400 t=      94.4000 a=       4.670000 th=      0.000 ph=      0.000 <l|r>=      0.977115946363          0.371499E-07 <l|h|r>=     -0.465985039446         -0.329523E-04 |d|=      0.280565353    
+@     94600 t=      94.6000 a=       4.680000 th=      0.000 ph=      0.000 <l|r>=      0.977102184192          0.366500E-07 <l|h|r>=     -0.465822338746         -0.328189E-04 |d|=      0.280277904    
+@     94800 t=      94.8000 a=       4.690000 th=      0.000 ph=      0.000 <l|r>=      0.977088467688          0.361376E-07 <l|h|r>=     -0.465658028006         -0.326954E-04 |d|=      0.279989834    
+@     95000 t=      95.0000 a=       4.700000 th=      0.000 ph=      0.000 <l|r>=      0.977074792868          0.356121E-07 <l|h|r>=     -0.465492109581         -0.325819E-04 |d|=      0.279700830    
+@     95200 t=      95.2000 a=       4.710000 th=      0.000 ph=      0.000 <l|r>=      0.977061155642          0.350732E-07 <l|h|r>=     -0.465324586282         -0.324788E-04 |d|=      0.279410566    
+@     95400 t=      95.4000 a=       4.720000 th=      0.000 ph=      0.000 <l|r>=      0.977047551856          0.345203E-07 <l|h|r>=     -0.465155461209         -0.323860E-04 |d|=      0.279118711    
+@     95600 t=      95.6000 a=       4.730000 th=      0.000 ph=      0.000 <l|r>=      0.977033977347          0.339531E-07 <l|h|r>=     -0.464984737602         -0.323036E-04 |d|=      0.278824930    
+@     95800 t=      95.8000 a=       4.740000 th=      0.000 ph=      0.000 <l|r>=      0.977020427985          0.333710E-07 <l|h|r>=     -0.464812418681         -0.322314E-04 |d|=      0.278528885    
+@     96000 t=      96.0000 a=       4.750000 th=      0.000 ph=      0.000 <l|r>=      0.977006899715          0.327737E-07 <l|h|r>=     -0.464638507514         -0.321692E-04 |d|=      0.278230244    
+@     96200 t=      96.2000 a=       4.760000 th=      0.000 ph=      0.000 <l|r>=      0.976993388600          0.321607E-07 <l|h|r>=     -0.464463006871         -0.321167E-04 |d|=      0.277928678    
+@     96400 t=      96.4000 a=       4.770000 th=      0.000 ph=      0.000 <l|r>=      0.976979890851          0.315317E-07 <l|h|r>=     -0.464285919106         -0.320733E-04 |d|=      0.277623867    
+@     96600 t=      96.6000 a=       4.780000 th=      0.000 ph=      0.000 <l|r>=      0.976966402867          0.308864E-07 <l|h|r>=     -0.464107246031         -0.320387E-04 |d|=      0.277315502    
+@     96800 t=      96.8000 a=       4.790000 th=      0.000 ph=      0.000 <l|r>=      0.976952921261          0.302243E-07 <l|h|r>=     -0.463926988805         -0.320122E-04 |d|=      0.277003286    
+@     97000 t=      97.0000 a=       4.800000 th=      0.000 ph=      0.000 <l|r>=      0.976939442888          0.295451E-07 <l|h|r>=     -0.463745147826         -0.319931E-04 |d|=      0.276686941    
+@     97200 t=      97.2000 a=       4.810000 th=      0.000 ph=      0.000 <l|r>=      0.976925964872          0.288487E-07 <l|h|r>=     -0.463561722636         -0.319809E-04 |d|=      0.276366205    
+@     97400 t=      97.4000 a=       4.820000 th=      0.000 ph=      0.000 <l|r>=      0.976912484625          0.281347E-07 <l|h|r>=     -0.463376711828         -0.319747E-04 |d|=      0.276040835    
+@     97600 t=      97.6000 a=       4.830000 th=      0.000 ph=      0.000 <l|r>=      0.976898999868          0.274029E-07 <l|h|r>=     -0.463190112964         -0.319738E-04 |d|=      0.275710611    
+@     97800 t=      97.8000 a=       4.840000 th=      0.000 ph=      0.000 <l|r>=      0.976885508645          0.266531E-07 <l|h|r>=     -0.463001922506         -0.319772E-04 |d|=      0.275375336    
+@     98000 t=      98.0000 a=       4.850000 th=      0.000 ph=      0.000 <l|r>=      0.976872009334          0.258853E-07 <l|h|r>=     -0.462812135752         -0.319843E-04 |d|=      0.275034838    
+@     98200 t=      98.2000 a=       4.860000 th=      0.000 ph=      0.000 <l|r>=      0.976858500657          0.250991E-07 <l|h|r>=     -0.462620746793         -0.319940E-04 |d|=      0.274688969    
+@     98400 t=      98.4000 a=       4.870000 th=      0.000 ph=      0.000 <l|r>=      0.976844981684          0.242947E-07 <l|h|r>=     -0.462427748469         -0.320056E-04 |d|=      0.274337609    
+@     98600 t=      98.6000 a=       4.880000 th=      0.000 ph=      0.000 <l|r>=      0.976831451833          0.234717E-07 <l|h|r>=     -0.462233132356         -0.320181E-04 |d|=      0.273980664    
+@     98800 t=      98.8000 a=       4.890000 th=      0.000 ph=      0.000 <l|r>=      0.976817910863          0.226304E-07 <l|h|r>=     -0.462036888752         -0.320307E-04 |d|=      0.273618066    
+@     99000 t=      99.0000 a=       4.900000 th=      0.000 ph=      0.000 <l|r>=      0.976804358871          0.217705E-07 <l|h|r>=     -0.461839006684         -0.320426E-04 |d|=      0.273249775    
+@     99200 t=      99.2000 a=       4.910000 th=      0.000 ph=      0.000 <l|r>=      0.976790796283          0.208922E-07 <l|h|r>=     -0.461639473929         -0.320530E-04 |d|=      0.272875778    
+@     99400 t=      99.4000 a=       4.920000 th=      0.000 ph=      0.000 <l|r>=      0.976777223834          0.199954E-07 <l|h|r>=     -0.461438277044         -0.320611E-04 |d|=      0.272496086    
+@     99600 t=      99.6000 a=       4.930000 th=      0.000 ph=      0.000 <l|r>=      0.976763642557          0.190802E-07 <l|h|r>=     -0.461235401409         -0.320662E-04 |d|=      0.272110737    
+@     99800 t=      99.8000 a=       4.940000 th=      0.000 ph=      0.000 <l|r>=      0.976750053766          0.181466E-07 <l|h|r>=     -0.461030831278         -0.320676E-04 |d|=      0.271719790    
+@    100000 t=     100.0000 a=       4.950000 th=      0.000 ph=      0.000 <l|r>=      0.976736459032          0.171948E-07 <l|h|r>=     -0.460824549836         -0.320647E-04 |d|=      0.271323329    
+@    100200 t=     100.2000 a=       4.960000 th=      0.000 ph=      0.000 <l|r>=      0.976722860171          0.162247E-07 <l|h|r>=     -0.460616539270         -0.320570E-04 |d|=      0.270921458    
+@    100400 t=     100.4000 a=       4.970000 th=      0.000 ph=      0.000 <l|r>=      0.976709259212          0.152364E-07 <l|h|r>=     -0.460406780837         -0.320438E-04 |d|=      0.270514300    
+@    100600 t=     100.6000 a=       4.980000 th=      0.000 ph=      0.000 <l|r>=      0.976695658387          0.142301E-07 <l|h|r>=     -0.460195254942         -0.320248E-04 |d|=      0.270101998    
+@    100800 t=     100.8000 a=       4.990000 th=      0.000 ph=      0.000 <l|r>=      0.976682060103          0.132058E-07 <l|h|r>=     -0.459981941219         -0.319995E-04 |d|=      0.269684710    
+@    101000 t=     101.0000 a=       5.000000 th=      0.000 ph=      0.000 <l|r>=      0.976668466921          0.121637E-07 <l|h|r>=     -0.459766818610         -0.319675E-04 |d|=      0.269262606    
+@    101200 t=     101.2000 a=       5.010000 th=      0.000 ph=      0.000 <l|r>=      0.976654881537          0.111037E-07 <l|h|r>=     -0.459549865453         -0.319286E-04 |d|=      0.268835872    
+@    101400 t=     101.4000 a=       5.020000 th=      0.000 ph=      0.000 <l|r>=      0.976641306758          0.100260E-07 <l|h|r>=     -0.459331059562         -0.318826E-04 |d|=      0.268404702    
+@    101600 t=     101.6000 a=       5.030000 th=      0.000 ph=      0.000 <l|r>=      0.976627745481          0.893057E-08 <l|h|r>=     -0.459110378317         -0.318292E-04 |d|=      0.267969302    
+@    101800 t=     101.8000 a=       5.040000 th=      0.000 ph=      0.000 <l|r>=      0.976614200673          0.781758E-08 <l|h|r>=     -0.458887798738         -0.317682E-04 |d|=      0.267529881    
+@    102000 t=     102.0000 a=       5.050000 th=      0.000 ph=      0.000 <l|r>=      0.976600675344          0.668702E-08 <l|h|r>=     -0.458663297578         -0.316997E-04 |d|=      0.267086656    
+@    102200 t=     102.2000 a=       5.060000 th=      0.000 ph=      0.000 <l|r>=      0.976587172535          0.553895E-08 <l|h|r>=     -0.458436851397         -0.316235E-04 |d|=      0.266639846    
+@    102400 t=     102.4000 a=       5.070000 th=      0.000 ph=      0.000 <l|r>=      0.976573695283          0.437337E-08 <l|h|r>=     -0.458208436641         -0.315397E-04 |d|=      0.266189672    
+@    102600 t=     102.6000 a=       5.080000 th=      0.000 ph=      0.000 <l|r>=      0.976560246614          0.319030E-08 <l|h|r>=     -0.457978029722         -0.314484E-04 |d|=      0.265736356    
+@    102800 t=     102.8000 a=       5.090000 th=      0.000 ph=      0.000 <l|r>=      0.976546829511          0.198974E-08 <l|h|r>=     -0.457745607090         -0.313497E-04 |d|=      0.265280118    
+@    103000 t=     103.0000 a=       5.100000 th=      0.000 ph=      0.000 <l|r>=      0.976533446898          0.771664E-09 <l|h|r>=     -0.457511145302         -0.312438E-04 |d|=      0.264821173    
+@    103200 t=     103.2000 a=       5.110000 th=      0.000 ph=      0.000 <l|r>=      0.976520101624         -0.463966E-09 <l|h|r>=     -0.457274621092         -0.311309E-04 |d|=      0.264359734    
+@    103400 t=     103.4000 a=       5.120000 th=      0.000 ph=      0.000 <l|r>=      0.976506796438         -0.171720E-08 <l|h|r>=     -0.457036011436         -0.310113E-04 |d|=      0.263896007    
+@    103600 t=     103.6000 a=       5.130000 th=      0.000 ph=      0.000 <l|r>=      0.976493533976         -0.298812E-08 <l|h|r>=     -0.456795293613         -0.308852E-04 |d|=      0.263430190    
+@    103800 t=     103.8000 a=       5.140000 th=      0.000 ph=      0.000 <l|r>=      0.976480316746         -0.427680E-08 <l|h|r>=     -0.456552445270         -0.307531E-04 |d|=      0.262962474    
+@    104000 t=     104.0000 a=       5.150000 th=      0.000 ph=      0.000 <l|r>=      0.976467147110         -0.558336E-08 <l|h|r>=     -0.456307444475         -0.306153E-04 |d|=      0.262493039    
+@    104200 t=     104.2000 a=       5.160000 th=      0.000 ph=      0.000 <l|r>=      0.976454027277         -0.690791E-08 <l|h|r>=     -0.456060269772         -0.304722E-04 |d|=      0.262022053    
+@    104400 t=     104.4000 a=       5.170000 th=      0.000 ph=      0.000 <l|r>=      0.976440959286         -0.825059E-08 <l|h|r>=     -0.455810900225         -0.303243E-04 |d|=      0.261549674    
+@    104600 t=     104.6000 a=       5.180000 th=      0.000 ph=      0.000 <l|r>=      0.976427945000         -0.961155E-08 <l|h|r>=     -0.455559315449         -0.301720E-04 |d|=      0.261076048    
+@    104800 t=     104.8000 a=       5.190000 th=      0.000 ph=      0.000 <l|r>=      0.976414986100         -0.109910E-07 <l|h|r>=     -0.455305495639         -0.300157E-04 |d|=      0.260601305    
+@    105000 t=     105.0000 a=       5.200000 th=      0.000 ph=      0.000 <l|r>=      0.976402084074         -0.123890E-07 <l|h|r>=     -0.455049421586         -0.298561E-04 |d|=      0.260125564    
+@    105200 t=     105.2000 a=       5.210000 th=      0.000 ph=      0.000 <l|r>=      0.976389240221         -0.138059E-07 <l|h|r>=     -0.454791074688         -0.296935E-04 |d|=      0.259648930    
+@    105400 t=     105.4000 a=       5.220000 th=      0.000 ph=      0.000 <l|r>=      0.976376455640         -0.152419E-07 <l|h|r>=     -0.454530436966         -0.295285E-04 |d|=      0.259171492    
+@    105600 t=     105.6000 a=       5.230000 th=      0.000 ph=      0.000 <l|r>=      0.976363731235         -0.166971E-07 <l|h|r>=     -0.454267491071         -0.293615E-04 |d|=      0.258693328    
+@    105800 t=     105.8000 a=       5.240000 th=      0.000 ph=      0.000 <l|r>=      0.976351067715         -0.181718E-07 <l|h|r>=     -0.454002220305         -0.291931E-04 |d|=      0.258214499    
+@    106000 t=     106.0000 a=       5.250000 th=      0.000 ph=      0.000 <l|r>=      0.976338465598         -0.196662E-07 <l|h|r>=     -0.453734608625         -0.290237E-04 |d|=      0.257735053    
+@    106200 t=     106.2000 a=       5.260000 th=      0.000 ph=      0.000 <l|r>=      0.976325925211         -0.211805E-07 <l|h|r>=     -0.453464640651         -0.288538E-04 |d|=      0.257255021    
+@    106400 t=     106.4000 a=       5.270000 th=      0.000 ph=      0.000 <l|r>=      0.976313446703         -0.227151E-07 <l|h|r>=     -0.453192301655         -0.286838E-04 |d|=      0.256774423    
+@    106600 t=     106.6000 a=       5.280000 th=      0.000 ph=      0.000 <l|r>=      0.976301030049         -0.242701E-07 <l|h|r>=     -0.452917577530         -0.285142E-04 |d|=      0.256293262    
+@    106800 t=     106.8000 a=       5.290000 th=      0.000 ph=      0.000 <l|r>=      0.976288675058         -0.258458E-07 <l|h|r>=     -0.452640454755         -0.283454E-04 |d|=      0.255811532    
+@    107000 t=     107.0000 a=       5.300000 th=      0.000 ph=      0.000 <l|r>=      0.976276381387         -0.274424E-07 <l|h|r>=     -0.452360920330         -0.281776E-04 |d|=      0.255329211    
+@    107200 t=     107.2000 a=       5.310000 th=      0.000 ph=      0.000 <l|r>=      0.976264148551         -0.290602E-07 <l|h|r>=     -0.452078961725         -0.280114E-04 |d|=      0.254846271    
+@    107400 t=     107.4000 a=       5.320000 th=      0.000 ph=      0.000 <l|r>=      0.976251975937         -0.306994E-07 <l|h|r>=     -0.451794566814         -0.278469E-04 |d|=      0.254362672    
+@    107600 t=     107.6000 a=       5.330000 th=      0.000 ph=      0.000 <l|r>=      0.976239862815         -0.323601E-07 <l|h|r>=     -0.451507723832         -0.276845E-04 |d|=      0.253878369    
+@    107800 t=     107.8000 a=       5.340000 th=      0.000 ph=      0.000 <l|r>=      0.976227808355         -0.340426E-07 <l|h|r>=     -0.451218421336         -0.275243E-04 |d|=      0.253393306    
+@    108000 t=     108.0000 a=       5.350000 th=      0.000 ph=      0.000 <l|r>=      0.976215811640         -0.357472E-07 <l|h|r>=     -0.450926648171         -0.273666E-04 |d|=      0.252907425    
+@    108200 t=     108.2000 a=       5.360000 th=      0.000 ph=      0.000 <l|r>=      0.976203871679         -0.374738E-07 <l|h|r>=     -0.450632393448         -0.272116E-04 |d|=      0.252420658    
+@    108400 t=     108.4000 a=       5.370000 th=      0.000 ph=      0.000 <l|r>=      0.976191987425         -0.392228E-07 <l|h|r>=     -0.450335646512         -0.270593E-04 |d|=      0.251932936    
+@    108600 t=     108.6000 a=       5.380000 th=      0.000 ph=      0.000 <l|r>=      0.976180157787         -0.409942E-07 <l|h|r>=     -0.450036396903         -0.269099E-04 |d|=      0.251444183    
+@    108800 t=     108.8000 a=       5.390000 th=      0.000 ph=      0.000 <l|r>=      0.976168381643         -0.427882E-07 <l|h|r>=     -0.449734634299         -0.267635E-04 |d|=      0.250954322    
+@    109000 t=     109.0000 a=       5.400000 th=      0.000 ph=      0.000 <l|r>=      0.976156657854         -0.446048E-07 <l|h|r>=     -0.449430348458         -0.266199E-04 |d|=      0.250463274    
+@    109200 t=     109.2000 a=       5.410000 th=      0.000 ph=      0.000 <l|r>=      0.976144985276         -0.464442E-07 <l|h|r>=     -0.449123529145         -0.264793E-04 |d|=      0.249970959    
+@    109400 t=     109.4000 a=       5.420000 th=      0.000 ph=      0.000 <l|r>=      0.976133362772         -0.483063E-07 <l|h|r>=     -0.448814166062         -0.263416E-04 |d|=      0.249477301    
+@    109600 t=     109.6000 a=       5.430000 th=      0.000 ph=      0.000 <l|r>=      0.976121789224         -0.501912E-07 <l|h|r>=     -0.448502248784         -0.262067E-04 |d|=      0.248982225    
+@    109800 t=     109.8000 a=       5.440000 th=      0.000 ph=      0.000 <l|r>=      0.976110263539         -0.520989E-07 <l|h|r>=     -0.448187766718         -0.260746E-04 |d|=      0.248485661    
+@    110000 t=     110.0000 a=       5.450000 th=      0.000 ph=      0.000 <l|r>=      0.976098784665         -0.540294E-07 <l|h|r>=     -0.447870709063         -0.259452E-04 |d|=      0.247987544    
+@    110200 t=     110.2000 a=       5.460000 th=      0.000 ph=      0.000 <l|r>=      0.976087351594         -0.559826E-07 <l|h|r>=     -0.447551064797         -0.258183E-04 |d|=      0.247487814    
+@    110400 t=     110.4000 a=       5.470000 th=      0.000 ph=      0.000 <l|r>=      0.976075963370         -0.579585E-07 <l|h|r>=     -0.447228822663         -0.256937E-04 |d|=      0.246986414    
+@    110600 t=     110.6000 a=       5.480000 th=      0.000 ph=      0.000 <l|r>=      0.976064619102         -0.599570E-07 <l|h|r>=     -0.446903971165         -0.255714E-04 |d|=      0.246483298    
+@    110800 t=     110.8000 a=       5.490000 th=      0.000 ph=      0.000 <l|r>=      0.976053317964         -0.619780E-07 <l|h|r>=     -0.446576498559         -0.254511E-04 |d|=      0.245978421    
+@    111000 t=     111.0000 a=       5.500000 th=      0.000 ph=      0.000 <l|r>=      0.976042059204         -0.640214E-07 <l|h|r>=     -0.446246392837         -0.253327E-04 |d|=      0.245471746    
+@    111200 t=     111.2000 a=       5.510000 th=      0.000 ph=      0.000 <l|r>=      0.976030842149         -0.660870E-07 <l|h|r>=     -0.445913641702         -0.252159E-04 |d|=      0.244963245    
+@    111400 t=     111.4000 a=       5.520000 th=      0.000 ph=      0.000 <l|r>=      0.976019666210         -0.681747E-07 <l|h|r>=     -0.445578232541         -0.251005E-04 |d|=      0.244452895    
+@    111600 t=     111.6000 a=       5.530000 th=      0.000 ph=      0.000 <l|r>=      0.976008530883         -0.702844E-07 <l|h|r>=     -0.445240152398         -0.249864E-04 |d|=      0.243940682    
+@    111800 t=     111.8000 a=       5.540000 th=      0.000 ph=      0.000 <l|r>=      0.975997435758         -0.724158E-07 <l|h|r>=     -0.444899387940         -0.248732E-04 |d|=      0.243426601    
+@    112000 t=     112.0000 a=       5.550000 th=      0.000 ph=      0.000 <l|r>=      0.975986380516         -0.745688E-07 <l|h|r>=     -0.444555925434         -0.247607E-04 |d|=      0.242910656    
+@    112200 t=     112.2000 a=       5.560000 th=      0.000 ph=      0.000 <l|r>=      0.975975364933         -0.767432E-07 <l|h|r>=     -0.444209750739         -0.246487E-04 |d|=      0.242392862    
+@    112400 t=     112.4000 a=       5.570000 th=      0.000 ph=      0.000 <l|r>=      0.975964388885         -0.789388E-07 <l|h|r>=     -0.443860849293         -0.245370E-04 |d|=      0.241873243    
+@    112600 t=     112.6000 a=       5.580000 th=      0.000 ph=      0.000 <l|r>=      0.975953452341         -0.811555E-07 <l|h|r>=     -0.443509206120         -0.244253E-04 |d|=      0.241351832    
+@    112800 t=     112.8000 a=       5.590000 th=      0.000 ph=      0.000 <l|r>=      0.975942555369         -0.833929E-07 <l|h|r>=     -0.443154805842         -0.243133E-04 |d|=      0.240828672    
+@    113000 t=     113.0000 a=       5.600000 th=      0.000 ph=      0.000 <l|r>=      0.975931698135         -0.856509E-07 <l|h|r>=     -0.442797632696         -0.242009E-04 |d|=      0.240303816    
+@    113200 t=     113.2000 a=       5.610000 th=      0.000 ph=      0.000 <l|r>=      0.975920880899         -0.879293E-07 <l|h|r>=     -0.442437670557         -0.240878E-04 |d|=      0.239777325    
+@    113400 t=     113.4000 a=       5.620000 th=      0.000 ph=      0.000 <l|r>=      0.975910104012         -0.902279E-07 <l|h|r>=     -0.442074902968         -0.239737E-04 |d|=      0.239249267    
+@    113600 t=     113.6000 a=       5.630000 th=      0.000 ph=      0.000 <l|r>=      0.975899367917         -0.925465E-07 <l|h|r>=     -0.441709313170         -0.238584E-04 |d|=      0.238719719    
+@    113800 t=     113.8000 a=       5.640000 th=      0.000 ph=      0.000 <l|r>=      0.975888673142         -0.948848E-07 <l|h|r>=     -0.441340884132         -0.237418E-04 |d|=      0.238188765    
+@    114000 t=     114.0000 a=       5.650000 th=      0.000 ph=      0.000 <l|r>=      0.975878020298         -0.972427E-07 <l|h|r>=     -0.440969598581         -0.236237E-04 |d|=      0.237656494    
+@    114200 t=     114.2000 a=       5.660000 th=      0.000 ph=      0.000 <l|r>=      0.975867410073         -0.996201E-07 <l|h|r>=     -0.440595439027         -0.235038E-04 |d|=      0.237123001    
+@    114400 t=     114.4000 a=       5.670000 th=      0.000 ph=      0.000 <l|r>=      0.975856843225         -0.102017E-06 <l|h|r>=     -0.440218387787         -0.233819E-04 |d|=      0.236588385    
+@    114600 t=     114.6000 a=       5.680000 th=      0.000 ph=      0.000 <l|r>=      0.975846320578         -0.104432E-06 <l|h|r>=     -0.439838427002         -0.232580E-04 |d|=      0.236052753    
+@    114800 t=     114.8000 a=       5.690000 th=      0.000 ph=      0.000 <l|r>=      0.975835843017         -0.106867E-06 <l|h|r>=     -0.439455538661         -0.231319E-04 |d|=      0.235516213    
+@    115000 t=     115.0000 a=       5.700000 th=      0.000 ph=      0.000 <l|r>=      0.975825411475         -0.109320E-06 <l|h|r>=     -0.439069704607         -0.230035E-04 |d|=      0.234978878    
+@    115200 t=     115.2000 a=       5.710000 th=      0.000 ph=      0.000 <l|r>=      0.975815026932         -0.111792E-06 <l|h|r>=     -0.438680906569         -0.228727E-04 |d|=      0.234440866    
+@    115400 t=     115.4000 a=       5.720000 th=      0.000 ph=      0.000 <l|r>=      0.975804690406         -0.114282E-06 <l|h|r>=     -0.438289126176         -0.227393E-04 |d|=      0.233902296    
+@    115600 t=     115.6000 a=       5.730000 th=      0.000 ph=      0.000 <l|r>=      0.975794402940         -0.116791E-06 <l|h|r>=     -0.437894344990         -0.226034E-04 |d|=      0.233363292    
+@    115800 t=     115.8000 a=       5.740000 th=      0.000 ph=      0.000 <l|r>=      0.975784165602         -0.119318E-06 <l|h|r>=     -0.437496544542         -0.224649E-04 |d|=      0.232823978    
+@    116000 t=     116.0000 a=       5.750000 th=      0.000 ph=      0.000 <l|r>=      0.975773979471         -0.121863E-06 <l|h|r>=     -0.437095706366         -0.223238E-04 |d|=      0.232284478    
+@    116200 t=     116.2000 a=       5.760000 th=      0.000 ph=      0.000 <l|r>=      0.975763845633         -0.124427E-06 <l|h|r>=     -0.436691812035         -0.221801E-04 |d|=      0.231744920    
+@    116400 t=     116.4000 a=       5.770000 th=      0.000 ph=      0.000 <l|r>=      0.975753765169         -0.127008E-06 <l|h|r>=     -0.436284843206         -0.220337E-04 |d|=      0.231205426    
+@    116600 t=     116.6000 a=       5.780000 th=      0.000 ph=      0.000 <l|r>=      0.975743739154         -0.129607E-06 <l|h|r>=     -0.435874781649         -0.218848E-04 |d|=      0.230666122    
+@    116800 t=     116.8000 a=       5.790000 th=      0.000 ph=      0.000 <l|r>=      0.975733768644         -0.132224E-06 <l|h|r>=     -0.435461609283         -0.217334E-04 |d|=      0.230127129    
+@    117000 t=     117.0000 a=       5.800000 th=      0.000 ph=      0.000 <l|r>=      0.975723854674         -0.134859E-06 <l|h|r>=     -0.435045308204         -0.215796E-04 |d|=      0.229588566    
+@    117200 t=     117.2000 a=       5.810000 th=      0.000 ph=      0.000 <l|r>=      0.975713998250         -0.137512E-06 <l|h|r>=     -0.434625860709         -0.214233E-04 |d|=      0.229050549    
+@    117400 t=     117.4000 a=       5.820000 th=      0.000 ph=      0.000 <l|r>=      0.975704200344         -0.140183E-06 <l|h|r>=     -0.434203249319         -0.212648E-04 |d|=      0.228513190    
+@    117600 t=     117.6000 a=       5.830000 th=      0.000 ph=      0.000 <l|r>=      0.975694461889         -0.142872E-06 <l|h|r>=     -0.433777456796         -0.211042E-04 |d|=      0.227976599    
+@    117800 t=     117.8000 a=       5.840000 th=      0.000 ph=      0.000 <l|r>=      0.975684783774         -0.145578E-06 <l|h|r>=     -0.433348466159         -0.209415E-04 |d|=      0.227440880    
+@    118000 t=     118.0000 a=       5.850000 th=      0.000 ph=      0.000 <l|r>=      0.975675166842         -0.148302E-06 <l|h|r>=     -0.432916260695         -0.207769E-04 |d|=      0.226906133    
+@    118200 t=     118.2000 a=       5.860000 th=      0.000 ph=      0.000 <l|r>=      0.975665611885         -0.151044E-06 <l|h|r>=     -0.432480823965         -0.206105E-04 |d|=      0.226372454    
+@    118400 t=     118.4000 a=       5.870000 th=      0.000 ph=      0.000 <l|r>=      0.975656119641         -0.153804E-06 <l|h|r>=     -0.432042139814         -0.204424E-04 |d|=      0.225839935    
+@    118600 t=     118.6000 a=       5.880000 th=      0.000 ph=      0.000 <l|r>=      0.975646690794         -0.156582E-06 <l|h|r>=     -0.431600192368         -0.202728E-04 |d|=      0.225308663    
+@    118800 t=     118.8000 a=       5.890000 th=      0.000 ph=      0.000 <l|r>=      0.975637325969         -0.159377E-06 <l|h|r>=     -0.431154966040         -0.201019E-04 |d|=      0.224778720    
+@    119000 t=     119.0000 a=       5.900000 th=      0.000 ph=      0.000 <l|r>=      0.975628025736         -0.162190E-06 <l|h|r>=     -0.430706445536         -0.199297E-04 |d|=      0.224250184    
+@    119200 t=     119.2000 a=       5.910000 th=      0.000 ph=      0.000 <l|r>=      0.975618790604         -0.165021E-06 <l|h|r>=     -0.430254615851         -0.197565E-04 |d|=      0.223723129    
+@    119400 t=     119.4000 a=       5.920000 th=      0.000 ph=      0.000 <l|r>=      0.975609621023         -0.167870E-06 <l|h|r>=     -0.429799462283         -0.195823E-04 |d|=      0.223197622    
+@    119600 t=     119.6000 a=       5.930000 th=      0.000 ph=      0.000 <l|r>=      0.975600517383         -0.170736E-06 <l|h|r>=     -0.429340970432         -0.194074E-04 |d|=      0.222673729    
+@    119800 t=     119.8000 a=       5.940000 th=      0.000 ph=      0.000 <l|r>=      0.975591480019         -0.173620E-06 <l|h|r>=     -0.428879126209         -0.192318E-04 |d|=      0.222151508    
+@    120000 t=     120.0000 a=       5.950000 th=      0.000 ph=      0.000 <l|r>=      0.975582509204         -0.176521E-06 <l|h|r>=     -0.428413915840         -0.190557E-04 |d|=      0.221631014    
+
+ Largest left/right Lmax  150 150
+
+   Final left/right Lmax  150 150
+
+Final left/right nradial      200     200
+
+
+
+Analyzing wavefunction composition
+
+
+    Final norm, by total angular momentum
+
+    L      M                         Re(norm)                           Im(norm)     
+   ---    ---                  ------------------                  ------------------
+     0      0      0.23226150051744623437067E-001     -0.47626576681621825797150E-005
+     1      0      0.59549713424761355207160E-001     -0.12258774242498345695787E-004
+     2      0      0.81816360991004699609874E-001     -0.11771903975563261261425E-004
+     3      0      0.92308754835345313560779E-001     -0.92316967742863941252980E-005
+     4      0      0.94188962508143084240153E-001     -0.61504222906737594222799E-005
+     5      0      0.90378587760168743736600E-001     -0.32173595023854327593906E-005
+     6      0      0.83186953073610375719582E-001     -0.76036414506520461123712E-006
+     7      0      0.74298282836662440931086E-001      0.11231973270771365813856E-005
+     8      0      0.64870826123785446659653E-001      0.24517832437854996695324E-005
+     9      0      0.55642106634873338133485E-001      0.33012318170399371284988E-005
+    10      0      0.47055775999722798674796E-001      0.37644289620905801547698E-005
+    11      0      0.39334659122754210558437E-001      0.39346682610737678404680E-005
+    12      0      0.32568504001298473338188E-001      0.38941734044299856898601E-005
+    13      0      0.26749215325204373644441E-001      0.37115046940336532964625E-005
+    14      0      0.21822439011976238476542E-001      0.34406655945569549368500E-005
+    15      0      0.17699659385176862158584E-001      0.31223741328531584050821E-005
+    16      0      0.14286111215561602197366E-001      0.27863152926867856423742E-005
+    17      0      0.11481693306450425212661E-001      0.24527927350492169061131E-005
+    18      0      0.91952152505468502663444E-002      0.21353322075624791727129E-005
+    19      0      0.73410410124105079238133E-002      0.18417977065701736953598E-005
+    20      0      0.58459892057459352660009E-002      0.15764874279283471447124E-005
+    21      0      0.46450668615581596626596E-002      0.13406756086363086874524E-005
+    22      0      0.36846229968361034895485E-002      0.11340812879798873762983E-005
+    23      0      0.29185388240316710584121E-002      0.95501782434660591428080E-006
+    24      0      0.23095606852371408992952E-002      0.80134774615077444725390E-006
+    25      0      0.18263380142721451476068E-002      0.67041982968099310763129E-006
+    26      0      0.14439177225057122332108E-002      0.55966127340993698258424E-006
+    27      0      0.11416077689870261779870E-002      0.46642608920606604542197E-006
+    28      0      0.90311180550762659019481E-003      0.38835087928282394932454E-006
+    29      0      0.71505887785751776758447E-003      0.32318512919518554410612E-006
+    30      0      0.56700048398227982995867E-003      0.26900040897161607286191E-006
+    31      0      0.45043030328729548750905E-003      0.22403637310487933990794E-006
+    32      0      0.35874029215857367123427E-003      0.18682214804524361418251E-006
+    33      0      0.28658158640776083651847E-003      0.15605020164926267766937E-006
+    34      0      0.22981762280700361372396E-003      0.13064640019588826638276E-006
+    35      0      0.18511411416109643237812E-003      0.10967279670781265982025E-006
+    36      0      0.14990136740249815480372E-003      0.92368204144706654592053E-007
+    37      0      0.12211421498967703824431E-003      0.78076166074318760563686E-007
+    38      0      0.10016530572924271769684E-003      0.66268786276995298899965E-007
+    39      0      0.82781420588576694417210E-004      0.56494749694141323174320E-007
+    40      0      0.68985983844335215095164E-004      0.48393691998913796898338E-007
+    41      0      0.57996504368983242661516E-004      0.41659341075063089190447E-007
+    42      0      0.49213847127528441871992E-004      0.36048529770018031104754E-007
+    43      0      0.42158061335116143097598E-004      0.31355339611744073018100E-007
+    44      0      0.36462247530650779541589E-004      0.27417045483373788347945E-007
+    45      0      0.31832325845159396967773E-004      0.24096071639925102281476E-007
+    46      0      0.28043871575261794201230E-004      0.21284138751225558335935E-007
+    47      0      0.24916746221106123569157E-004      0.18889675310690697104983E-007
+    48      0      0.22313774149316735115594E-004      0.16840873085457439530584E-007
+    49      0      0.20124579744886624736808E-004      0.15076867000292190532210E-007
+    50      0      0.18265362602725367818270E-004      0.13550094902786044602386E-007
+    51      0      0.16668437297794713020365E-004      0.12220065101275296256988E-007
+    52      0      0.15282635255595042019297E-004      0.11055246777854262037855E-007
+    53      0      0.14066386895866822299289E-004      0.10028611540646484253244E-007
+    54      0      0.12988458685360298360467E-004      0.91191881132070262583987E-008
+    55      0      0.12023249700128344771106E-004      0.83088233600352138359303E-008
+    56      0      0.11151688056309353556266E-004      0.75834838540355879167442E-008
+    57      0      0.10357926748793849875351E-004      0.69308610068379113833485E-008
+    58      0      0.96302956286782901785051E-005      0.63414734936282615535653E-008
+    59      0      0.89588957431357635146328E-005      0.58068631322315802946755E-008
+    60      0      0.83365465729521163779255E-005      0.53205354962430706916263E-008
+    61      0      0.77569699337950629271579E-005      0.48765752803189130664642E-008
+    62      0      0.72156979200345998983748E-005      0.44704522144574543534210E-008
+    63      0      0.67086541803982495320606E-005      0.40979394208589120022439E-008
+    64      0      0.62330031044537925134417E-005      0.37558051028833396180925E-008
+    65      0      0.57860075188025837455248E-005      0.34409538225266801021630E-008
+    66      0      0.53658087749822416432331E-005      0.31510199633448379519196E-008
+    67      0      0.49704838604703925435385E-005      0.28836761992684560883911E-008
+    68      0      0.45987520211688418713064E-005      0.26371417177244435727051E-008
+    69      0      0.42491819124863726084024E-005      0.24096186380929987277510E-008
+    70      0      0.39208246520519805789189E-005      0.21997260034122930928510E-008
+    71      0      0.36125392684386778001686E-005      0.20060362692757036595183E-008
+    72      0      0.33235551312235563566912E-005      0.18274447692801299412369E-008
+    73      0      0.30528950709883965362261E-005      0.16627862909260704889415E-008
+    74      0      0.27998720080613168957411E-005      0.15111487523735617970703E-008
+    75      0      0.25635956833287521381619E-005      0.13715552903477017259648E-008
+    76      0      0.23434089941232031606921E-005      0.12432299715783699285843E-008
+    77      0      0.21384676391672576361799E-005      0.11253343673612873400963E-008
+    78      0      0.19481213903333336332955E-005      0.10171921139479402999553E-008
+    79      0      0.17715573170303955368571E-005      0.91807114956026455087583E-009
+    80      0      0.16081304626545473266286E-005      0.82737285241846692377057E-009
+    81      0      0.14570618139805054984745E-005      0.74445246307433549569400E-009
+    82      0      0.13177221848960720302106E-005      0.66877750718100994805479E-009
+    83      0      0.11893766430357183987615E-005      0.59977988291076198411574E-009
+    84      0      0.10714252338189383188105E-005      0.53698748583884488097886E-009
+    85      0      0.96318662785690832353071E-006      0.47990234138157137826592E-009
+    86      0      0.86409969213781020534021E-006      0.42810888214752104122386E-009
+    87      0      0.77354062127495891817335E-006      0.38117349212014225838809E-009
+    88      0      0.69098998028293738235436E-006      0.33873268630455439761819E-009
+    89      0      0.61587910948052902096320E-006      0.30041045282979659921062E-009
+    90      0      0.54772768008991010888701E-006      0.26588949407968368255254E-009
+    91      0      0.48601624085497718945608E-006      0.23484363736505996815121E-009
+    92      0      0.43029921520875846268904E-006      0.20699513307901344001939E-009
+    93      0      0.38010085023200156511571E-006      0.18206000725365581384335E-009
+    94      0      0.33500791305560155207389E-006      0.15979407362139861714471E-009
+    95      0      0.29458612957562991240825E-006      0.13994938297474708515725E-009
+    96      0      0.25845586644140023624655E-006      0.12231111407562118656207E-009
+    97      0      0.22622579071784899727899E-006      0.10666333583569143763477E-009
+    98      0      0.19755393043966783769543E-006      0.92818411922214555732564E-010
+    99      0      0.17209515156796994755957E-006      0.80590301322896584698210E-010
+   100      0      0.14954945492821056371178E-006      0.69817684278311022516201E-010
+   101      0      0.12962016647504332609027E-006      0.60343133670608648861067E-010
+   102      0      0.11205120024311307993476E-006      0.52030922089754217207907E-010
+   103      0      0.96593527295312428128829E-007      0.44750655023936988734357E-010
+   104      0      0.83033246445893620428820E-007      0.38390639256324508311244E-010
+   105      0      0.71164680970157622936072E-007      0.32844929497605924830202E-010
+   106      0      0.60811198066024078785752E-007      0.28023137711352135413401E-010
+   107      0      0.51803901694434022717311E-007      0.23840199636292246359878E-010
+   108      0      0.43997043248967154053623E-007      0.20223485287571871006601E-010
+   109      0      0.37251586315799573676095E-007      0.17104843369232502138322E-010
+   110      0      0.31446723105552796974734E-007      0.14425773117422163693437E-010
+   111      0      0.26467611564288347577923E-007      0.12131416572166313948360E-010
+   112      0      0.22214060389163036310448E-007      0.10174376435475997764312E-010
+   113      0      0.18591634921485076473306E-007      0.85103310410047375388555E-011
+   114      0      0.15518156837327164463606E-007      0.71008820760842135756309E-011
+   115      0      0.12917312391770604533035E-007      0.59104344288210534225477E-011
+   116      0      0.10723347340525491642267E-007      0.49082928346560370373160E-011
+   117      0      0.88763850930575209725750E-008      0.40664442932242948559625E-011
+   118      0      0.73256061255193415245022E-008      0.33610298653133791830548E-011
+   119      0      0.60256838199364132587130E-008      0.27707188331646186441210E-011
+   120      0      0.49387579064585420223205E-008      0.22776588621884267108532E-011
+   121      0      0.40316379721183865959627E-008      0.18662258662188011266631E-011
+   122      0      0.32769184342499953896489E-008      0.15235705978676221683725E-011
+   123      0      0.26507920227213005587708E-008      0.12386288591753164513896E-011
+   124      0      0.21336420534345799637348E-008      0.10023971317650619110307E-011
+   125      0      0.17084032230254634316537E-008      0.80715995344270242203464E-012
+   126      0      0.13608922349800417561850E-008      0.64661836076852113549666E-012
+   127      0      0.10786613532156217127543E-008      0.51532119898325482998035E-012
+   128      0      0.85122173490792699959830E-009      0.40873672516406202611830E-012
+   129      0      0.66930241100006460487232E-009      0.32287070557563244328181E-012
+   130      0      0.52502578281267393579455E-009      0.25432790529870134119746E-012
+   131      0      0.41145720143248065566928E-009      0.20008172391518526942709E-012
+   132      0      0.32273585845485585428613E-009      0.15753522186087968924563E-012
+   133      0      0.25380015452451058991263E-009      0.12439336991030000193682E-012
+   134      0      0.20046101179915691647340E-009      0.98713309540746941186914E-013
+   135      0      0.15921449228416290073967E-009      0.78830772936489991700538E-013
+   136      0      0.12725505026366579195315E-009      0.63387456513433034889536E-013
+   137      0      0.10232642064473366140714E-009      0.51276800812649358143217E-013
+   138      0      0.82691677012079815670639E-010      0.41645453662357715158721E-013
+   139      0      0.67008764707360470394449E-010      0.33842334566138215243790E-013
+   140      0      0.54285194894353551285449E-010      0.27401555852246528584267E-013
+   141      0      0.43781794493720886470015E-010      0.21993774214929014410022E-013
+   142      0      0.34974833543984442035376E-010      0.17403172212299443097209E-013
+   143      0      0.27490389164552705111379E-010      0.13487130248198158337594E-013
+   144      0      0.21082244156117683634624E-010      0.10158336976623846375037E-013
+   145      0      0.15590961196957778669659E-010      0.73580232296835884920423E-014
+   146      0      0.10933305593152944497556E-010      0.50480903667233836807252E-014
+   147      0      0.70750740784128878269288E-011      0.31979250220095801526031E-014
+   148      0      0.40233186718248994379831E-011      0.17846158637545753455359E-014
+   149      0      0.18043120954431714751239E-011      0.78860086249558225833905E-015
+   150      0      0.45390341749331162915727E-012      0.19652647660860838141469E-015
+
+
+              Timing data at 2023/07/28 15:58:06
+
+                                                       Total time (seconds)           Self time (seconds)
+ Timer                                   Calls         --------------------           -------------------
+ -----                                   -----           Real           CPU            Real           CPU
+
+ start                                      1.          188.8        1132.2             0.9           5.2
+ Atomic fwd n                          240000.           13.3          81.5            13.3          81.5
+ Atomic rev n                          240000.           14.2          87.6            14.2          87.6
+ Atomic fwd t                          240000.           12.4          74.1            12.4          74.1
+ Atomic rev t                          240000.           13.2          76.4            13.2          76.4
+ Laser rev n (par L)                   119000.           29.1         174.9            29.1         174.9
+ Laser rev t (par L)                   119000.           37.3         225.4            37.3         225.4
+ Laser fwd n (par L)                   118999.           29.6         178.6            29.6         178.6
+ Laser fwd t (par L)                   118999.           38.0         224.9            38.0         224.9
+
+ ( 17 timers contributing less than 1% are not shown)
+

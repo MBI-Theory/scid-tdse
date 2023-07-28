@@ -59,12 +59,13 @@ module vectorpotential_tools
   public vp_apot
   public rcsid_vectorpotential_tools
   !
-  character(len=clen), save :: rcsid_vectorpotential_tools = "$Id: vectorpotential_tools.f90,v 1.21 2022/09/26 17:19:41 ps Exp ps $"
+  character(len=clen), save :: rcsid_vectorpotential_tools = "$Id: vectorpotential_tools.f90,v 1.22 2023/07/28 14:07:15 ps Exp ps $"
   !
   !  List of vector-potential names. These are used in a couple different places; 
   !  I would prefer any typos to cause a compile-time error!
   ! 
   character(len=*), parameter :: vpn_zero       = 'zero'
+  character(len=*), parameter :: vpn_zLinear    = 'z linear'
   character(len=*), parameter :: vpn_zGaussian  = 'z Gaussian'
   character(len=*), parameter :: vpn_xGaussian  = 'x Gaussian'
   character(len=*), parameter :: vpn_zzGaussian = 'zz Gaussian'
@@ -179,9 +180,13 @@ module vectorpotential_tools
         th   = omega*t
         ph   = 0._xk
       case (vpn_zero)
-        apot = 0._rk
-        th   = 0._rk
-        ph   = 0._rk
+        apot = 0._xk
+        th   = 0._xk
+        ph   = 0._xk
+      case (vpn_zLinear)
+        apot = vp_scale * max(0._xk,t-origin)
+        th   = 0._xk
+        ph   = 0._xk
       case (vpn_zGaussian)
         apot = vp_scale * GaussianVP(t,omega,phase,origin,width,gau_toff1,gau_toff2,gau_alpha)
         th   = 0._xk
@@ -281,6 +286,12 @@ module vectorpotential_tools
         case ('table')
           stop 'vectorpotential_tools%initialize - logic error: vp_shape=table must be handled elsewhere'
         case (vpn_zero) ! Nothing to do
+        case (vpn_zLinear)
+          origin = vp_param(3)
+          write (out,"(/'Using linearly-growing vector-potential along Z')")
+          write (out,"(t5,'  Startig time = ',g24.13,' [a.u. time]')") origin
+          write (out,"(t5,'Electric field = ',g24.13,' [a.u. field]')") -vp_scale
+          call flush_wrapper(out)
         case (vpn_zGaussian)
           call init_GaussianVP('along lab Z',vp_param,omega,phase,origin,width,gau_toff1,gau_toff2,gau_alpha)
         case (vpn_xGaussian)

@@ -1,4 +1,4 @@
-Last updated: 2023 June 17
+Last updated: 2023 July 28
 ------------
 
   All input to scid-tdse is provided through the sph_tdse namelist, with one
@@ -992,6 +992,14 @@ Input keywords
     Possible choices are:
       'zero'        - The vector-potential is zero; propagation is entirely
                       field-free.
+      'z linear'    - For t<vp_param(3), the vector-potential is zero. For
+                      later times, it is taken to be vp_scale*(t-vp_param(3)).
+                      The overall effect is that of a constant electric field
+                      of magnitude (-vp_scale) along Z. Please keep in mind that
+                      composition analysis is NOT valid for A/=0. It is also
+                      advisable to set vp_as_is=.true. Note that very large
+                      values of SD_LMAX may be necessary for convergence.
+                      See an example in examples/hydrogen_static.inp
       'z Gaussian'  - Linearly-polarized (almost-)Gaussian pulse along lab Z;
                       Pulse parameters from VP_SCALE/VP_PARAM
       'zz Gaussian' - Sum of two independent "Gaussian" pulses along lab Z.

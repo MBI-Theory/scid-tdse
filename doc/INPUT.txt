@@ -1,4 +1,4 @@
-Last updated: 2023 July 28
+Last updated: 2023 August 11
 ------------
 
   All input to scid-tdse is provided through the sph_tdse namelist, with one
@@ -983,8 +983,10 @@ Input keywords
 
   VP_PARAM=0. (vectorpotential_tools.f90)
   VP_PARAM_X=0. (vectorpotential_tools.f90)
+  VP_PARAM_X2=0. (vectorpotential_tools.f90)
   VP_SCALE=0. (vectorpotential_tools.f90)
   VP_SCALE_X=0 (vectorpotential_tools.f90)
+  VP_SCALE_X2=0 (vectorpotential_tools.f90)
 
   VP_SHAPE=' ' (vectorpotential_tools.f90)
     Overall vector-potential shape. Combined with VP_SCALE, VP_PARAM, 
@@ -1005,6 +1007,10 @@ Input keywords
       'zz Gaussian' - Sum of two independent "Gaussian" pulses along lab Z.
                       Pulse 1 parameters from VP_SCALE/VP_PARAM
                       Pulse 2 parameters from VP_SCALE_X/VP_PARAM_X
+      'zzz Gaussian'- Sum of three independent "Gaussian" pulses along lab Z.
+                      Pulse 1 parameters from VP_SCALE/VP_PARAM
+                      Pulse 2 parameters from VP_SCALE_X/VP_PARAM_X
+                      Pulse 3 parameters from VP_SCALE_X2/VP_PARAM_X2
       'zx Gaussian' - Elliptically-polarized "Gaussian" pulse, ZY plane
                       Vector-potential along lab Z from VP_SCALE/VP_PARAM
                       Vector-potential along lab X from VP_SCALE_X/VP_PARAM_X

@@ -61,7 +61,7 @@ module spherical_tdse
   public start
   public rcsid_spherical_tdse
   !
-  character(len=clen), save :: rcsid_spherical_tdse = "$Id: spherical_tdse.f90,v 1.135 2023/06/17 13:45:36 ps Exp ps $"
+  character(len=clen), save :: rcsid_spherical_tdse = "$Id: spherical_tdse.f90,v 1.136 2023/08/11 16:02:04 ps Exp ps $"
   !
   integer, parameter       :: iu_detail             = 29           ! Unit for detailed output; remains open during the entire run
   integer, parameter       :: iu_temp               = 22           ! An arbitrary unit number, which can be used here
@@ -213,7 +213,8 @@ module spherical_tdse
                       ! Parameters from propagator_tools
                       pt_mix_solver, pt_chunk, pt_sense_real, pt_eps_dt, pt_force_par_l, &
                       ! Parameters from vectorpotential_tools
-                      vp_scale, vp_scale_x, vp_shape, vp_param, vp_param_x, vp_table, &
+                      vp_scale, vp_scale_x, vp_scale_x2, vp_shape, vp_param, vp_param_x, &
+                      vp_param_x2, vp_table, &
                       ! Parameters from timer
                       timer_disable, &
                       ! Parameters from bicg_tools
@@ -1390,6 +1391,7 @@ module spherical_tdse
         ! This includes 'z Gaussian', 'z Sin2', etc
         if (vp_shape(1:2)=='z ') rotation_mode = 'none'
         if (vp_shape(1:3)=='zz ') rotation_mode = 'none'
+        if (vp_shape(1:4)=='zzz ') rotation_mode = 'none'
         if (vp_shape(1:4)=='zero') rotation_mode = 'none'
         ! If we still do not know, we choose the general case (rotation)
         if (rotation_mode=='auto') rotation_mode = 'sparse'
@@ -1405,7 +1407,7 @@ module spherical_tdse
         if (sd_mmin/=sd_mmax) then
           write (out,"(/'WARNING: Multiple, uncoupled M values are propagated.'/)") 
         end if
-        if (vp_shape(1:2)/='z ' .and. vp_shape(1:2)/='zz ' .and. vp_shape(1:4)/='zero') then
+        if (vp_shape(1:2)/='z ' .and. vp_shape(1:3)/='zz ' .and. vp_shape(1:4)/='zzz ' .and. vp_shape(1:4)/='zero') then
           write (out,"(/'WARNING: Vector-potential may contain components along X/Y, but the propagator')")
           write (out,"( 'WARNING: assumes it is along Z. The results are likely incorrect.'/)")
         end if

@@ -1,8 +1,12 @@
-Last updated: 2023 July 28
+Last updated: 2023 August 11
 ------------
 
 Change log
 ----------
+
+2023 Aug 11
+
+ - Added support for vp_share='zzz Gaussian'.
 
 2023 Jul 28
 

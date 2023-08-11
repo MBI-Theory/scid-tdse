@@ -56,10 +56,11 @@ module vectorpotential_tools
   implicit none
   private
   public vp_scale, vp_shape, vp_param, vp_param_x, vp_scale_x, vp_table
+  public vp_param_x2, vp_scale_x2
   public vp_apot
   public rcsid_vectorpotential_tools
   !
-  character(len=clen), save :: rcsid_vectorpotential_tools = "$Id: vectorpotential_tools.f90,v 1.22 2023/07/28 14:07:15 ps Exp ps $"
+  character(len=clen), save :: rcsid_vectorpotential_tools = "$Id: vectorpotential_tools.f90,v 1.23 2023/08/11 16:02:04 ps Exp ps $"
   !
   !  List of vector-potential names. These are used in a couple different places; 
   !  I would prefer any typos to cause a compile-time error!
@@ -69,6 +70,7 @@ module vectorpotential_tools
   character(len=*), parameter :: vpn_zGaussian  = 'z Gaussian'
   character(len=*), parameter :: vpn_xGaussian  = 'x Gaussian'
   character(len=*), parameter :: vpn_zzGaussian = 'zz Gaussian'
+  character(len=*), parameter :: vpn_zzzGaussian= 'zzz Gaussian'
   character(len=*), parameter :: vpn_xSin2      = 'x Sin2'
   character(len=*), parameter :: vpn_zSin2      = 'z Sin2'
   character(len=*), parameter :: vpn_zzSin2     = 'zz Sin2'
@@ -91,8 +93,11 @@ module vectorpotential_tools
                                                         ! parameters, which apply in more than one case.
                                                         ! Values from 11 on correspond to specific vp_shape choices.
                                                         ! See vp_apot() and below. 
-  real(xk), save            :: vp_scale_x = 0.00_xk     ! Additional scaling parameter for the extra polatization component
+  real(xk), save            :: vp_scale_x  = 0.00_xk    ! Additional scaling parameter for the extra polatization component
+  real(xk), save            :: vp_scale_x2 = 0.00_xk    ! Additional scaling parameter for the extra polatization component
   real(xk), save            :: vp_param_x(20)           ! Same as vp_param, for pulse shapes defined by two orthogonal
+                                                        ! polarizations. ("x" stands for "extra", not the X axis!)
+  real(xk), save            :: vp_param_x2(20)          ! Same as vp_param, for pulse shapes defined by two orthogonal
                                                         ! polarizations. ("x" stands for "extra", not the X axis!)
   character(len=clen), save :: vp_table   = 'vp.table'  ! Relevant if vp_shape='table' or vp_shape='spline'
                                                         !
@@ -129,6 +134,10 @@ module vectorpotential_tools
   real(xk), save            :: x_phase    = 0._xk       ! vp_param_x(2) : Carrier phase at pulse origin [radians]
   real(xk), save            :: x_origin   = 0._xk       ! vp_param_x(3) : Pulse origin [atomic units]
   real(xk), save            :: x_width    = 0._xk       ! vp_param_x(4) : Pulse width; meaning and units differ
+  real(xk), save            :: x2_omega    = 0._xk      ! vp_param_x2(1) : Carrier frequency [atomic units]
+  real(xk), save            :: x2_phase    = 0._xk      ! vp_param_x2(2) : Carrier phase at pulse origin [radians]
+  real(xk), save            :: x2_origin   = 0._xk      ! vp_param_x2(3) : Pulse origin [atomic units]
+  real(xk), save            :: x2_width    = 0._xk      ! vp_param_x2(4) : Pulse width; meaning and units differ
   !
   !  Values relevant for vp_shape=='Gaussian':
   !
@@ -140,8 +149,12 @@ module vectorpotential_tools
   real(xk), save            :: gau_alpha    = 0._xk     ! Pulse width parameter; derived from width
   real(xk), save            :: x_gau_toff1  = 0._xk     ! vp_param_x(11) : Beginning of the hard turn-off, relative to origin
   real(xk), save            :: x_gau_toff2  = 0._xk     ! vp_param_x(12) : End of the hard turn-off, relative to origin
-                                                        !                gau_toff2 must be greater than gau_toff1
+                                                        !                  gau_toff2 must be greater than gau_toff1
   real(xk), save            :: x_gau_alpha  = 0._xk     ! Pulse width parameter; derived from width
+  real(xk), save            :: x2_gau_toff1  = 0._xk    ! vp_param_x2(11) : Beginning of the hard turn-off, relative to origin
+  real(xk), save            :: x2_gau_toff2  = 0._xk    ! vp_param_x2(12) : End of the hard turn-off, relative to origin
+                                                        !                   gau_toff2 must be greater than gau_toff1
+  real(xk), save            :: x2_gau_alpha  = 0._xk    ! Pulse width parameter; derived from width
   !
   !  Values relevant for vp_shape='Flat-Sin2'
   !
@@ -198,6 +211,12 @@ module vectorpotential_tools
       case (vpn_zzGaussian)
         apot = vp_scale   * GaussianVP(t,  omega,  phase,  origin,  width,  gau_toff1,  gau_toff2,  gau_alpha) &
              + vp_scale_x * GaussianVP(t,x_omega,x_phase,x_origin,x_width,x_gau_toff1,x_gau_toff2,x_gau_alpha)
+        th   = 0._xk
+        ph   = 0._xk
+      case (vpn_zzzGaussian)
+        apot = vp_scale    * GaussianVP(t,   omega,   phase,   origin,   width,   gau_toff1,   gau_toff2,   gau_alpha) &
+             + vp_scale_x  * GaussianVP(t, x_omega, x_phase, x_origin, x_width, x_gau_toff1, x_gau_toff2, x_gau_alpha) &
+             + vp_scale_x2 * GaussianVP(t,x2_omega,x2_phase,x2_origin,x2_width,x2_gau_toff1,x2_gau_toff2,x2_gau_alpha)
         th   = 0._xk
         ph   = 0._xk
       case (vpn_zSin2)
@@ -299,6 +318,10 @@ module vectorpotential_tools
         case (vpn_zzGaussian)
           call init_GaussianVP('along lab Z (1)',vp_param,    omega,  phase,  origin,  width,  gau_toff1,  gau_toff2,  gau_alpha)
           call init_GaussianVP('along lab Z (2)',vp_param_x,x_omega,x_phase,x_origin,x_width,x_gau_toff1,x_gau_toff2,x_gau_alpha)
+        case (vpn_zzzGaussian)
+          call init_GaussianVP('lab Z (1)',vp_param,      omega,   phase,   origin,   width,   gau_toff1,   gau_toff2,   gau_alpha)
+          call init_GaussianVP('lab Z (2)',vp_param_x,  x_omega, x_phase, x_origin, x_width, x_gau_toff1, x_gau_toff2, x_gau_alpha)
+          call init_GaussianVP('lab Z (3)',vp_param_x2,x2_omega,x2_phase,x2_origin,x2_width,x2_gau_toff1,x2_gau_toff2,x2_gau_alpha)
         case (vpn_xSin2)
           call init_Sin2VP('along lab X',vp_param,omega,phase,origin,width)
         case (vpn_zSin2)

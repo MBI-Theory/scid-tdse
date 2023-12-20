@@ -40,7 +40,7 @@ module wavefunction_tools
   public wt_max_solution_iterations, wt_enable_memory_caches
   public wt_init_memory_caches
   public wt_atomic_solutions, wt_one_atomic_solution
-  public wt_normalize, wt_energy, wt_dipole
+  public wt_normalize, wt_energy, wt_dipole, wt_transition_matrix_elements
   public wt_adaptive_r_buffer
   public wt_reset_lrmax, wt_update_lrmax
   public wt_resize
@@ -223,6 +223,7 @@ module wavefunction_tools
     end if
     call TimerStop('Atomic solutions')
   end subroutine wt_atomic_solutions
+
   !
   !  Compute a single atomic solution using inverse iterations.
   !  Requires approximate energy of the solution as the starting guess.
@@ -1132,7 +1133,7 @@ module wavefunction_tools
                                                 ! dipole(:,2) - [(d/d t) <L|q r|R>] + (e^2/m) A <L|R>
                                                 ! dipole(:,3) - [(d^2/d t^2) <L|q r|R>] + (e^2/m) (d A/d t) <L|R>
                                                 ! All dipole terms are in the local (rotating) frame
-    !
+!
     integer(ik) :: l_left, m_left, l_right, m_right, m_op, ispin, my_lmax, nr
     complex(rk) :: dip_sph(-1:1), vel_sph(-1:1), acc_sph(-1:1), wgt_dip, wgt_acc
     complex(rk) :: wgt_vel
@@ -1295,6 +1296,101 @@ module wavefunction_tools
       cart(3) =          sph( 0)
     end subroutine cyc2cart
   end subroutine wt_dipole
+  !
+  !  Calculate transition matrix elements between bound states stored in the cache and save to
+  !  a file called tme.dat.
+  ! TODO: Implemented only for m=0, loop over m is missing
+  !
+  subroutine wt_transition_matrix_elements(do_projections,iu_temp)
+    logical, intent(in)      :: do_projections  !
+    integer(ik), intent(in) :: iu_temp
+!
+    integer(ik) :: l_left, m_left, l_right, m_right, m_op, nr,i_left,i_right,istate,l_right_m,l_right_p
+    complex(rk) :: dip_sph(-1:1),  wgt_dip, wgt_ang
+    complex(rk) :: tme(3) !  <L_ground|q r|R_excited> expectation value
+    !
+    !  Quick return if possible
+    !
+    if (.not.do_projections) then
+      return
+    end if
+    call TimerStart('WF tme')
+    !
+    open(iu_temp,file=trim("tme.dat"),form='formatted',status='replace',position='rewind',recl=1050,pad='no')
+    !
+    nr = sd_nradial
+    ! We can only have transition matrix elements with l+1 or l-1 and with delta m=0,+1,-1
+    m_left = 0
+    m_right = 0
+    !
+    loop_l_left: do l_left=0,sd_lmax
+      loop_i_left: do i_left=1,nr
+        if (real(cache_eval(i_left,l_left))>0.0) then
+          cycle
+        end if
+!         loop_m_left: do m_left=max(-l_left,sd_mmin),min(l_left,sd_mmax)
+          ! l+1 and l-1 cases
+          l_right_p = l_left + 1
+          l_right_m = l_left - 1
+          !
+          if (l_right_p < sd_lmax) then
+            loop_i_right_p: do i_right = 1,nr
+              if (real(cache_eval(i_right,l_right_p))>0.0) then
+                cycle
+              end if
+              ! we have m_left, m_right,l_left, l_right_p, i_left and i_right, we can do!
+              wgt_dip = sum(cache_evec(1:nr,i_left,2,l_left) * cache_evec(1:nr,i_right,1,l_right_p) * sd_rtab(1:nr))
+              loop_m_op_p: do m_op = -1,1
+                wgt_ang = angular_term(l_left,m_left,1_ik,m_op,l_right_p,m_right)
+                dip_sph(m_op) = electron_charge*wgt_ang*wgt_dip
+              end do loop_m_op_p
+              call sph2cart(dip_sph,tme(:))
+              write (iu_temp,"(6(1x,i3),6(1x,g32.22e4))") l_left, m_left, i_left, l_right_p, m_right, i_right, tme
+            end do loop_i_right_p
+          end if
+          !
+          if (l_right_m > 0) then
+            loop_i_right_m: do i_right = 1,nr
+              if (real(cache_eval(i_right,l_right_m))>0.0) then
+                cycle
+              end if
+              ! we have m_left, m_right,l_left, l_right_m, i_left and i_right, we can do!
+              wgt_dip = sum(cache_evec(1:nr,i_left,2,l_left) * cache_evec(1:nr,i_right,1,l_right_m) * sd_rtab(1:nr))
+              loop_m_op_m: do m_op = -1,1
+                wgt_ang = angular_term(l_left,m_left,1_ik,m_op,l_right_m,m_right)
+                dip_sph(m_op) = electron_charge*wgt_ang*wgt_dip
+              end do loop_m_op_m
+              call sph2cart(dip_sph,tme(:))
+              write (iu_temp,"(6(1x,i3),6(1x,g32.22e4))") l_left, m_left, i_left, l_right_m, m_right, i_right, tme
+            end do loop_i_right_m
+          end if
+!         end do loop_m_left
+      end do loop_i_left
+    end do loop_l_left
+    close(iu_temp)
+    call TimerStop('WF tme')
+    !
+    contains
+    !
+    real(rk) function angular_term(l1,m1,l2,m2,l3,m3)
+      integer(ik), intent(in) :: l1, m1, l2, m2, l3, m3
+      ! Brute-force expression using 3J symbols; Mathematica phase convenstions
+      angular_term = ((-1)**m1) * sqrt((2*l1+1)*(2*l2+1)*(2*l3+1)/(4*pi)) &
+                   * Math3J(l1,l2,l3,0_ik,0_ik,0_ik) * Math3J(l1,l2,l3,-m1,m2,m3)
+    end function angular_term
+    !
+
+    !
+    subroutine sph2cart(sph,cart)
+      complex(rk), intent(in)  :: sph (-1:1) ! Spherical tensor
+      complex(rk), intent(out) :: cart(3)    ! Equivalent Cartesian tensor
+      !
+      cart(1) =       sqrt((2*pi)/3) * (sph(-1)-sph(+1))
+      cart(2) = (0._rk,1._rk)*sqrt((2*pi)/3) * (sph(-1)+sph(+1))
+      cart(3) =       sqrt((4*pi)/3) *  sph(0)
+    end subroutine sph2cart
+  end subroutine wt_transition_matrix_elements
+
   !
   !  Calculate the conversion factor for transformation of the right wavefunction
   !  into the real-space wavefunction.

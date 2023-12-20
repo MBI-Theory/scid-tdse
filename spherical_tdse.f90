@@ -65,6 +65,7 @@ module spherical_tdse
   !
   integer, parameter       :: iu_detail             = 29           ! Unit for detailed output; remains open during the entire run
   integer, parameter       :: iu_temp               = 22           ! An arbitrary unit number, which can be used here
+  integer, parameter       :: iu_tme                = 32           ! Unit for transition matrix elements
   !                                                 
   integer(ik)              :: verbose               = 2_ik         ! How verbose do we need to be?
   integer(ik)              :: omp_num_threads       = 0_ik         ! Non-zero value will cause number of OpenMP threads
@@ -81,6 +82,7 @@ module spherical_tdse
                                                                    !            Must supply initial_wfn_index and initial_wfn_energy
                                                                    ! 'read'   = Read initial wfn from a file
   integer(ik)              :: initial_wfn_index(3)  = (/0,0,1/)    ! Initial wavefunction quantum numbers; L,M,I
+  logical                  :: wt_tme               = .false.      ! Calculate transition matrix elements between all bound states
   complex(rk)              :: initial_wfn_energy    = -1._rk       ! Initial guess for wavefunction energy
   character(len=clen)      :: initial_wfn_file      = ' '          ! File containing initial wavefunction
   character(len=clen)      :: task                  = 'real time'  ! What to do after the initialization. One of:
@@ -246,7 +248,7 @@ module spherical_tdse
                       ca_maxram, &
                       ! Parameters from node_tools
                       nt_node_output, nt_rebalance_interval, nt_use_multinode, nt_verbose, &
-                      nt_max_requests
+                      nt_max_requests,wt_tme
   !
   contains
   !
@@ -1538,6 +1540,15 @@ module spherical_tdse
     ! which may refer to them.
     !
     call wt_init_memory_caches(verbose)
+    !
+    ! Calculate transition matrix elements between bound states if asked for
+    ! Only makes sense if memory caches for atomic solutions is enabled and cap disabled
+    !
+    if (wt_tme.and.wt_enable_memory_caches(1).and.(cap_name=="none")) then
+      call wt_transition_matrix_elements(wt_tme,iu_tme)
+      else
+          stop 'spherical_tdse%input_error - wt_tme'
+    end if
     !
     !  We need a wavefunction to start from
     !

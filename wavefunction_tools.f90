@@ -40,7 +40,7 @@ module wavefunction_tools
   public wt_max_solution_iterations, wt_enable_memory_caches
   public wt_init_memory_caches
   public wt_atomic_solutions, wt_one_atomic_solution
-  public wt_normalize, wt_energy, wt_dipole, wt_transition_matrix_elements
+  public wt_normalize, wt_energy, wt_dipole, wt_transition_matrix_elements, wt_tme
   public wt_adaptive_r_buffer
   public wt_reset_lrmax, wt_update_lrmax
   public wt_resize
@@ -70,6 +70,8 @@ module wavefunction_tools
                                                             ! and right-to-left transformation matrices (2)
                                                             ! If eigensolutions and transformation matrices exist in the disk
                                                             ! cache specified by wt_atomic_cache_prefix, they'll be loaded.
+  logical,save               :: wt_tme                      = .false.
+                                                            ! Calculate transition matrix elements between all bound states                                                    
   !
   !  In-memory caches. These caches can be enormously large; do not activate them
   !  unless you have plenty of RAM!
@@ -1105,6 +1107,37 @@ module wavefunction_tools
     call TimerStop('WF energy')
   end subroutine wt_energy
   !
+  ! Angular part for integrals involving 3 spherical harmonics
+  !
+  real(rk) function angular_term(l1,m1,l2,m2,l3,m3)
+    integer(ik), intent(in) :: l1, m1, l2, m2, l3, m3
+    ! Brute-force expression using 3J symbols; Mathematica phase convenstions
+    angular_term = ((-1)**m1) * sqrt((2*l1+1)*(2*l2+1)*(2*l3+1)/(4*pi)) &
+                 * Math3J(l1,l2,l3,0_ik,0_ik,0_ik) * Math3J(l1,l2,l3,-m1,m2,m3)
+  end function angular_term
+  !
+  ! Transform between Spherical tensor (Y_1,1, Y_1,0, Y_1,-1), and Cartesian tensor (x,y,z)
+  !
+  subroutine sph2cart(sph,cart)
+    complex(rk), intent(in)  :: sph (-1:1) ! Spherical tensor
+    complex(rk), intent(out) :: cart(3)    ! Equivalent Cartesian tensor
+    !
+    cart(1) =       sqrt((2*pi)/3) * (sph(-1)-sph(+1))
+    cart(2) = (0._rk,1._rk)*sqrt((2*pi)/3) * (sph(-1)+sph(+1))
+    cart(3) =       sqrt((4*pi)/3) *  sph(0)
+  end subroutine sph2cart
+  !
+  ! Transform between Cyclic vector and Cartesian vector (x,y,z)
+  !
+  subroutine cyc2cart(sph,cart)
+  complex(rk), intent(in)  :: sph (-1:1) ! Cyclic vector
+  complex(rk), intent(out) :: cart(3)    ! Equivalent Cartesian vector
+  !
+  cart(1) =         (sph(-1)-sph(+1)) / sqrt(2._rk)
+  cart(2) = (0._rk,1._rk) * (sph(-1)+sph(+1)) / sqrt(2._rk)
+  cart(3) =          sph( 0)
+  end subroutine cyc2cart
+  !
   !  Calculate dipole expectation and dipole acceleration 
   !
   !  WARNING: Dipole acceleration is valid ONLY for multiplicative potentials
@@ -1253,13 +1286,6 @@ module wavefunction_tools
       grad_m(:nr) = grad_m(:nr) - (lval+1)*sd_rminus(:nr)*wfn(:nr)
     end subroutine prepare_gradients
     !
-    real(rk) function angular_term(l1,m1,l2,m2,l3,m3)
-      integer(ik), intent(in) :: l1, m1, l2, m2, l3, m3
-      ! Brute-force expression using 3J symbols; Mathematica phase convenstions
-      angular_term = ((-1)**m1) * sqrt((2*l1+1)*(2*l2+1)*(2*l3+1)/(4*pi)) &
-                   * Math3J(l1,l2,l3,0_ik,0_ik,0_ik) * Math3J(l1,l2,l3,-m1,m2,m3)
-    end function angular_term
-    !
     real(rk) function vel_c(l,m) 
       integer(ik), intent(in) :: l, m
       real(rk) :: r_l, r_m
@@ -1277,33 +1303,15 @@ module wavefunction_tools
       r_m   = m
       vel_d = sqrt( (r_l+r_m)*(r_l+r_m+1)/( 2*(2*r_l-1)*(2*r_l+1) ) )
     end function vel_d
-    !
-    subroutine sph2cart(sph,cart)
-      complex(rk), intent(in)  :: sph (-1:1) ! Spherical tensor
-      complex(rk), intent(out) :: cart(3)    ! Equivalent Cartesian tensor
-      !
-      cart(1) =       sqrt((2*pi)/3) * (sph(-1)-sph(+1))
-      cart(2) = (0._rk,1._rk)*sqrt((2*pi)/3) * (sph(-1)+sph(+1))
-      cart(3) =       sqrt((4*pi)/3) *  sph( 0)
-    end subroutine sph2cart
-    !
-    subroutine cyc2cart(sph,cart)
-      complex(rk), intent(in)  :: sph (-1:1) ! Cyclic vector
-      complex(rk), intent(out) :: cart(3)    ! Equivalent Cartesian vector
-      !
-      cart(1) =         (sph(-1)-sph(+1)) / sqrt(2._rk)
-      cart(2) = (0._rk,1._rk) * (sph(-1)+sph(+1)) / sqrt(2._rk)
-      cart(3) =          sph( 0)
-    end subroutine cyc2cart
   end subroutine wt_dipole
-
   !
-  !  Calculate electric dipole transition matrix elements between bound states stored in the cache
+  ! Calculate electric dipole transition matrix elements between bound states stored in the cache
   ! and save to a file called tme.dat.
   !
-  subroutine wt_transition_matrix_elements(do_projections,iu_temp)
+  subroutine wt_transition_matrix_elements(iu_temp,cap_name)
     logical, intent(in)      :: do_projections  !
     integer(ik), intent(in) :: iu_temp
+    character(len=clen), intent(in) :: cap_name
 !
     integer(ik) :: l_left, m_left, l_right, m_right, m_op, nr,i_left,i_right,istate,l_right_m,l_right_p
     complex(rk) :: dip_sph(-1:1),  wgt_dip, wgt_ang
@@ -1311,12 +1319,15 @@ module wavefunction_tools
     !
     !  Quick return if possible
     !
-    if (.not.do_projections) then
+    if ((.not.wt_tme).or.(.not.wt_enable_memory_caches(1))) then
       return
     end if
     call TimerStart('WF tme')
-    !
     open(iu_temp,file=trim("tme.dat"),form='formatted',status='replace',position='rewind',recl=1050,pad='no')
+    ! Check if the CAP is set to none, otherwise inform
+    if (.not.(cap_name=="none")) then
+      write (iu_temp,"( '#WARNING: CAP is not set to NONE, expect wrong dipole transitions.')")
+    end if
     !
     nr = sd_nradial
     !

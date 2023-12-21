@@ -1309,7 +1309,6 @@ module wavefunction_tools
   ! and save to a file called tme.dat.
   !
   subroutine wt_transition_matrix_elements(iu_temp,cap_name)
-    logical, intent(in)      :: do_projections  !
     integer(ik), intent(in) :: iu_temp
     character(len=clen), intent(in) :: cap_name
 !

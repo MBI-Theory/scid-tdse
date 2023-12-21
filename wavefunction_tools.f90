@@ -1338,7 +1338,7 @@ module wavefunction_tools
           cycle
         end if
         loop_m_left: do m_left=max(-l_left,sd_mmin),min(l_left,sd_mmax)
-          loop_m_right: do m_right=max(-m_left-1,sd_mmin),min(m_left+1,sd_mmax)
+          loop_m_right: do m_right=max(m_left-1,sd_mmin),min(m_left+1,sd_mmax)
             ! l+1 and l-1 cases
             l_right_p = l_left + 1
             l_right_m = l_left - 1

@@ -1296,10 +1296,10 @@ module wavefunction_tools
       cart(3) =          sph( 0)
     end subroutine cyc2cart
   end subroutine wt_dipole
+
   !
-  !  Calculate transition matrix elements between bound states stored in the cache and save to
-  !  a file called tme.dat.
-  ! TODO: Implemented only for m=0, loop over m is missing
+  !  Calculate electric dipole transition matrix elements between bound states stored in the cache
+  ! and save to a file called tme.dat.
   !
   subroutine wt_transition_matrix_elements(do_projections,iu_temp)
     logical, intent(in)      :: do_projections  !
@@ -1307,7 +1307,7 @@ module wavefunction_tools
 !
     integer(ik) :: l_left, m_left, l_right, m_right, m_op, nr,i_left,i_right,istate,l_right_m,l_right_p
     complex(rk) :: dip_sph(-1:1),  wgt_dip, wgt_ang
-    complex(rk) :: tme(3) !  <L_ground|q r|R_excited> expectation value
+    complex(rk) :: tme(3) !  <L_ground|q r|R_excited> electric dipole transitions (x,y,z)
     !
     !  Quick return if possible
     !
@@ -1319,52 +1319,51 @@ module wavefunction_tools
     open(iu_temp,file=trim("tme.dat"),form='formatted',status='replace',position='rewind',recl=1050,pad='no')
     !
     nr = sd_nradial
-    ! We can only have transition matrix elements with l+1 or l-1 and with delta m=0,+1,-1
-    m_left = 0
-    m_right = 0
+    !
+    ! We only have transition matrix elements with l+1 or l-1 and with delta m=0 (along z), +1,-1 (along x and y)
     !
     loop_l_left: do l_left=0,sd_lmax
       loop_i_left: do i_left=1,nr
-        if (real(cache_eval(i_left,l_left))>0.0) then
+        if (real(cache_eval(i_left,l_left))>0.0) then ! Ignore states with positive energy
           cycle
         end if
-!         loop_m_left: do m_left=max(-l_left,sd_mmin),min(l_left,sd_mmax)
-          ! l+1 and l-1 cases
-          l_right_p = l_left + 1
-          l_right_m = l_left - 1
-          !
-          if (l_right_p < sd_lmax) then
-            loop_i_right_p: do i_right = 1,nr
-              if (real(cache_eval(i_right,l_right_p))>0.0) then
-                cycle
-              end if
-              ! we have m_left, m_right,l_left, l_right_p, i_left and i_right, we can do!
-              wgt_dip = sum(cache_evec(1:nr,i_left,2,l_left) * cache_evec(1:nr,i_right,1,l_right_p) * sd_rtab(1:nr))
-              loop_m_op_p: do m_op = -1,1
-                wgt_ang = angular_term(l_left,m_left,1_ik,m_op,l_right_p,m_right)
-                dip_sph(m_op) = electron_charge*wgt_ang*wgt_dip
-              end do loop_m_op_p
-              call sph2cart(dip_sph,tme(:))
-              write (iu_temp,"(6(1x,i3),6(1x,g32.22e4))") l_left, m_left, i_left, l_right_p, m_right, i_right, tme
-            end do loop_i_right_p
-          end if
-          !
-          if (l_right_m > 0) then
-            loop_i_right_m: do i_right = 1,nr
-              if (real(cache_eval(i_right,l_right_m))>0.0) then
-                cycle
-              end if
-              ! we have m_left, m_right,l_left, l_right_m, i_left and i_right, we can do!
-              wgt_dip = sum(cache_evec(1:nr,i_left,2,l_left) * cache_evec(1:nr,i_right,1,l_right_m) * sd_rtab(1:nr))
-              loop_m_op_m: do m_op = -1,1
-                wgt_ang = angular_term(l_left,m_left,1_ik,m_op,l_right_m,m_right)
-                dip_sph(m_op) = electron_charge*wgt_ang*wgt_dip
-              end do loop_m_op_m
-              call sph2cart(dip_sph,tme(:))
-              write (iu_temp,"(6(1x,i3),6(1x,g32.22e4))") l_left, m_left, i_left, l_right_m, m_right, i_right, tme
-            end do loop_i_right_m
-          end if
-!         end do loop_m_left
+        loop_m_left: do m_left=max(-l_left,sd_mmin),min(l_left,sd_mmax)
+          loop_m_right: do m_right=max(-m_left-1,sd_mmin),min(m_left+1,sd_mmax)
+            ! l+1 and l-1 cases
+            l_right_p = l_left + 1
+            l_right_m = l_left - 1
+            !
+            if ((l_right_p<=sd_lmax).and.(l_right_p>=abs(m_right))) then ! only do if l and m of the right state make sense (l>0, l > |m|)
+              loop_i_right_p: do i_right = 1,nr ! Loop over all states
+                if (real(cache_eval(i_right,l_right_p))>0.0) then ! Ignore states with positive energy
+                  cycle
+                end if
+                wgt_dip = sum(cache_evec(1:nr,i_left,2,l_left) * cache_evec(1:nr,i_right,1,l_right_p) * sd_rtab(1:nr)) ! Radial part only depends on l and i of l and r
+                loop_m_op_p: do m_op = -1,1 ! Calculate integral for m=-1,0,1 and l=1 of the 3rd sph harm.
+                  wgt_ang = angular_term(l_left,m_left,1_ik,m_op,l_right_p,m_right)
+                  dip_sph(m_op) = electron_charge*wgt_ang*wgt_dip
+                end do loop_m_op_p
+                call sph2cart(dip_sph,tme(:))
+                write (iu_temp,"(6(1x,i3),6(1x,g32.22e4))") l_left, m_left, i_left, l_right_p, m_right, i_right, tme
+              end do loop_i_right_p
+            end if
+            !
+            if ((l_right_m >= 0).and.(l_right_m>=abs(m_right))) then ! only do if l and m of the right state make sense (l>0, l > |m|)
+              loop_i_right_m: do i_right = 1,nr ! Loop over all states
+                if (real(cache_eval(i_right,l_right_m))>0.0) then ! Ignore states with positive energy
+                  cycle
+                end if
+                wgt_dip = sum(cache_evec(1:nr,i_left,2,l_left) * cache_evec(1:nr,i_right,1,l_right_m) * sd_rtab(1:nr)) ! Radial part only depends on l and i of l and r
+                loop_m_op_m: do m_op = -1,1 ! Calculate integral for m=-1,0,1 and l=1 of the 3rd sph harm.
+                  wgt_ang = angular_term(l_left,m_left,1_ik,m_op,l_right_m,m_right)
+                  dip_sph(m_op) = electron_charge*wgt_ang*wgt_dip
+                end do loop_m_op_m
+                call sph2cart(dip_sph,tme(:))
+                write (iu_temp,"(6(1x,i3),6(1x,g32.22e4))") l_left, m_left, i_left, l_right_m, m_right, i_right, tme
+              end do loop_i_right_m
+            end if
+          end do loop_m_right
+        end do loop_m_left
       end do loop_i_left
     end do loop_l_left
     close(iu_temp)

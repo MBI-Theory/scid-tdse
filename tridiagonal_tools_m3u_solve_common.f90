@@ -20,7 +20,7 @@
 !   real(rk), intent(in)  :: r (:)   ! Right-hand size
 !   real(rk), intent(out) :: x (:)   ! Solution vector
     !
-!   character(len=clen), save :: rcsid_tridiagonal_tools_m3u_solve_common = "$Id: tridiagonal_tools_m3u_solve_common.f90,v 1.5 2021/04/26 15:44:44 ps Exp ps $"
+!   character(len=clen), save :: rcsid_tridiagonal_tools_m3u_solve_common = "$Id: tridiagonal_tools_m3u_solve_common.f90,v 1.5 2021/04/26 15:44:44 ps Exp $"
     !
     integer(ik) :: i, sz
     !

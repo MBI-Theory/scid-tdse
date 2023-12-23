@@ -40,7 +40,7 @@ module spherical_tsurf_data
   public sts_data
   public rcsid_spherical_tsurf_data
   !
-  character(len=clen), save :: rcsid_spherical_tsurf_data = "$Id: spherical_tsurf_data.f90,v 1.2 2021/04/26 15:44:44 ps Exp ps $"
+  character(len=clen), save :: rcsid_spherical_tsurf_data = "$Id: spherical_tsurf_data.f90,v 1.2 2021/04/26 15:44:44 ps Exp $"
   !
   !  Common parameters for all t-SURF instances
   !

@@ -23,7 +23,7 @@
 !   real(rk), intent(out)          :: x(:)     ! Solution of the linear system
 !   real(rk), intent(out)          :: scr(:,:) ! Scratch for iterative refinement
     !
-!   character(len=clen), save :: rcsid_tridiagonal_tools_m3d_solve_common = "$Id: tridiagonal_tools_m3d_solve_common.f90,v 1.8 2021/04/26 15:44:44 ps Exp ps $"
+!   character(len=clen), save :: rcsid_tridiagonal_tools_m3d_solve_common = "$Id: tridiagonal_tools_m3d_solve_common.f90,v 1.8 2021/04/26 15:44:44 ps Exp $"
     !
     integer(ik) :: ipass
     !

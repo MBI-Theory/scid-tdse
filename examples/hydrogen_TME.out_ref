@@ -1,0 +1,375 @@
+Version: Optimized gfortran-13 (ZEN/EPYC), built on balrog.mbi-berlin.de at Sat 23 Dec 2023 11:04:20 AM CET
+
+    $Id: spherical_tdse.f90,v 1.136 2023/08/11 16:02:04 ps Exp ps $
+    $Id: accuracy.f90,v 1.46 2023/06/09 14:10:24 ps Exp $
+    $Id: bicg_tools.f90,v 1.11 2021/04/26 15:44:44 ps Exp ps $
+    $Id: cap_tools.f90,v 1.6 2021/04/26 15:44:44 ps Exp ps $
+    $Id: checkpoint_tools.f90,v 1.17 2022/10/08 17:24:26 ps Exp ps $
+    $Id: composition_analysis.f90,v 1.19 2023/06/17 13:45:36 ps Exp ps $
+    $Id: constants.f90,v 1.7 2021/04/26 15:44:44 ps Exp ps $
+    $Id: coulomb_functions.f90,v 1.15 2023/06/09 14:10:24 ps Exp $
+    $Id: cubic_spline.f90,v 1.2 2021/04/26 15:44:44 ps Exp ps $
+    $Id: math.f90,v 1.15 2023/06/09 14:10:24 ps Exp $
+    $Id: node_tools.f90,v 1.11 2023/06/09 14:10:24 ps Exp $
+    $Id: potential_tools.f90,v 1.21 2023/06/09 14:10:24 ps Exp $
+    $Id: propagator_tools.f90,v 1.45 2022/10/08 17:24:26 ps Exp ps $
+    $Id: rotation_tools.f90,v 1.36 2023/06/09 14:10:24 ps Exp $
+    $Id: sort_tools.f90,v 1.3 2021/04/26 15:44:44 ps Exp ps $
+    $Id: spherical_bessel.f90,v 1.7 2023/06/09 14:10:24 ps Exp $
+    $Id: spherical_data.f90,v 1.44 2023/06/09 14:10:24 ps Exp $
+    $Id: spherical_data_initialize.f90,v 1.5 2021/04/26 15:44:44 ps Exp ps $
+    $Id: spherical_tsurf.f90,v 1.38 2023/06/09 14:10:24 ps Exp $
+    $Id: spherical_tsurf_data.f90,v 1.2 2021/04/26 15:44:44 ps Exp ps $
+    $Id: test_tools.f90,v 1.30 2022/10/06 17:14:31 ps Exp ps $
+    $Id: timer.f90,v 1.6 2023/06/09 14:10:24 ps Exp $
+    $Id: tridiagonal_cyclic.f90,v 1.2 2021/04/26 15:44:44 ps Exp ps $
+    $Id: tridiagonal_pivoted.f90,v 1.6 2021/04/26 15:44:44 ps Exp ps $
+    $Id: tridiagonal_tools.f90,v 1.22 2021/04/26 15:44:44 ps Exp ps $
+    $Id: vectorpotential_tools.f90,v 1.23 2023/08/11 16:02:04 ps Exp ps $
+    $Id: wavefunction_tools.f90,v 1.64 2023/06/17 13:45:36 ps Exp ps $
+
+    Integer kind = 4 (9 decimals)
+       Real kind = 8 (15 decimals)
+  Aux. real kind = 8 (15 decimals)
+Max. LAPACK kind = 8 (15 decimals)
+
+ ===== begin simulation parameters ===== 
+&SPH_TDSE
+ VERBOSE=1          ,
+ COMMENT="Transition Matrix Element example input file for Hydrogen, l=0..2, shows also all energies                                                                                                                                                                     ",
+ OMP_NUM_THREADS=4          ,
+ INITIAL_WFN="atomic                                                                                                                                                                                                                                                         ",
+ INITIAL_WFN_INDEX= 2*0          ,1          ,
+ INITIAL_WFN_ENERGY=(-0.50000000000000000,0.0000000000000000),
+ INITIAL_WFN_FILE="                                                                                                                                                                                                                                                               ",
+ TASK="real time                                                                                                                                                                                                                                                      ",
+ DT=  1.0000000000000000E-002,
+ DT_SUBDIVISION="on                                                                                                                                                                                                                                                             ",
+ DT_MAX_LA=  2.0000000000000000     ,
+ DT_INTERPOLANT_WIDTH=5          ,
+ TIMESTEPS=0          ,
+ ROTATION_MODE="auto                                                                                                                                                                                                                                                           ",
+ FIELD_UNWRAP=T,
+ UNWRAP_THRESHOLD=  1.0000000000000000E-008,
+ FIELD_PREVIEW="                                                                                                                                                                                                                                                               ",
+ SKIP_TESTS=T,
+ OUTPUT_EACH=20         ,
+ DETAIL_FREQUENCY=1          ,
+ DETAIL_OUTPUT="                                                                                                                                                                                                                                                               ",
+ COMPOSITION_THRESHOLD=  1.0000000000000001E-005,
+ COMPOSITION_MAX_ENERGY=  1.7976931348623157E+308,
+ FINAL_WF_DUMP_PREFIX="                                                                                                                                                                                                                                                               ",
+ INITIAL_WF_DUMP_PREFIX="                                                                                                                                                                                                                                                               ",
+ VP_AS_IS=F,
+ DO_DIPOLE= 3*T,
+ DO_DIPOLE_PLASMA=T,
+ VISUALIZE_PREFIX="                                                                                                                                                                                                                                                               ",
+ VISUALIZE_EACH=1000       ,
+ VISUALIZE_1STSEQ=1          ,
+ SKIP_LEFT_PROPAGATION=F,
+ FAKE_LEFT_PROPAGATION=T,
+ RECONSTRUCT_LEFT=F,
+ SD_NRADIAL=2000       ,
+ SD_NSPIN=1          ,
+ SD_LMAX=2          ,
+ SD_MMIN=-2         ,
+ SD_MMAX=2          ,
+ SD_ADAPTIVE_L=T,
+ SD_TOLERANCE_L= 2*-1.0000000000000000      ,
+ SD_ADAPTIVE_R=T,
+ SD_TOLERANCE_R= 2*-1.0000000000000000      ,
+ SD_NRADIAL_SCL=  1.1000000000000001     ,
+ SD_RADIAL_EDGE=-1         ,
+ SD_RGRID="uniform                                                                                                                                                                                                                                                        ",
+ SD_RGRID_ZETA=  1.0000000000000000     ,
+ SD_RGRID_RMIN=  0.0000000000000000     ,
+ SD_RGRID_DR= 0.10000000000000001     ,
+ SD_RGRID_R0=  1.0000000000000000E-002,
+ SD_RGRID_SCALE=  1.0500000000000000     ,
+ SD_RGRID_NPAD=-1         ,
+ SD_RGRID_FILE="grid.dat                                                                                                                                                                                                                                                       ",
+ SD_RGRID_REPORT="                                                                                                                                                                                                                                                               ",
+ SD_RGRID_GRAD_DELTA=  1.0000000000000000E-002,
+ SD_OPERATORS="channel                                                                                                                                                                                                                                                        ",
+ POT_NAME="hydrogenic          ",
+ POT_PARAM=  1.0000000000000000     , 4*0.0000000000000000       ,
+ POT_MASK="none                ",
+ POT_MASK_R0=  1000.0000000000000     ,
+ POT_MASK_RX=  2000.0000000000000     ,
+ POT_SHIFT=  0.0000000000000000     ,
+ POT_LMAX=0          ,
+ POT_TONG05= 45*0.0000000000000000       ,
+ POT_INPUT= 80*0.0000000000000000       ,
+ PT_MIX_SOLVER="default             ",
+ PT_CHUNK=1          ,
+ PT_SENSE_REAL=T,
+ PT_EPS_DT= -1.0000000000000000     ,
+ PT_FORCE_PAR_L=F,
+ VP_SCALE=  4.5075000000000002E-003,
+ VP_SCALE_X=  0.0000000000000000     ,
+ VP_SCALE_X2=  0.0000000000000000     ,
+ VP_SHAPE="z Gaussian                                                                                                                                                                                                                                                     ",
+ VP_PARAM= 0.37500000000000000     ,  0.0000000000000000     ,  100.00000000000000     ,  60.000000000000000     , 6*0.0000000000000000       ,
+   70.000000000000000     ,  95.000000000000000     , 8*0.0000000000000000       ,
+ VP_PARAM_X= 20*0.0000000000000000       ,
+ VP_PARAM_X2= 20*0.0000000000000000       ,
+ VP_TABLE="vp.table                                                                                                                                                                                                                                                       ",
+ TIMER_DISABLE=F,
+ BICG_FAILTRACE=T,
+ BICG_EPSILON=  0.0000000000000000     ,
+ BICG_MAXITER=8          ,
+ RT_MAX_ROT=  1.0000000000000000E-003,
+ RT_BLOCKSIZE=16         ,
+ RT_SENSE_REAL=T,
+ RT_NSTEP_MAX=100        ,
+ WT_ATOMIC_CACHE_PREFIX="cache/hydrogen_TME                                                                                                                                                                                                                                             ",
+ WT_ITERATIVE_IMPROVEMENT=T,
+ WT_DISABLE_ORTHOGONALIZATION=F,
+ WT_MAX_SOLUTION_ITERATIONS=20         ,
+ WT_ENABLE_MEMORY_CACHES=T,F,
+ WT_TME=T,
+ WT_TME_FILE="hydrogen_TME.dipoles                                                                                                                                                                                                                                           ",
+ CAP_NAME="none                                                                                                                                                                                                                                                           ",
+ CAP_PARAM= 2*0.20000000000000001      ,
+ STS_VOLKOV=F,
+ STS_VOLKOV_ATEND=F,
+ STS_COULOMB_ATEND=F,
+ STS_STEP_FREQUENCY=8          ,
+ STS_VERBOSE=1          ,
+ STS_RMATCH= -10.000000000000000     ,
+ STS_KGRID="uniform                                                                                                                                                                                                                                                        ",
+ STS_DGRID="product                                                                                                                                                                                                                                                        ",
+ STS_KGRID_MIN=  0.0000000000000000     ,
+ STS_KGRID_MAX=  3.0000000000000000     ,
+ STS_KGRID_COUNT=100        ,
+ STS_KGRID_FILE="km.table                                                                                                                                                                                                                                                       ",
+ STS_DGRID_NTHETA=15         ,
+ STS_DGRID_NPHI=30         ,
+ STS_DGRID_COUNT=0          ,
+ STS_DGRID_FILE="kd.table                                                                                                                                                                                                                                                       ",
+ STS_ASYMPTOTIC_Q=  1.0000000000000000     ,
+ STS_VOLKOV_TABLE="                                                                                                                                                                                                                                                               ",
+ STS_VOLKOV_OPENDX="tsurf.dx                                                                                                                                                                                                                                                       ",
+ STS_COULOMB_WAVES="                                                                                                                                                                                                                                                               ",
+ STS_COULOMB_TABLE="                                                                                                                                                                                                                                                               ",
+ STS_COULOMB_OPENDX="coulomb.dx                                                                                                                                                                                                                                                     ",
+ STS_ATEND_BLOCK=32         ,
+ STS_R2R_SCALE= -1.0000000000000000     ,
+ STS_ATEND_MODE="direct                                                                                                                                                                                                                                                         ",
+ M3D_SOLVER="unpivoted ",
+ M3D_ITERATIONS=2          ,
+ CKPT_SAVE_BASENAME="                                                                                                                                                                                                                                                               ",
+ CKPT_LOAD_FILENAME="                                                                                                                                                                                                                                                               ",
+ CKPT_MAX_CHECKPOINTS=3          ,
+ CKPT_INTERVAL=10000      ,
+ CA_MAXRAM=  0.0000000000000000     ,
+ NT_NODE_OUTPUT="node_                                                                                                                                                                                                                                                          ",
+ NT_REBALANCE_INTERVAL=500        ,
+ NT_USE_MULTINODE=F,
+ NT_VERBOSE=2          ,
+ NT_MAX_REQUESTS=128        ,
+ /
+ ====== end simulation parameters ====== 
+
+Transition Matrix Element example input file for Hydrogen, l=0..2, shows also all energies
+
+Forcing number of OpenMP threads to 4
+Maximum number of OpenMP threads for this run is 4
+Coulombic nuclear potential. Nuclear charge =       1.000000000000    
+
+Using reflecting outer boundary
+
+sd_radial_edge reset to     64
+
+Creating uniform grid with step      0.1000000000000     Bohr
+
+        Number of radial grid points = 2000
+                The world starts at r=       0.000000000000    
+    First explicit grid point is at r=      0.1000000000000    
+      Last explicit grid point s at r=       200.0000000000    
+                  The world ends at r=       200.1000000000    
+Effective nuclear charge for L=0 grid=       1.000000000000    
+
+Right/left adaptive tolerance (L) =   0.138778E-16  0.138778E-17
+Right/left adaptive tolerance (R) =   0.138778E-16  0.138778E-17
+
+L>=1 channel d1(1,1)=       0.000000000000     m1(1,1)=      0.6666666666667    
+ L=0 channel d1(1,1)=      -2.877697841727     m1(1,1)=      0.5467625899281    
+L>=1 channel d2(1,1)=      -228.5714285714     m2(1,1)=      0.7619047619048    
+ L=0 channel d2(1,1)=      -198.2300884956     m2(1,1)=      0.8377581120944    
+
+Allocating .358 Gbytes of RAM for the atomic eigenfunctions cache.
+
+
+Iterative update of L=2 solutions complete
+        ground-state energy is      -0.5555555584116116107918E-01        0.000000000000000000000     change =     -0.2160772E-12       0.000000    
+   most affected eigenvalue is        302.5353747169145890439            0.000000000000000000000     change =      0.1114131E-10       0.000000    
+
+Iterative update of L=1 solutions complete
+        ground-state energy is      -0.1249999839785885663579            0.000000000000000000000     change =      0.8735651E-12       0.000000    
+   most affected eigenvalue is        287.6538751382789200761            0.000000000000000000000     change =      0.4888534E-11       0.000000    
+
+Iterative update of L=0 solutions complete
+        ground-state energy is      -0.5000010733989663780363            0.000000000000000000000     change =     -0.1287859E-12       0.000000    
+   most affected eigenvalue is        291.8813708371326356428            0.000000000000000000000     change =     -0.5002221E-11       0.000000    
+
+Saving dipole matrix elements to file hydrogen_TME.dipoles
+
+Wavefunction requires        0.610 Mbytes of memory
+Choosing atomic solution with L=0 M=0 I=1
+Energy of the atomic solution is     -0.5000010733989664            0.000000000000000      Hartree
+        Initial wavefunction norm was      1.000000000000           0.000000000000     
+Right wavefunction Cartesian norm was      1.000000000000     
+                  Left/Right Lmax was    1   1
+               Left/Right nradial was      492     469
+
+ Right to real-space wavefunction conversion factor:    3.16448139580143061877493    
+
+
+Done with initialization
+
+
+              Timing data at 2023/12/23 11:49:09
+
+                                                       Total time (seconds)           Self time (seconds)
+ Timer                                   Calls         --------------------           -------------------
+ -----                                   -----           Real           CPU            Real           CPU
+
+ start                          *           1.           48.9         145.0             0.0           0.0
+ Initialization                             1.           48.9         145.0             0.0           0.0
+ Atomic memory cache                        1.           48.9         144.9             0.0           0.0
+ Atomic solutions                           2.           48.9         145.0             0.0           0.0
+ Atomic solutions: Guess                    1.           15.5          46.6            15.5          46.6
+ Atomic solutions: Orthogonaliz             2.           21.7          65.0            21.7          65.0
+ Atomic solutions: Improve                  1.           13.8          41.3             2.9           8.7
+ Atomic solutions: Verify                   1.            8.7          24.6             8.7          24.6
+
+ (  7 timers contributing less than 1% are not shown)
+
+
+Real-time propagation
+
+
+Chosen rotation_mode = 'none'
+
+
+WARNING: Multiple, uncoupled M values are propagated.
+
+
+Using truncated Gaussian vector-potential along lab Z
+
+             Carrier frequency =      0.3750000000000     [(a.u. time)^-1]
+       Carrier phase at origin =       0.000000000000     [Radian]
+                  Pulse origin =       100.0000000000     [a.u. time]
+      Full width at half power =       60.00000000000     [a.u. time]
+    Beginning of hard turn-off =       70.00000000000     [a.u. time]
+          End of hard turn-off =       95.00000000000     [a.u. time]
+
+Gaussian vector-potential envelope exponent =   0.38721004597E-03
+    The long-pulse approximate GVP exponent =   0.38508176698E-03
+
+
+Skipping vector-potential unwrapping
+
+
+Detailed output is not enabled; will not calculate dipole velocity or acceleration
+
+Resizing radial wavefunction to      622 grid points
+@         0 t=       0.0000 a=       0.000000 th=      0.000 ph=      0.000 <l|r>=       1.00000000000           0.00000     <l|h|r>=     -0.500001073399           0.00000     |d|=       0.00000000    
+Resizing radial wavefunction to     2000 grid points
+
+Largest number of microsteps per time step was 1
+    Number of time steps requiring subdivision 0
+                    Total number of microsteps 0
+    Average number of microsteps per time step NaN
+
+
+ Largest left/right Lmax    1   1
+
+   Final left/right Lmax    1   1
+
+Final left/right nradial      492     469
+
+
+
+Analyzing wavefunction composition
+
+
+    Final norm, by total angular momentum
+
+    L      M                         Re(norm)                           Im(norm)     
+   ---    ---                  ------------------                  ------------------
+     0      0       1.0000000000000000000000            0.0000000000000000000000     
+     1     -1       0.0000000000000000000000            0.0000000000000000000000     
+     1      0       0.0000000000000000000000            0.0000000000000000000000     
+     1      1       0.0000000000000000000000            0.0000000000000000000000     
+     2     -2       0.0000000000000000000000            0.0000000000000000000000     
+     2     -1       0.0000000000000000000000            0.0000000000000000000000     
+     2      0       0.0000000000000000000000            0.0000000000000000000000     
+     2      1       0.0000000000000000000000            0.0000000000000000000000     
+     2      2       0.0000000000000000000000            0.0000000000000000000000     
+
+
+    Analyzing the final wavefunction in terms of field-free eigenstates
+
+
+    Global memory requirements for the analysis step:                1.007 Mbytes
+Per-thread memory requirements for the analysis step:              122.070 Mbytes
+
+This estimate assumes that the atomic solutions are precomputed.
+Computing atomic solutions on the fly will approximately triple per-thread memory requirements
+
+
+    Final populations, by total angular momentum
+
+    L          Total population                                   Bound population                               Continuum population                          
+   ---        ------------------                                 ------------------                             ----------------------                         
+     0       1.000000000000           0.000000000000            1.000000000000           0.000000000000            0.000000000000           0.000000000000     
+     1       0.000000000000           0.000000000000            0.000000000000           0.000000000000            0.000000000000           0.000000000000     
+     2       0.000000000000           0.000000000000            0.000000000000           0.000000000000            0.000000000000           0.000000000000     
+
+
+Total population across all channels:       1.000000000000           0.000000000000    
+                        Bound states:       1.000000000000           0.000000000000    
+                    Continuum states:       0.000000000000           0.000000000000    
+
+
+    Final populations, by total angular momentum and angular momentum projection
+
+    L      M          Total population                                   Bound population                               Continuum population                          
+   ---    ---        ------------------                                 ------------------                             ----------------------                         
+     0      0       1.000000000000           0.000000000000            1.000000000000           0.000000000000            0.000000000000           0.000000000000     
+     1     -1       0.000000000000           0.000000000000            0.000000000000           0.000000000000            0.000000000000           0.000000000000     
+     1      0       0.000000000000           0.000000000000            0.000000000000           0.000000000000            0.000000000000           0.000000000000     
+     1      1       0.000000000000           0.000000000000            0.000000000000           0.000000000000            0.000000000000           0.000000000000     
+     2     -2       0.000000000000           0.000000000000            0.000000000000           0.000000000000            0.000000000000           0.000000000000     
+     2     -1       0.000000000000           0.000000000000            0.000000000000           0.000000000000            0.000000000000           0.000000000000     
+     2      0       0.000000000000           0.000000000000            0.000000000000           0.000000000000            0.000000000000           0.000000000000     
+     2      1       0.000000000000           0.000000000000            0.000000000000           0.000000000000            0.000000000000           0.000000000000     
+     2      2       0.000000000000           0.000000000000            0.000000000000           0.000000000000            0.000000000000           0.000000000000     
+
+
+    Large amplitudes of individual field-free states
+
+    L      M       I               Re[E(i)], H                 Im[E(i)]                  Re[Wgt]                  Im[Wgt]                  Re[<I|W>]                Im[<I|W>]                 Re[<W|I>]                Im[<W|I>] 
+   ---    ---     ---             -------------               ----------               -----------              -----------               -----------              -----------               -----------                ---------
+     0      0       1     -0.5000010733990           0.000000000000            1.000000000000           0.000000000000            1.000000000000           0.000000000000          1.000000000000           0.000000000000     
+
+
+              Timing data at 2023/12/23 11:49:09
+
+                                                       Total time (seconds)           Self time (seconds)
+ Timer                                   Calls         --------------------           -------------------
+ -----                                   -----           Real           CPU            Real           CPU
+
+ start                                      1.           49.0         145.2             0.0           0.0
+ Initialization                             1.           48.9         145.0             0.0           0.0
+ Atomic memory cache                        1.           48.9         144.9             0.0           0.0
+ Atomic solutions                           3.           48.9         145.0             0.1           0.1
+ Atomic solutions: Guess                    1.           15.5          46.6            15.5          46.6
+ Atomic solutions: Orthogonaliz             2.           21.7          65.0            21.7          65.0
+ Atomic solutions: Improve                  1.           13.8          41.3             2.9           8.7
+ Atomic solutions: Verify                   1.            8.7          24.6             8.7          24.6
+
+ ( 14 timers contributing less than 1% are not shown)
+

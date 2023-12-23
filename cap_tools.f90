@@ -31,7 +31,7 @@ module cap_tools
   public cap_evaluate_potential
   public rcsid_cap_tools
   !
-  character(len=clen) :: rcsid_cap_tools = "$Id: cap_tools.f90,v 1.6 2021/04/26 15:44:44 ps Exp ps $"
+  character(len=clen) :: rcsid_cap_tools = "$Id: cap_tools.f90,v 1.6 2021/04/26 15:44:44 ps Exp $"
   !
   !  We recognize
   !

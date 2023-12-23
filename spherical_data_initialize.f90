@@ -40,7 +40,7 @@ module spherical_data_initialize
   public rcsid_spherical_data_initialize
   !
   character(len=clen), save :: rcsid_spherical_data_initialize = &
-     "$Id: spherical_data_initialize.f90,v 1.5 2021/04/26 15:44:44 ps Exp ps $"
+     "$Id: spherical_data_initialize.f90,v 1.5 2021/04/26 15:44:44 ps Exp $"
   !
   interface sd_expand_implicit_operator
     module procedure sd_expand_implicit_operator_r

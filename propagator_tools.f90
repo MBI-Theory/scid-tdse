@@ -62,7 +62,7 @@ module propagator_tools
   public pt_reset_caches
   public rcsid_propagator_tools
   !
-  character(len=clen), save :: rcsid_propagator_tools = "$Id: propagator_tools.f90,v 1.45 2022/10/08 17:24:26 ps Exp ps $"
+  character(len=clen), save :: rcsid_propagator_tools = "$Id: propagator_tools.f90,v 1.45 2022/10/08 17:24:26 ps Exp $"
   !
   character(len=20), save :: pt_mix_solver  = 'default' ! Solver to use for L=0 Hmix inverse. Can be:
                                                         ! 'default' - will use the fastest solver

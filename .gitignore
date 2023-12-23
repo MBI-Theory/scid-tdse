@@ -17,6 +17,7 @@ examples/*.detail
 examples/*.detail_sum
 examples/*.table_sum
 examples/*.field
+examples/*.dipoles
 examples/*.dx
 examples/*.ckpt
 examples/last.gpl
@@ -24,4 +25,4 @@ examples/*.trace
 #
 examples/wfn/*[0-9]
 examples/wfn/*.data
-
+examples/cache/*

@@ -331,6 +331,35 @@ if [ ! -z "${detail_out}" ] ; then
   fi
 fi
 #
+#  Check transition dipole calculation (separate file)
+#
+function reduce_dipole () {
+  awk '/^#/{next}
+       function pd(v) { printf "'${fmt_dipole}' ", v }
+       {for(i=1;i<=6;i++) printf "%d ", $(i) ;
+        for(i=7;i<=16;i+=2){ pd($(i)) ; } ; printf "\n"}' "$1"
+  }
+dipole_out="$(awk '/^Saving dipole matrix elements to file /{print $7}' "${out}")"
+if [ ! -z "${dipole_out}" ] ; then
+  dipole_ref="${dipole_out}${extraext}"
+  if [ ! -r "${dipole_ref}" ] ; then
+    echo "WARNING: Reference output ${dipole_ref} is not present. Skipping test"
+  else
+    total=$((total + 1))
+    reduce_dipole "${dipole_out}" | fix_zero > "${tmpref}"
+    reduce_dipole "${dipole_ref}" | fix_zero > "${tmpout}"
+    if { ! $quiet ; } ; then
+      echo "Test $total: transition dipole output first five lines (out vs ref):"
+      diff --side-by-side "${tmpout}" "${tmpref}" | head -5
+    fi
+    if { ! diff -q "${tmpref}" "${tmpout}" > /dev/null ; } ; then
+      echo "Transition dipole output (${dipole_out}) differs. First 25 lines of the output are:"
+      diff -c "${tmpref}" "${tmpout}" | head -25
+      failed=$((failed + 1))
+    fi
+  fi
+fi
+#
 #  Execution times
 #
 walltime_ref="$(awk '/^ start  *[1-9]/{print $3}' "${ref}")"

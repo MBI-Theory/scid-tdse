@@ -22,7 +22,7 @@ module lapack
   use accuracy
   implicit none
 
-  character(len=clen), save :: rcsid_lapack = "$Id: lapack.f90,v 1.11 2022/10/06 17:14:31 ps Exp ps $"
+  character(len=clen), save :: rcsid_lapack = "$Id: lapack.f90,v 1.11 2022/10/06 17:14:31 ps Exp $"
 
   interface lapack_geev
      module procedure lapack_cgeev2

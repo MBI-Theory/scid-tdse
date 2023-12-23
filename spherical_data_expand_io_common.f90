@@ -22,7 +22,7 @@
 !   logical, intent(in)   :: mopp (  :) ! Pivot list for the factored modifier
 !   real(rk), intent(out) :: block(:,:) ! Explicit operator matrix
     !
-!   character(len=clen), save :: rcsid_spherical_data_expand_io_common = "$Id: spherical_data_expand_io_common.f90,v 1.7 2021/04/26 15:44:44 ps Exp ps $"
+!   character(len=clen), save :: rcsid_spherical_data_expand_io_common = "$Id: spherical_data_expand_io_common.f90,v 1.7 2021/04/26 15:44:44 ps Exp $"
     integer(ik) :: sz, icol
 !   real(rk)    :: rhs(size(block,dim=1))
 !   real(rk)    :: tmp(size(block,dim=1))

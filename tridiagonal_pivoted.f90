@@ -29,7 +29,7 @@ module tridiagonal_pivoted
   public m3dp_decompose_x, m3dp_solve_x
   public rcsid_tridiagonal_pivoted
   !
-  character(len=clen), save :: rcsid_tridiagonal_pivoted = "$Id: tridiagonal_pivoted.f90,v 1.6 2021/04/26 15:44:44 ps Exp ps $"
+  character(len=clen), save :: rcsid_tridiagonal_pivoted = "$Id: tridiagonal_pivoted.f90,v 1.6 2021/04/26 15:44:44 ps Exp $"
   !
   interface m3dp_decompose
     module procedure m3dp_decompose_r

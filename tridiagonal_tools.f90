@@ -40,7 +40,7 @@ module tridiagonal_tools
   public m3d_left_scale, m3d_right_scale, m3d_transpose
   public rcsid_tridiagonal_tools
   !
-  character(len=clen), save :: rcsid_tridiagonal_tools = "$Id: tridiagonal_tools.f90,v 1.22 2021/04/26 15:44:44 ps Exp ps $"
+  character(len=clen), save :: rcsid_tridiagonal_tools = "$Id: tridiagonal_tools.f90,v 1.22 2021/04/26 15:44:44 ps Exp $"
   !
 ! character(len=10), save :: m3d_solver     = 'cyclic'     ! Choice of the linear solver. Can be one of:
   character(len=10), save :: m3d_solver     = 'unpivoted'  ! Choice of the linear solver. Can be one of:

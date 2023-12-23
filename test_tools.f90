@@ -34,7 +34,7 @@ module test_tools
   public derivatives_test, fieldfree_test, imaginary_propagation_test
   public rcsid_test_tools
   !
-  character(len=clen), save :: rcsid_test_tools = "$Id: test_tools.f90,v 1.30 2022/10/06 17:14:31 ps Exp ps $"
+  character(len=clen), save :: rcsid_test_tools = "$Id: test_tools.f90,v 1.30 2022/10/06 17:14:31 ps Exp $"
   !
   contains
   !

@@ -1,4 +1,4 @@
-Last updated: 2023 August 11
+Last updated: 2023 December 23
 ------------
 
   All input to scid-tdse is provided through the sph_tdse namelist, with one
@@ -1206,3 +1206,6 @@ Input keywords
     i) dramatically increase the memory requirements
     ii) remove the CAP.
     Therefore time propagation with these options is not recommended.
+
+ WT_TME_FILE="tme.dat" (wavefunction_tools.f90)
+    Name of the output file for wt_tme=.true.

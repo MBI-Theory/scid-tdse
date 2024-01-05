@@ -34,7 +34,7 @@
 !   !
 !   real(rk)      :: fact, temp         ! Must match the type of mf()
     !
-!   character(len=clen), save :: rcsid_tridiagonal_pivoted_m3dp_decompose_common = "$Id: tridiagonal_pivoted_m3dp_decompose_common.f90,v 1.7 2021/04/26 15:44:44 ps Exp ps $"
+!   character(len=clen), save :: rcsid_tridiagonal_pivoted_m3dp_decompose_common = "$Id: tridiagonal_pivoted_m3dp_decompose_common.f90,v 1.7 2021/04/26 15:44:44 ps Exp $"
     !
     integer(ik)   :: n                  ! Dimensionality of the linear system
     integer(ik)   :: i

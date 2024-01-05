@@ -37,7 +37,7 @@ module composition_analysis
   public ca_maxram
   public rcsid_composition_analysis
   !
-  character(len=clen) :: rcsid_composition_analysis = "$Id: composition_analysis.f90,v 1.19 2023/06/17 13:45:36 ps Exp ps $"
+  character(len=clen) :: rcsid_composition_analysis = "$Id: composition_analysis.f90,v 1.19 2023/06/17 13:45:36 ps Exp $"
   !
   real(rk), save :: ca_maxram           = 0._rk       ! Maximum amount of memory which can be used during the analysis step
                                                       ! This limit does NOT include the memory needed to compute atomic 

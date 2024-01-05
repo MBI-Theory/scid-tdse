@@ -34,7 +34,7 @@ module bicg_tools
   public bicg_failure_count
   public rcsid_bicg_tools
   !
-  character(len=clen) :: rcsid_bicg_tools = "$Id: bicg_tools.f90,v 1.11 2021/04/26 15:44:44 ps Exp ps $"
+  character(len=clen) :: rcsid_bicg_tools = "$Id: bicg_tools.f90,v 1.11 2021/04/26 15:44:44 ps Exp $"
   !
   logical, save      :: bicg_failtrace     = .true. ! Produce a verbose report when solution fails; 
                                                     ! May increase the runtime if vectors are traced

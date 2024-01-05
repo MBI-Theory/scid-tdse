@@ -27,7 +27,7 @@ module sort_tools
   public sort, order_keys
   public rcsid_sort_tools
 
-  character(len=clen), save :: rcsid_sort_tools = "$Id: sort_tools.f90,v 1.3 2021/04/26 15:44:44 ps Exp ps $"
+  character(len=clen), save :: rcsid_sort_tools = "$Id: sort_tools.f90,v 1.3 2021/04/26 15:44:44 ps Exp $"
 
   interface sort
      module procedure sort_integer

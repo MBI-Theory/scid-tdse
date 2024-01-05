@@ -23,7 +23,7 @@ module constants
   implicit none
   public
   !
-  character(len=clen), save :: rcsid_constants = "$Id: constants.f90,v 1.7 2021/04/26 15:44:44 ps Exp ps $"
+  character(len=clen), save :: rcsid_constants = "$Id: constants.f90,v 1.7 2021/04/26 15:44:44 ps Exp $"
   !
   !  Mathematical constants
   !

@@ -28,7 +28,7 @@
 !   real(rk), intent(in)     :: r(:,:)     ! Right-hand-side vectors
 !   real(rk), intent(out)    :: x(:,:)     ! Solution vectors
     !
-!   character(len=clen), save :: rcsid_tridiagonal_pivoted_m3dp_solve_g_common = "$Id: tridiagonal_pivoted_m3dp_solve_g_common.f90,v 1.7 2021/04/26 15:44:44 ps Exp ps $"
+!   character(len=clen), save :: rcsid_tridiagonal_pivoted_m3dp_solve_g_common = "$Id: tridiagonal_pivoted_m3dp_solve_g_common.f90,v 1.7 2021/04/26 15:44:44 ps Exp $"
     integer(ik) :: n, i, nrhs, ir
     !
     n    = size(mf,dim=1)

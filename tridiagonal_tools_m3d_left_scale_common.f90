@@ -20,7 +20,7 @@
 !   real(rk), intent(in)     :: m (:,:) ! Tridiagonal matrix
 !   complex(rk), intent(out) :: sm(:,:) ! Tridiagonal s . m
     !
-!   character(len=clen), save :: rcsid_tridiagonal_tools_m3d_left_scale_common = "$Id: tridiagonal_tools_m3d_left_scale_common.f90,v 1.5 2021/04/26 15:44:44 ps Exp ps $"
+!   character(len=clen), save :: rcsid_tridiagonal_tools_m3d_left_scale_common = "$Id: tridiagonal_tools_m3d_left_scale_common.f90,v 1.5 2021/04/26 15:44:44 ps Exp $"
     integer(ik) :: sz
     !
     sz = size(m,dim=1)

@@ -1,8 +1,8 @@
-Last updated: 2023 August 11
+Last updated: 2023 December 23
 ------------
 
   All input to scid-tdse is provided through the sph_tdse namelist, with one
-  exception. In order to sipport some MPI implementations, scid-tdse will
+  exception. In order to support some MPI implementations, scid-tdse will
   accept input redirection through a command-line argument, in the form:
 
     --scid-stdin input.inp
@@ -1197,3 +1197,15 @@ Input keywords
     Maximum number of passes used to find atomic eigenvectors using inverse
     iteration. Each pass involves five updates of the eigenvalue, each with
     three eigenvector updates.
+
+  WT_TME=.false. (wavefunction_tools.f90)
+    If true, calculates the transition matrix elements between bound states
+    of the Hamiltonian and save them in a file called "tme.dat".
+    It should be called with cap="none" and WT_ENABLE_MEMORY_CACHES(1) = .true.
+    This will
+    i) dramatically increase the memory requirements
+    ii) remove the CAP.
+    Therefore time propagation with these options is not recommended.
+
+ WT_TME_FILE="tme.dat" (wavefunction_tools.f90)
+    Name of the output file for wt_tme=.true.

@@ -82,6 +82,7 @@ for inp in hydrogen_1S_2P0_uniform.inp hydrogen_1S_2P0_uniform_restart.inp hydro
            hydrogen_2P0_ion.inp hydrogen_2P0_ion_restart.inp helium_GJG75.inp \
            helium_triplet_spline_linear.inp helium_triplet_vptable_linear.inp \
            argon_hhg_full.inp argon_hhg_fakeleft.inp argon_hhg_fakeleft2.inp \
+           hydrogen_TME.inp \
            ; do
   run_test $inp
 done

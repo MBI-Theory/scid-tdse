@@ -1,0 +1,40 @@
+ &sph_tdse
+   comment                 = "Transition Matrix Element example input file for Hydrogen, l=0..2, shows also all energies"
+   verbose                 = 1,
+   omp_num_threads         = 4,
+   initial_wfn             = 'atomic',
+   initial_wfn_index       = 0, 0, 1,
+   initial_wfn_energy      = (-0.500,0.0)
+   sd_nradial              = 2000,
+   sd_lmax                 =   2,
+   sd_mmin                 =   -2,
+   sd_mmax                 =   2,
+   field_unwrap            = .true.
+   rotation_mode           = 'auto',
+   sd_rgrid                = 'uniform',
+   sd_rgrid_zeta           = 1.0,
+   sd_rgrid_dr             = 0.1,
+   pot_name                = 'hydrogenic',
+   pot_param               = 1.0,
+   task                    = 'real time',
+   dt                      = 0.0100
+   timesteps               = 0 !000,
+   vp_shape                = 'z Gaussian',
+   vp_scale                = 4.5075e-3,
+   vp_param(1:4)           = 0.375, 0.000000, 100.000,  60.0
+   vp_param(11:12)         = 70.0, 95.0
+   pt_mix_solver           = 'default',
+   bicg_epsilon            = 0
+   skip_tests              = .T.
+   output_each             = 20,
+   composition_threshold   = 1e-5,
+   initial_wf_dump_prefix  = ' ',
+   final_wf_dump_prefix    = ' ',
+   field_preview           = ' ',
+   detail_output           = ' ',
+   wt_atomic_cache_prefix  = 'cache/hydrogen_TME',
+   wt_enable_memory_caches = .true.,.false.
+   wt_tme                  = .true.
+   wt_tme_file             = "hydrogen_TME.dipoles"
+   cap_name                = "none"
+ /

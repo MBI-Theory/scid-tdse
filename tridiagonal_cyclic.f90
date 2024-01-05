@@ -36,7 +36,7 @@ module tridiagonal_cyclic
   public m3c_decompose, m3c_solve
   public rcsid_tridiagonal_cyclic
   !
-  character(len=clen), save :: rcsid_tridiagonal_cyclic = "$Id: tridiagonal_cyclic.f90,v 1.2 2021/04/26 15:44:44 ps Exp ps $"
+  character(len=clen), save :: rcsid_tridiagonal_cyclic = "$Id: tridiagonal_cyclic.f90,v 1.2 2021/04/26 15:44:44 ps Exp $"
   !
   integer(ik), parameter :: max_cr_steps = 64 ! Enough to exhaust address space on a 64-bit system several times over
   !

@@ -21,7 +21,7 @@
 !   logical, intent(out), optional :: fail    ! Set to .true. if decomposition fails; 
 !                                             ! if fail is absent, abort on decomposition failure.
 !   !
-!   character(len=clen), save :: rcsid_tridiagonal_tools_m3u_decompose_common = "$Id: tridiagonal_tools_m3u_decompose_common.f90,v 1.5 2021/04/26 15:44:44 ps Exp ps $"
+!   character(len=clen), save :: rcsid_tridiagonal_tools_m3u_decompose_common = "$Id: tridiagonal_tools_m3u_decompose_common.f90,v 1.5 2021/04/26 15:44:44 ps Exp $"
 !   real(rk)    :: denom
     integer(ik) :: i, sz
     logical     :: l_fail

@@ -50,7 +50,7 @@ module cubic_spline
                                        ! expected to be in the ascending order
   end type cs_data
   !
-  character(len=clen), save :: rcsid_cubic_spline    = "$Id: cubic_spline.f90,v 1.2 2021/04/26 15:44:44 ps Exp ps $"
+  character(len=clen), save :: rcsid_cubic_spline    = "$Id: cubic_spline.f90,v 1.2 2021/04/26 15:44:44 ps Exp $"
   logical, save             :: cs_use_default_solver = .false. ! Use the default solver, not the pivoted.
   !
   contains

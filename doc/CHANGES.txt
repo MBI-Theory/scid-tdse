@@ -1,8 +1,12 @@
-Last updated: 2023 August 11
+Last updated: 2023 December 23
 ------------
 
 Change log
 ----------
+
+2023 Dec 23
+
+ - Added calculation of dipole matrix elements (wt_tme=.true.)
 
 2023 Aug 11
 

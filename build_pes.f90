@@ -30,7 +30,7 @@ module build_pes
   public start
   public rcsid_build_pes
   !
-  character(len=clen), save :: rcsid_build_pes = "$Id: build_pes.f90,v 1.5 2021/04/26 15:44:44 ps Exp ps $"
+  character(len=clen), save :: rcsid_build_pes = "$Id: build_pes.f90,v 1.5 2021/04/26 15:44:44 ps Exp $"
   !
   integer, parameter       :: iu_temp               = 25           ! Some arbitrary I/O unit
   !

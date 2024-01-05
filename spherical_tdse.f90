@@ -61,7 +61,7 @@ module spherical_tdse
   public start
   public rcsid_spherical_tdse
   !
-  character(len=clen), save :: rcsid_spherical_tdse = "$Id: spherical_tdse.f90,v 1.136 2023/08/11 16:02:04 ps Exp ps $"
+  character(len=clen), save :: rcsid_spherical_tdse = "$Id: spherical_tdse.f90,v 1.137 2023/12/23 11:09:20 ps Exp $"
   !
   integer, parameter       :: iu_detail             = 29           ! Unit for detailed output; remains open during the entire run
   integer, parameter       :: iu_temp               = 22           ! An arbitrary unit number, which can be used here
@@ -224,7 +224,7 @@ module spherical_tdse
                       ! Parameters from wavefunction_tools
                       wt_atomic_cache_prefix, wt_iterative_improvement, &
                       wt_disable_orthogonalization, wt_max_solution_iterations, &
-                      wt_enable_memory_caches, &
+                      wt_enable_memory_caches, wt_tme, wt_tme_file, &
                       ! Parameters from cap_tools
                       cap_name, cap_param, &
                       ! Parameters from spherical_tsurf
@@ -1538,6 +1538,11 @@ module spherical_tdse
     ! which may refer to them.
     !
     call wt_init_memory_caches(verbose)
+    !
+    ! Calculate transition matrix elements between bound states if asked for
+    ! Only makes sense if memory caches for atomic solutions is enabled and cap disabled
+    !
+    call wt_transition_matrix_elements(cap_name)
     !
     !  We need a wavefunction to start from
     !

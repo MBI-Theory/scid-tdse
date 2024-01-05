@@ -61,7 +61,7 @@ module checkpoint_tools
   integer(ik), save         :: ckpt_max_checkpoints = 3_ik      ! Maximum number of checkpoints to keep.
   integer(ik), save         :: ckpt_interval        = 10000_ik  ! Number of timesteps between checkpoints.
   !
-  character(len=clen), save :: rcsid_checkpoint_tools = "$Id: checkpoint_tools.f90,v 1.17 2022/10/08 17:24:26 ps Exp ps $"
+  character(len=clen), save :: rcsid_checkpoint_tools = "$Id: checkpoint_tools.f90,v 1.17 2022/10/08 17:24:26 ps Exp $"
   !
   type ckpt_data
     private                                                         ! This data is not for exterrrnal consumption

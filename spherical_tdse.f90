@@ -1,6 +1,6 @@
 !
 !   SCID-TDSE: Simple 1-electron atomic TDSE solver
-!   Copyright (C) 2015-2021 Serguei Patchkovskii, Serguei.Patchkovskii@mbi-berlin.de
+!   Copyright (C) 2015-2024 Serguei Patchkovskii, Serguei.Patchkovskii@mbi-berlin.de
 !
 !   This program is free software: you can redistribute it and/or modify
 !   it under the terms of the GNU General Public License as published by
@@ -63,7 +63,6 @@ module spherical_tdse
   !
   character(len=clen), save :: rcsid_spherical_tdse = "$Id: spherical_tdse.f90,v 1.137 2023/12/23 11:09:20 ps Exp $"
   !
-  integer, parameter       :: iu_detail             = 29           ! Unit for detailed output; remains open during the entire run
   integer, parameter       :: iu_temp               = 22           ! An arbitrary unit number, which can be used here
   !                                                 
   integer(ik)              :: verbose               = 2_ik         ! How verbose do we need to be?
@@ -72,6 +71,9 @@ module spherical_tdse
                                                                    ! mess with the environment variables, and stop
                                                                    ! OMP_NUM_THREADS from working.
   character(len=clen)      :: comment               = ' '          ! Descriptive string, to be copied to the output
+  integer(ik)              :: ensemble_size         = 1_ik         ! Number of wavefunctions propagated in lockstep.
+  integer(ik)              :: ensemble_index        = 1_ik         ! Index of the current wavefunction in the ensemble
+                                                                   ! Only relevant during the input, and not used otherwise
   character(len=clen)      :: initial_wfn           = 'atomic'     ! Choice of the initial wavefunction. One of:
                                                                    ! 'random' = Use random initial guess
                                                                    ! 'unit'   = Use unit vector as the initial guess
@@ -163,8 +165,6 @@ module spherical_tdse
   logical                  :: vp_as_is              = .false.      ! If true, do not reset the vector-potential to zero at the beginning
                                                                    ! and the end of the simulation. Please do not use unless you know
                                                                    ! EXACTLY what you are doing.
-  type(sd_wfn)             :: wfn_r                                ! Our wavefunction (right)
-  type(sd_wfn)             :: wfn_l                                ! Ditto (left)
   real(xk), allocatable    :: vpot_table(:,:)                      ! Vector-potential parameters table for the entire simulation
                                                                    ! First index: (0) = time, (1) = signed magnitude, (2) = theta, (3) = phi
                                                                    ! Second index: timestep, from -1 to 2*timesteps+1; even numbers are whole
@@ -178,11 +178,21 @@ module spherical_tdse
                                                                    ! the same as in vpot_table.
                                                                    ! efield_table is derived from the contents of vpot_table in
                                                                    ! fill_efield_table() below.
-  type(sts_data)           :: tsurf                                ! Running data for photoelectron spectrum calculation with t-SURF
-  type(ckpt_data)          :: ckpt                                 ! Global checkpointer state. 
   integer(ik)              :: max_subdivision       = 1_ik         ! Largest timestep subdivision factor seen
   integer(ik)              :: timesteps_subdivided  = 0_ik         ! Number of time steps where subdivision was necessary
   integer(ik)              :: timesteps_micro       = 0_ik         ! Number of time steps after the subdivision
+                                                                   ! The fields below are per-wavefunction in an ensemble.
+                                                                   ! The index runs from 1 to ensemble_size.
+  type(sd_wfn), allocatable    :: wfns_r(:), wfns_l(:)             ! Our wavefunctions (right and left).
+  type(sts_data), allocatable  :: tsurfs(:)                        ! Running data for photoelectron spectrum calculation with t-SURF
+  type(ckpt_data), allocatable :: ckpts(:)                         ! Global checkpointer state, one per wavefunction
+  !
+  !  Parameters which are per-ensemble
+  !
+  character(len=clen), allocatable :: &
+      ens_detail_output(:), ens_final_wf_dump_prefix(:), ens_initial_wf_dump_prefix(:), &
+      ens_visualize_prefix(:), ens_ckpt_save_basename(:)
+  integer(ik), allocatable         :: iu_detail(:)                 ! Units for detailed output; remains open during the entire run
   !
   !  Simulation parameters; we are collecting variables from many modules.
   !
@@ -190,6 +200,7 @@ module spherical_tdse
                       ! Parameters defined locally
                       verbose, comment, &
                       omp_num_threads, &
+                      ensemble_size, ensemble_index, &
                       initial_wfn, initial_wfn_index, initial_wfn_energy, initial_wfn_file, &
                       task, dt, dt_subdivision, dt_max_la, dt_interpolant_width, timesteps, rotation_mode, &
                       field_unwrap, unwrap_threshold, field_preview, skip_tests, &
@@ -248,6 +259,12 @@ module spherical_tdse
                       nt_node_output, nt_rebalance_interval, nt_use_multinode, nt_verbose, &
                       nt_max_requests
   !
+  namelist /sph_multi/ &
+                      ensemble_index, &
+                      initial_wfn, initial_wfn_index, initial_wfn_energy, initial_wfn_file, &
+                      detail_output, final_wf_dump_prefix, initial_wf_dump_prefix, &
+                      visualize_prefix, ckpt_save_basename
+  !
   contains
   !
   subroutine random_initial_wfn(tag,wfn)
@@ -270,7 +287,9 @@ module spherical_tdse
     write (out,"('Initial ',a,' wavefunction set to random values')") trim(tag)
   end subroutine random_initial_wfn
   !
-  subroutine atomic_initial_wfn
+  subroutine atomic_initial_wfn(wfn_l,wfn_r)
+    type(sd_wfn), intent(inout) :: wfn_l, wfn_r
+    !
     integer(ik)              :: ipt, lval, mval, ind, nvec, alloc
     complex(rk), allocatable :: evec(:,:,:)   ! Eigenvectors
     complex(rk), allocatable :: eval(:)       ! Eigenvalues
@@ -322,7 +341,9 @@ module spherical_tdse
     deallocate (evec,eval)
   end subroutine atomic_initial_wfn
   !
-  subroutine prepare_initial_wavefunction
+  subroutine prepare_one_initial_wavefunction(wfn_l,wfn_r)
+    type(sd_wfn), intent(inout) :: wfn_l, wfn_r
+    !
     real(rk)    :: ram
     complex(rk) :: norm(2)
     integer(ik) :: alloc
@@ -335,7 +356,7 @@ module spherical_tdse
               wfn_r%wfn(sd_nradial,sd_nspin,0:sd_lmax,sd_mmin:sd_mmax),stat=alloc)
     if (alloc/=0) then
       write (out,"('Allocation of wavefunction array failed, code = ',i0)") alloc
-      stop 'spherical_tdse%prepare_initial_wavefunction - out of memory'
+      stop 'spherical_tdse%prepare_one_initial_wavefunction - out of memory'
     end if
     !
     !  Wavefunction initialization happens on the master node. The wavefunction is broadcast
@@ -345,7 +366,7 @@ module spherical_tdse
       select case (initial_wfn)
         case default
           write (out,"('Initial wavefunction choice ',a,' is not recognized')") trim(initial_wfn)
-          stop 'spherical_tdse%prepare_initial_wavefunction - bad initial_wfn'
+          stop 'spherical_tdse%prepare_one_initial_wavefunction - bad initial_wfn'
         case ('random')
           call random_initial_wfn('left',wfn_l)
           call random_initial_wfn('right',wfn_r)
@@ -353,9 +374,9 @@ module spherical_tdse
           wfn_l%wfn = 1
           wfn_r%wfn = 1
         case ('atomic','single')
-          call atomic_initial_wfn
+          call atomic_initial_wfn(wfn_l,wfn_r)
         case ('read')
-          call fetch_wavefunctions(initial_wfn_file)
+          call fetch_wavefunctions(initial_wfn_file,wfn_l,wfn_r)
       end select
     end if
     call nt_broadcast(wfn_l)
@@ -393,7 +414,68 @@ module spherical_tdse
     write (out,"('                  Left/Right Lmax was ',2i4)") wfn_l%lmax, wfn_r%lmax
     write (out,"('               Left/Right nradial was ',2i8)") wfn_l%nradial, wfn_r%nradial
     call TimerStop('Initial wavefunction')
-  end subroutine prepare_initial_wavefunction
+  end subroutine prepare_one_initial_wavefunction
+  !
+  subroutine prepare_initial_wavefunctions
+    integer(ik) :: alloc, ie
+    logical     :: scoreboard(ensemble_size)
+    !
+    allocate (wfns_l(ensemble_size),wfns_r(ensemble_size),ckpts(ensemble_size), &
+              tsurfs(ensemble_size),iu_detail(ensemble_size), &
+              ens_detail_output(ensemble_size), ens_final_wf_dump_prefix(ensemble_size), &
+              ens_initial_wf_dump_prefix(ensemble_size), ens_visualize_prefix(ensemble_size), &
+              ens_ckpt_save_basename(ensemble_size), &
+              stat=alloc)
+    if (alloc/=0) then
+      write (out,"('prepare_initial_wavefunctions: Error ',i0,' allocating memory')") alloc
+      stop 'spherical_tdse%prepare_initial_wavefunctions - No memory for descriptors'
+    end if
+    !
+    iu_detail(:) = -1_ik
+    scoreboard(:) = .false.
+    call mark_and_call_init
+    prepare_ensemble: do ie=2,ensemble_size
+      read (input,nml=sph_multi)
+      write (out,"(' ==== Ensemble input ',i0,' ====')") ie-1
+      write (out,nml=sph_multi)
+      write (out,"(' ==== End of ensemble input ',i0,' ====')") ie-1
+      call mark_and_call_init
+    end do prepare_ensemble
+    if (.not.all(scoreboard)) then
+      write (out,"('prepare_initial_wavefunctions: Some wavefunctions are not initialized')")
+      write (out,"('scoreboard: ',(t14(50(l1,1x))))") scoreboard
+      stop 'spherical_tdse%prepare_initial_wavefunctions - Missing ensemble index'
+    end if
+    !
+    contains 
+    subroutine mark_and_call_init
+      if (ensemble_index<1 .or. ensemble_index>ensemble_size) then
+        write (out,"('prepare_initial_wavefunctions: ensemble_index=',i0,' is not between 1 and ',i0)") &
+               ensemble_index, ensemble_size
+        stop 'spherical_tdse%prepare_initial_wavefunctions - Bad ensemble index'
+      end if
+      if (scoreboard(ensemble_index)) then
+        write (out,"('prepare_initial_wavefunctions: ensemble_index=',i0,' appears more than once')") &
+               ensemble_index
+        stop 'spherical_tdse%prepare_initial_wavefunctions - Duplicate ensemble index'
+      end if
+      scoreboard(ensemble_index) = .true.
+      ens_detail_output         (ensemble_index) = detail_output
+      ens_final_wf_dump_prefix  (ensemble_index) = final_wf_dump_prefix
+      ens_initial_wf_dump_prefix(ensemble_index) = initial_wf_dump_prefix
+      ens_visualize_prefix      (ensemble_index) = visualize_prefix
+      ens_ckpt_save_basename    (ensemble_index) = ckpt_save_basename
+      call prepare_one_initial_wavefunction(wfns_l(ensemble_index),wfns_r(ensemble_index))
+    end subroutine mark_and_call_init
+  end subroutine prepare_initial_wavefunctions
+  !
+  subroutine surf_init_all_instances
+    integer(ik) :: ie
+    !
+    surf_instances: do ie=1,ensemble_size
+      call sts_initialize_instance(tsurfs(ie),wfns_l(ie),wfns_r(ie))
+    end do surf_instances
+  end subroutine surf_init_all_instances
   !
   subroutine fill_vpot_table
     integer(ik) :: its, alloc
@@ -674,10 +756,12 @@ module spherical_tdse
     call TimerStop('Dump VP table')
   end subroutine preview_laser_field
   !
-  subroutine visualize_wavefunctions(prefix,timestep,th,ph)
-    character(len=*), intent(in) :: prefix
-    integer(ik), intent(in)      :: timestep
-    real(xk), intent(in)         :: th, ph    ! Rotation angles for the current localm coordinate system
+  subroutine visualize_wavefunctions(wfn_l,wfn_r,tsurf,prefix,timestep,th,ph)
+    type(sd_wfn), intent(inout)   :: wfn_l, wfn_r
+    type(sts_data), intent(inout) :: tsurf
+    character(len=*), intent(in)  :: prefix
+    integer(ik), intent(in)       :: timestep
+    real(xk), intent(in)          :: th, ph    ! Rotation angles for the current localm coordinate system
     !
     integer(ik)          :: lval, mval, sval
     character(len=clen)  :: filename
@@ -774,8 +858,9 @@ module spherical_tdse
     call TimerStop('Visualize wavefunction')
   end subroutine visualize_wavefunctions
   !
-  subroutine dump_wavefunctions(prefix)
+  subroutine dump_one_wavefunction(prefix,wfn_l,wfn_r)
     character(len=*), intent(in) :: prefix
+    type(sd_wfn), intent(inout)  :: wfn_l, wfn_r
     integer(ik)                  :: lval, mval, sval, ir, ios
     character(len=clen)          :: filename
     !
@@ -804,10 +889,30 @@ module spherical_tdse
       end do dump_m_channels
     end do dump_l_channels
     call TimerStop('Dump wavefunction')
-  end subroutine dump_wavefunctions
+  end subroutine dump_one_wavefunction
   !
-  subroutine fetch_wavefunctions(prefix)
+  subroutine dump_all_wavefunctions(tag,names)
+    character(len=*), intent(in) :: tag       ! What kind of dump is this 
+    character(len=*), intent(in) :: names(:)  ! Names of the file prefixes, one per ensemble member
+    !
+    integer(ik) :: ie
+    !
+    dump_ensemble: do ie=1,ensemble_size
+      if (names(ie)==' ') cycle dump_ensemble
+      write (out,"(/'Dumping ',a,' wavefunction to disk, prefix = ',a/)") trim(tag), trim(names(ie))
+      call flush_wrapper(out)
+      call nt_merge_all(wfns_l(ie))
+      call nt_merge_all(wfns_r(ie))
+      call flush_wrapper(out)
+      if (nts%this_node==1) then
+        call dump_one_wavefunction(names(ie),wfns_l(ie),wfns_r(ie))
+      end if
+    end do dump_ensemble
+  end subroutine dump_all_wavefunctions
+  !
+  subroutine fetch_wavefunctions(prefix,wfn_l,wfn_r)
     character(len=*), intent(in) :: prefix
+    type(sd_wfn), intent(inout)  :: wfn_l, wfn_r
     integer(ik)                  :: lval, mval, sval, ir
     character(len=clen)          :: filename
     character(len=1)             :: buf
@@ -851,6 +956,50 @@ module spherical_tdse
     end do fetch_l_channels
     call TimerStop('Fetch wavefunction')
   end subroutine fetch_wavefunctions
+  !
+  subroutine report_adaptive
+    integer(ik) :: ie
+    !
+    if (.not.sd_adaptive) return
+    ensemble_report: do ie=1,ensemble_size
+      if (ensemble_size<=1) then
+        write (out,"()") 
+      else
+        write (out,"(/'For ensemble wavefunctuon ',i0,':'/)") ie
+      end if
+      if (sd_adaptive_l) write (out,"(' Largest left/right Lmax ',2i4/)") wfns_l(ie)%lmax_top, wfns_r(ie)%lmax_top
+      if (sd_adaptive_l) write (out,"('   Final left/right Lmax ',2i4/)") wfns_l(ie)%lmax,     wfns_r(ie)%lmax
+      if (sd_adaptive_r) write (out,"('Final left/right nradial ',2i8/)") wfns_l(ie)%nradial,  wfns_r(ie)%nradial
+      write (out,"()")
+    end do ensemble_report
+  end subroutine report_adaptive
+  !
+  subroutine reconstruct_all_left
+    integer(ik) :: ie
+    if (.not.reconstruct_left) return
+    !
+    write (out,"(/'Reconstructing left wavefunction(s)'/)")
+    reconstruct: do ie=1,ensemble_size
+      call wt_reconstruct_left(verbose,wfns_l(ie),wfns_r(ie))
+    end do reconstruct
+  end subroutine reconstruct_all_left
+  !
+  subroutine analyze_and_surf_all
+    integer(ik) :: ie
+
+    write (out,"(/'Analyzing wavefunction composition'/)")
+    call flush_wrapper(out)
+    analyze: do ie=1,ensemble_size
+      if (ensemble_size>1) then
+        write (out,"(/'Ensemble component ',i0/)") ie
+      end if
+      call ca_analyze(verbose,composition_threshold,composition_max_energy,wfns_l(ie),wfns_r(ie),tsurfs(ie))
+      !
+      call sts_atend_direct(tsurfs(ie),wfns_r(ie))
+      !
+      call sts_report(tsurfs(ie),'At end')
+    end do analyze
+  end subroutine analyze_and_surf_all
   !
   subroutine lab_dipole(wfn_l,wfn_r,rot,afield,efield,norm,dipole,velocity,acceleration)
     type(sd_wfn), intent(in) :: wfn_l           ! Left wavefunction 
@@ -982,65 +1131,73 @@ module spherical_tdse
     v  = MathInterpolate(tim,vpot_table(0,lp:rp),vpot_table(ic,lp:rp))
   end function interpolate_vpot
   !
-  subroutine write_detail_header
-    if (detail_output==' ') return
+  subroutine write_detail_headers
+    integer(ik) :: ie
     !
-    write (out,"(/'Saving detailed output to ',a/)") trim(detail_output)
-    open(iu_detail,file=trim(detail_output),form='formatted',status='replace',position='rewind',recl=1050,pad='no')
-    write (iu_detail,"('# Field Columns Data')")
-    write (iu_detail,"('#  1    2,13    Timestep')")
-    write (iu_detail,"('#  2   15,46    Time, au[t]')")
-    write (iu_detail,"('#  3   48,79    Vector-potential magnitude')")
-    write (iu_detail,"('#  4   81,112   Vector-potential, lab theta')")
-    write (iu_detail,"('#  5  114,145   Vector-potential, lab phi')")
-    write (iu_detail,"('#  6  147,178   Re[<Psi_L|Psi_R>]')")
-    write (iu_detail,"('#  7  180,211   Im[<Psi_L|Psi_R>]')")
-    write (iu_detail,"('#  8  213,244   Re[<Psi_L|H_at+H_L+V_cap|Psi_R>], Hartree')")
-    write (iu_detail,"('#  9  246,277   Im[<Psi_L|H_at+H_L+V_cap|Psi_R>], Hartree')")
-    write (iu_detail,"('# 10  279,310   Re[<Psi_L|H_at+H_L|Psi_R>], Hartree')")
-    write (iu_detail,"('# 11  312,343   Im[<Psi_L|H_at+H_L|Psi_R>], Hartree')")
-    write (iu_detail,"('# 12  345,376   Re[<Psi_L|e . x|Psi_R>], e-Bohr')")
-    write (iu_detail,"('# 13  378,409   Im[<Psi_L|e . x|Psi_R>], e-Bohr')")
-    write (iu_detail,"('# 14  411,442   Re[<Psi_L|e . y|Psi_R>], e-Bohr')")
-    write (iu_detail,"('# 15  444,475   Im[<Psi_L|e . y|Psi_R>], e-Bohr')")
-    write (iu_detail,"('# 16  477,508   Re[<Psi_L|e . z|Psi_R>], e-Bohr')")
-    write (iu_detail,"('# 17  510,541   Im[<Psi_L|e . z|Psi_R>], e-Bohr')")
-    write (iu_detail,"('# 18  543,574   Re[(d^2/d t^2) <Psi_L|e . x|Psi_R>], e-Bohr/jiffy^2')")
-    write (iu_detail,"('# 19  576,607   Im[(d^2/d t^2) <Psi_L|e . x|Psi_R>], e-Bohr/jiffy^2')")
-    write (iu_detail,"('# 20  609,640   Re[(d^2/d t^2) <Psi_L|e . y|Psi_R>], e-Bohr/jiffy^2')")
-    write (iu_detail,"('# 21  642,673   Im[(d^2/d t^2) <Psi_L|e . y|Psi_R>], e-Bohr/jiffy^2')")
-    write (iu_detail,"('# 22  675,706   Re[(d^2/d t^2) <Psi_L|e . z|Psi_R>], e-Bohr/jiffy^2')")
-    write (iu_detail,"('# 23  708,739   Im[(d^2/d t^2) <Psi_L|e . z|Psi_R>], e-Bohr/jiffy^2')")
-    write (iu_detail,"('# 24  741,772   Re[(d/d t) <Psi_L|e . x|Psi_R>], e-Bohr/jiffy')")
-    write (iu_detail,"('# 25  774,805   Im[(d/d t) <Psi_L|e . x|Psi_R>], e-Bohr/jiffy')")
-    write (iu_detail,"('# 26  807,838   Re[(d/d t) <Psi_L|e . y|Psi_R>], e-Bohr/jiffy')")
-    write (iu_detail,"('# 27  840,871   Im[(d/d t) <Psi_L|e . y|Psi_R>], e-Bohr/jiffy')")
-    write (iu_detail,"('# 28  873,904   Re[(d/d t) <Psi_L|e . z|Psi_R>], e-Bohr/jiffy')")
-    write (iu_detail,"('# 29  906,937   Im[(d/d t) <Psi_L|e . z|Psi_R>], e-Bohr/jiffy')")
-    write (iu_detail,"('# 30  939,970   Electric field, lab X, atomic units')")
-    write (iu_detail,"('# 31  972,1003  Electric field, lab Y, atomic units')")
-    write (iu_detail,"('# 32 1005,1036  Electric field, lab Z, atomic units')")
-    if (sd_pot_nonlocal) then
-      write (iu_detail,"('# WARNING: Non-local potential detected. Dipole acceleration results are incorrect')")
-      write (out,      "(/ 'WARNING: Non-local potential detected. Dipole acceleration results are incorrect'/)")
-    end if
-    write (iu_detail,"('#',1x,a12,31(1x,a32))") &
-           ' i ', ' time ', ' vp ', ' theta ', ' phi ', ' re(norm) ', ' im(norm) ', &
-           ' re(energy) ', ' im(energy) ', ' re(en-nocap) ', ' im(en-nocap) ', &
-           ' re(dip_x) ', ' im(dip_x) ', ' re(dip_y) ', ' im(dip_y) ', ' re(dip_z) ', ' im(dip_z) ', &
-           ' re(acc_x) ', ' im(acc_x) ', ' re(acc_y) ', ' im(acc_y) ', ' re(acc_z) ', ' im(acc_z) ', &
-           ' re(vel_x) ', ' im(vel_x) ', ' re(vel_y) ', ' im(vel_y) ', ' re(vel_z) ', ' im(vel_z) ', &
-           ' F_x ', ' F_y ', ' F_z '
-    write (iu_detail,"('#',1x,a12,31(1x,a32))") &
-           ' 1 ', ' 2 ', ' 3 ', ' 4 ', ' 5 ', ' 6 ', ' 7 ', ' 8 ', ' 9 ', ' 10 ', ' 11 ', &
-           ' 12 ', ' 13 ', ' 14 ', ' 15 ', ' 16 ', ' 17 ', &
-           ' 18 ', ' 19 ', ' 20 ', ' 21 ', ' 22 ', ' 23 ', &
-           ' 24 ', ' 25 ', ' 26 ', ' 27 ', ' 28 ', ' 29 ', &
-           ' 30 ', ' 31 ', ' 32 '
-  end subroutine write_detail_header
+    headers: do ie=1,ensemble_size
+      if (ens_detail_output(ie)==' ') cycle headers
+      if (ensemble_size==1) then
+        write (out,"(/'Saving detailed output to ',a/)") trim(ens_detail_output(ie))
+      else
+        write (out,"(/'Saving detailed output for w.f. ',i0,' to ',a/)") ie, trim(ens_detail_output(ie))
+      end if
+      open(newunit=iu_detail(ie),file=trim(ens_detail_output(ie)),form='formatted',status='replace', &
+           position='rewind',recl=1050,pad='no')
+      write (iu_detail(ie),"('# Field Columns Data')")
+      write (iu_detail(ie),"('#  1    2,13    Timestep')")
+      write (iu_detail(ie),"('#  2   15,46    Time, au[t]')")
+      write (iu_detail(ie),"('#  3   48,79    Vector-potential magnitude')")
+      write (iu_detail(ie),"('#  4   81,112   Vector-potential, lab theta')")
+      write (iu_detail(ie),"('#  5  114,145   Vector-potential, lab phi')")
+      write (iu_detail(ie),"('#  6  147,178   Re[<Psi_L|Psi_R>]')")
+      write (iu_detail(ie),"('#  7  180,211   Im[<Psi_L|Psi_R>]')")
+      write (iu_detail(ie),"('#  8  213,244   Re[<Psi_L|H_at+H_L+V_cap|Psi_R>], Hartree')")
+      write (iu_detail(ie),"('#  9  246,277   Im[<Psi_L|H_at+H_L+V_cap|Psi_R>], Hartree')")
+      write (iu_detail(ie),"('# 10  279,310   Re[<Psi_L|H_at+H_L|Psi_R>], Hartree')")
+      write (iu_detail(ie),"('# 11  312,343   Im[<Psi_L|H_at+H_L|Psi_R>], Hartree')")
+      write (iu_detail(ie),"('# 12  345,376   Re[<Psi_L|e . x|Psi_R>], e-Bohr')")
+      write (iu_detail(ie),"('# 13  378,409   Im[<Psi_L|e . x|Psi_R>], e-Bohr')")
+      write (iu_detail(ie),"('# 14  411,442   Re[<Psi_L|e . y|Psi_R>], e-Bohr')")
+      write (iu_detail(ie),"('# 15  444,475   Im[<Psi_L|e . y|Psi_R>], e-Bohr')")
+      write (iu_detail(ie),"('# 16  477,508   Re[<Psi_L|e . z|Psi_R>], e-Bohr')")
+      write (iu_detail(ie),"('# 17  510,541   Im[<Psi_L|e . z|Psi_R>], e-Bohr')")
+      write (iu_detail(ie),"('# 18  543,574   Re[(d^2/d t^2) <Psi_L|e . x|Psi_R>], e-Bohr/jiffy^2')")
+      write (iu_detail(ie),"('# 19  576,607   Im[(d^2/d t^2) <Psi_L|e . x|Psi_R>], e-Bohr/jiffy^2')")
+      write (iu_detail(ie),"('# 20  609,640   Re[(d^2/d t^2) <Psi_L|e . y|Psi_R>], e-Bohr/jiffy^2')")
+      write (iu_detail(ie),"('# 21  642,673   Im[(d^2/d t^2) <Psi_L|e . y|Psi_R>], e-Bohr/jiffy^2')")
+      write (iu_detail(ie),"('# 22  675,706   Re[(d^2/d t^2) <Psi_L|e . z|Psi_R>], e-Bohr/jiffy^2')")
+      write (iu_detail(ie),"('# 23  708,739   Im[(d^2/d t^2) <Psi_L|e . z|Psi_R>], e-Bohr/jiffy^2')")
+      write (iu_detail(ie),"('# 24  741,772   Re[(d/d t) <Psi_L|e . x|Psi_R>], e-Bohr/jiffy')")
+      write (iu_detail(ie),"('# 25  774,805   Im[(d/d t) <Psi_L|e . x|Psi_R>], e-Bohr/jiffy')")
+      write (iu_detail(ie),"('# 26  807,838   Re[(d/d t) <Psi_L|e . y|Psi_R>], e-Bohr/jiffy')")
+      write (iu_detail(ie),"('# 27  840,871   Im[(d/d t) <Psi_L|e . y|Psi_R>], e-Bohr/jiffy')")
+      write (iu_detail(ie),"('# 28  873,904   Re[(d/d t) <Psi_L|e . z|Psi_R>], e-Bohr/jiffy')")
+      write (iu_detail(ie),"('# 29  906,937   Im[(d/d t) <Psi_L|e . z|Psi_R>], e-Bohr/jiffy')")
+      write (iu_detail(ie),"('# 30  939,970   Electric field, lab X, atomic units')")
+      write (iu_detail(ie),"('# 31  972,1003  Electric field, lab Y, atomic units')")
+      write (iu_detail(ie),"('# 32 1005,1036  Electric field, lab Z, atomic units')")
+      if (sd_pot_nonlocal) then
+        write (iu_detail(ie),"('# WARNING: Non-local potential detected. Dipole acceleration results are incorrect')")
+        write (out,      "(/ 'WARNING: Non-local potential detected. Dipole acceleration results are incorrect'/)")
+      end if
+      write (iu_detail(ie),"('#',1x,a12,31(1x,a32))") &
+             ' i ', ' time ', ' vp ', ' theta ', ' phi ', ' re(norm) ', ' im(norm) ', &
+             ' re(energy) ', ' im(energy) ', ' re(en-nocap) ', ' im(en-nocap) ', &
+             ' re(dip_x) ', ' im(dip_x) ', ' re(dip_y) ', ' im(dip_y) ', ' re(dip_z) ', ' im(dip_z) ', &
+             ' re(acc_x) ', ' im(acc_x) ', ' re(acc_y) ', ' im(acc_y) ', ' re(acc_z) ', ' im(acc_z) ', &
+             ' re(vel_x) ', ' im(vel_x) ', ' re(vel_y) ', ' im(vel_y) ', ' re(vel_z) ', ' im(vel_z) ', &
+             ' F_x ', ' F_y ', ' F_z '
+      write (iu_detail(ie),"('#',1x,a12,31(1x,a32))") &
+             ' 1 ', ' 2 ', ' 3 ', ' 4 ', ' 5 ', ' 6 ', ' 7 ', ' 8 ', ' 9 ', ' 10 ', ' 11 ', &
+             ' 12 ', ' 13 ', ' 14 ', ' 15 ', ' 16 ', ' 17 ', &
+             ' 18 ', ' 19 ', ' 20 ', ' 21 ', ' 22 ', ' 23 ', &
+             ' 24 ', ' 25 ', ' 26 ', ' 27 ', ' 28 ', ' 29 ', &
+             ' 30 ', ' 31 ', ' 32 '
+    end do headers
+  end subroutine write_detail_headers
   !
   subroutine propagation
-    integer(ik)           :: its
+    integer(ik)           :: its, ie           ! Time step and ensemble member
     integer(ik)           :: its_from          ! Time step (possibly half-step) from which we want to step with t-SURF
     integer(ik)           :: its_to            ! Time step (possibly half-step) to which we want to step with t-SURF
     integer(ik)           :: nsub, isub        ! Number of micro time steps after subdivision, and the counter
@@ -1056,11 +1213,11 @@ module spherical_tdse
     real(xk)              :: th1, th2          ! vector-potential direction, ditto
     real(xk)              :: ph1, ph2          ! vector-potential direction, ditto
     complex(xk)           :: cdt1, cdt2        ! Time steps for the first and second half-steps
-    logical               :: checkpoint_go
+    logical               :: checkpoint_go(ensemble_size)
     !
     !  Propagation routine can handle varying time steps, at least in principle
     !
-    if (detail_output==' ') then
+    if (all(ens_detail_output==' ')) then
       if (any(do_dipole(2:3))) then
         write (out,"(/'Detailed output is not enabled; will not calculate dipole velocity or acceleration'/)")
       end if
@@ -1075,15 +1232,18 @@ module spherical_tdse
       end if
     end if
     if (nts%this_node==1) then
-      call write_detail_header
+      call write_detail_headers
     end if
     !
-    call grid_resize(max(wfn_l%nradial,wfn_r%nradial))
-    call nt_merge_all(wfn_r)
-    if (.not.skip_left_propagation) then
-      call nt_merge_all(wfn_l)
-    end if
-    call nt_rebalance(max(wfn_l%lmax,wfn_r%lmax))
+    initial_resize_and_merge: do ie=1,ensemble_size
+      call grid_resize(max(wfns_l(ie)%nradial,wfns_r(ie)%nradial))
+      call nt_merge_all(wfns_r(ie))
+      if (.not.skip_left_propagation) then
+        call nt_merge_all(wfns_l(ie))
+      end if
+    end do initial_resize_and_merge
+    !
+    call nt_rebalance(max(maxval(wfns_l(:)%lmax),maxval(wfns_r(:)%lmax)))
     !
     time_steps: do its=0,timesteps-1
       time   = vpot_table(0,2*its)
@@ -1094,22 +1254,28 @@ module spherical_tdse
       th1    = vpot_table(2,2*its)
       ph1    = vpot_table(3,2*its)
       !
-      call ckpt_do_checkpoint(ckpt,checkpoint_go,its,vpot_table(0:3,2*its),(/out,iu_detail/),wfn_l,wfn_r,tsurf)
-      if (.not.checkpoint_go) cycle time_steps ! Restart has been requested, but we are not at the point
-                                               ! indicated in the checkpoint file yet.
+      checkpoint_loop: do ie=1,ensemble_size
+        call ckpt_do_checkpoint(ckpts(ie),checkpoint_go(ie),its,vpot_table(0:3,2*its),(/out,iu_detail(ie)/), &
+                  wfns_l(ie),wfns_r(ie),tsurfs(ie))
+      end do checkpoint_loop
+      if (any(checkpoint_go) .and. .not.all(checkpoint_go)) then
+        write (out,"('ERROR: Checkpoint files are out of sync.')") 
+        write (out,"(50(1x,l1))") checkpoint_go
+        stop 'spherical_tdse%propagate - checkpoint mismatch'
+      end if
+      if (.not.all(checkpoint_go)) cycle time_steps ! Restart has been requested, but we are not at the point
+                                                    ! indicated in the checkpoint file yet.
       !
       !  Cartesian vector-potential and electric field are at the beginning of the time step
       !
       afield = real(vp1*(/sin(th1)*cos(ph1),sin(th1)*sin(ph1),cos(th1)/),kind=kind(afield))
       efield = real(efield_table(:,2*its),kind=kind(efield))
       call write_output(force=.false.)
-      if (mod(its,visualize_each)==0) then
-        call visualize_wavefunctions(visualize_prefix,its,th1,ph1)
-      end if
+      if (mod(its,visualize_each)==0) call visualize
       !
       !  See whether this time step needs to be subdivided to keep things stable
       !
-      call subdivide_timestep(its,max(wfn_l%lmax,wfn_r%lmax),nsub,vsub)
+      call subdivide_timestep(its,max(maxval(wfns_l(:)%lmax),maxval(wfns_r(:)%lmax)),nsub,vsub)
       !
       !  The subdivided timestep.
       !
@@ -1125,21 +1291,25 @@ module spherical_tdse
         th2    = vsub(2,2*isub+2)
         ph2    = vsub(3,2*isub+2)
         !
-        call nt_merge_borders(wfn_r)
-        call pt_fwd_laser_n(wfn_r,vp1,cdt1)
-        if (.not.skip_left_propagation) then
-          call nt_merge_borders(wfn_l)
-          call pt_fwd_laser_t(wfn_l,vp1,cdt1)
-        end if
+        laser_n_loop: do ie=1,ensemble_size
+          call nt_merge_borders(wfns_r(ie))
+          call pt_fwd_laser_n(wfns_r(ie),vp1,cdt1)
+          if (.not.skip_left_propagation) then
+            call nt_merge_borders(wfns_l(ie))
+            call pt_fwd_laser_t(wfns_l(ie),vp1,cdt1)
+          end if
+        end do laser_n_loop
         !
         !  We are at the mid-step; apply atomic propagator for the first half-step
         !
-        call pt_fwd_atomic_n(wfn_r,cdt1)
-        call pt_rev_atomic_n(wfn_r,cdt1)
-        if (.not.skip_left_propagation) then
-          call pt_fwd_atomic_t(wfn_l,cdt1)
-          call pt_rev_atomic_t(wfn_l,cdt1)
-        end if
+        atomic_loop_1: do ie=1,ensemble_size
+          call pt_fwd_atomic_n(wfns_r(ie),cdt1)
+          call pt_rev_atomic_n(wfns_r(ie),cdt1)
+          if (.not.skip_left_propagation) then
+            call pt_fwd_atomic_t(wfns_l(ie),cdt1)
+            call pt_rev_atomic_t(wfns_l(ie),cdt1)
+          end if
+        end do atomic_loop_1
         !
         !  Rotation; nominally a full step. It will be broken into still smaller sub-steps
         !  if this turns out to be necessary.
@@ -1148,21 +1318,25 @@ module spherical_tdse
         !
         !  Atomic propagator for the second half-step
         !
-        call pt_fwd_atomic_n(wfn_r,cdt2)
-        call pt_rev_atomic_n(wfn_r,cdt2)
-        if (.not.skip_left_propagation) then
-          call pt_fwd_atomic_t(wfn_l,cdt2)
-          call pt_rev_atomic_t(wfn_l,cdt2)
-        end if
+        atomic_loop_2: do ie=1,ensemble_size
+          call pt_fwd_atomic_n(wfns_r(ie),cdt2)
+          call pt_rev_atomic_n(wfns_r(ie),cdt2)
+          if (.not.skip_left_propagation) then
+            call pt_fwd_atomic_t(wfns_l(ie),cdt2)
+            call pt_rev_atomic_t(wfns_l(ie),cdt2)
+          end if
+        end do atomic_loop_2
         !
         !  Second half of the time step; vector potential is at the <i>next</i> time-step
         !
-        call nt_merge_borders(wfn_r)
-        call pt_rev_laser_n(wfn_r,vp2,cdt2)
-        if (.not.skip_left_propagation) then
-          call nt_merge_borders(wfn_l)
-          call pt_rev_laser_t(wfn_l,vp2,cdt2)
-        end if
+        laser_loop_r: do ie=1,ensemble_size
+          call nt_merge_borders(wfns_r(ie))
+          call pt_rev_laser_n(wfns_r(ie),vp2,cdt2)
+          if (.not.skip_left_propagation) then
+            call nt_merge_borders(wfns_l(ie))
+            call pt_rev_laser_t(wfns_l(ie),vp2,cdt2)
+          end if
+        end do laser_loop_r
         !
         call grid_adapt
         !
@@ -1170,12 +1344,14 @@ module spherical_tdse
       !
       !  Node rebalancing is potentially an expensive operation!
       !
-      if (nt_rebalance_needed(max(wfn_l%lmax,wfn_r%lmax))) then
-        call nt_merge_all(wfn_r)
-        if (.not.skip_left_propagation) then
-          call nt_merge_all(wfn_l)
-        end if
-        call nt_rebalance(max(wfn_l%lmax,wfn_r%lmax))
+      if (nt_rebalance_needed(max(maxval(wfns_l(:)%lmax),maxval(wfns_r(:)%lmax)))) then
+        rebalance_loop: do ie=1,ensemble_size
+          call nt_merge_all(wfns_r(ie))
+          if (.not.skip_left_propagation) then
+            call nt_merge_all(wfns_l(ie))
+          end if
+        end do rebalance_loop
+        call nt_rebalance(max(maxval(wfns_l(:)%lmax),maxval(wfns_r(:)%lmax)))
       end if
       !
       !  Photoelectron spectrum accumulation with t-SURF. 
@@ -1210,7 +1386,10 @@ module spherical_tdse
          !
          rdt  = vpot_table(0,2*its+2)-vpot_table(0,its_from)  ! Time step to the expansion point
          rdt2 = vpot_table(0,its_to) -vpot_table(0,2*its+2)   ! Time step to the end of the interval
-         call sts_timestep(wfn_l,wfn_r,tsurf,rdt,rdt2,vpot_table(1:3,2*its+2),efield_table(1:3,2*its+2))
+         surf_loop: do ie=1,ensemble_size
+           call sts_timestep(wfns_l(ie),wfns_r(ie),tsurfs(ie),rdt,rdt2, &
+                             vpot_table(1:3,2*its+2),efield_table(1:3,2*its+2))
+         end do surf_loop
       end if
     end do time_steps
     if (allocated(vsub)) deallocate (vsub)
@@ -1223,11 +1402,13 @@ module spherical_tdse
     efield = real(efield_table(:,2*its),kind=kind(efield))
     !
     call write_output(force=.true.)
-    call visualize_wavefunctions(visualize_prefix,its,th1,ph1)
+    call visualize
     !
-    if (detail_output/=' ' .and. nts%this_node==1) then
-      close(iu_detail)
-    end if
+    close_detail_loop: do ie=1,ensemble_size
+      if (ens_detail_output(ie)/=' ' .and. nts%this_node==1) then
+        close(iu_detail(ie))
+      end if
+    end do close_detail_loop
     !
     !  Rotate wavefunction back into the lab orientation for analysis
     !
@@ -1243,6 +1424,7 @@ module spherical_tdse
     subroutine write_output(force)
       logical, intent(in) :: force
       !
+      integer(ik)         :: ie
       real(rk)            :: abs_dipole
       complex(rk)         :: energy(2), norm
       complex(rk)         :: dipole(3)
@@ -1256,61 +1438,83 @@ module spherical_tdse
       detail_out = (detail_output/=' ') .and. (force .or. mod(its,detail_frequency)==0)
       if (.not.normal_out .and. .not.detail_out) return
       !
-      if (skip_left_propagation .and. fake_left_propagation) then
-        call wt_fake_left(wfn_l,wfn_r)
-      end if
-      call nt_merge_borders(wfn_l)
-      call nt_merge_borders(wfn_r)
-      call wt_energy(wfn_l,wfn_r,vp1,energy,norm)
       call MathRotationMatrix(real((/ph1,th1,0._xk/),kind=kind(rm)),rm)
-      call lab_dipole(wfn_l,wfn_r,rm,afield,efield,norm,dipole,velocity,acceleration) 
-      !
-      if (detail_out .and. nts%this_node==1) then
-        write (iu_detail,"(1x,i12,31(1x,g32.22e4))") &
-               its, time, vp1, th1, ph1, norm, energy, dipole, acceleration, velocity, efield
-      end if
-      !
-      abs_dipole = sqrt(sum(abs(dipole)**2))
-      if (normal_out) then
-        write (out,"('@ ',i9,' t= ',f12.4,' a= ',f14.6,' th= ',f10.3,' ph= ',f10.3,' <l|r>= ',g23.12,1x,g17.6," // &
-                   "' <l|h|r>= ',g23.12,1x,g17.6,' |d|= ',g20.9)") &
-               its, time, vp1, th1, ph1, norm, energy(1), abs_dipole
-        call flush_wrapper(out)
-      end if
+      report_loop: do ie=1,ensemble_size
+        if (skip_left_propagation .and. fake_left_propagation) then
+          call wt_fake_left(wfns_l(ie),wfns_r(ie))
+        end if
+        call nt_merge_borders(wfns_l(ie))
+        call nt_merge_borders(wfns_r(ie))
+        call wt_energy(wfns_l(ie),wfns_r(ie),vp1,energy,norm)
+        call lab_dipole(wfns_l(ie),wfns_r(ie),rm,afield,efield,norm,dipole,velocity,acceleration) 
+        !
+        if (detail_out .and. nts%this_node==1) then
+          write (iu_detail(ie),"(1x,i12,31(1x,g32.22e4))") &
+                 its, time, vp1, th1, ph1, norm, energy, dipole, acceleration, velocity, efield
+        end if
+        !
+        abs_dipole = sqrt(sum(abs(dipole)**2))
+        if (normal_out) then
+          if (ensemble_size<=1) then
+            write (out,"('@ ',i9,' t= ',f12.4,' a= ',f14.6,' th= ',f10.3,' ph= ',f10.3,' <l|r>= ',g23.12,1x,g17.6," // &
+                       "' <l|h|r>= ',g23.12,1x,g17.6,' |d|= ',g20.9)") &
+                   its, time, vp1, th1, ph1, norm, energy(1), abs_dipole
+          else
+            write (out,"('@ w=',i5,' ',i9,' t= ',f12.4,' a= ',f14.6,' th= ',f10.3,' ph= ',f10.3,' <l|r>= ',g23.12,1x,g17.6," // &
+                       "' <l|h|r>= ',g23.12,1x,g17.6,' |d|= ',g20.9)") &
+                   ie, its, time, vp1, th1, ph1, norm, energy(1), abs_dipole
+          end if
+          call flush_wrapper(out)
+        end if
+      end do report_loop
     end subroutine write_output
+    !
+    subroutine visualize
+      integer(ik) :: ie
+      !
+      visualize_loop: do ie=1,ensemble_size
+        call visualize_wavefunctions(wfns_l(ie),wfns_r(ie),tsurfs(ie),ens_visualize_prefix(ie),its,th1,ph1)
+      end do visualize_loop
+    end subroutine visualize
     !
     subroutine rotate(from,to)
       real(xk), intent(in) :: from(:), to(:) ! Initial and final field orientation
+      integer(ik)          :: ie
       !
-      select case (rotation_mode)
-        case default
-          write (out,"('spherical_tdse%propagation: Rotation mode ',a,' is not recognized')") trim(rotation_mode)
-          stop 'spherical_tdse%propagation - bad rotation_mode'
-        case ('none')
-        case ('sparse')
-          call rt_rotate(wfn_r,from=from,to=to,left=.false.)
-          if (.not.skip_left_propagation) then
-            call rt_rotate(wfn_l,from=from,to=to,left=.true.)
-          end if
-        case ('brute force')
-          call rt_rotate_bruteforce(wfn_r,from=from,to=to,left=.false.)
-          if (.not.skip_left_propagation) then
-            call rt_rotate_bruteforce(wfn_l,from=from,to=to,left=.true.)
-          end if
-      end select
+      rotation_loop: do ie=1,ensemble_size
+        select case (rotation_mode)
+          case default
+            write (out,"('spherical_tdse%propagation: Rotation mode ',a,' is not recognized')") trim(rotation_mode)
+            stop 'spherical_tdse%propagation - bad rotation_mode'
+          case ('none')
+          case ('sparse')
+            call rt_rotate(wfns_r(ie),from=from,to=to,left=.false.)
+            if (.not.skip_left_propagation) then
+              call rt_rotate(wfns_l(ie),from=from,to=to,left=.true.)
+            end if
+          case ('brute force')
+            call rt_rotate_bruteforce(wfns_r(ie),from=from,to=to,left=.false.)
+            if (.not.skip_left_propagation) then
+              call rt_rotate_bruteforce(wfns_l(ie),from=from,to=to,left=.true.)
+            end if
+        end select
+      end do rotation_loop
     end subroutine rotate
     !
     subroutine grid_adapt
+      integer(ik) :: ie
       integer(ik) :: rmax  ! Current extent of the left/right wavefunctions
       !
       if (.not.sd_adaptive) return
       !
-      !  Update radial extent
+      !  Update radial extent and LMAX
       !
-      call wt_update_lrmax(verbose,wfn_r)
-      if (.not.skip_left_propagation) then
-        call wt_update_lrmax(verbose,wfn_l)
-      end if
+      radial_update: do ie=1,ensemble_size
+        call wt_update_lrmax(verbose,wfns_r(ie))
+        if (.not.skip_left_propagation) then
+          call wt_update_lrmax(verbose,wfns_l(ie))
+        end if
+      end do radial_update
       !
       !  If radial grid is already at maximum, there is nothing to do.
       !
@@ -1318,7 +1522,7 @@ module spherical_tdse
       !
       !  If we are still within the safe range, there is nothing to do
       !
-      rmax = max(wfn_l%nradial,wfn_r%nradial)
+      rmax = max(maxval(wfns_l(:)%nradial),maxval(wfns_r(:)%nradial))
       if (rmax<safe_nr_max()) return
       !
       !  We need to resize now!
@@ -1345,7 +1549,7 @@ module spherical_tdse
   subroutine grid_resize(rmax)
     integer(ik), intent(in) :: rmax ! Current maximum extent of the radial wavefunction
     !
-    integer(ik) :: nr
+    integer(ik) :: nr, ie
     !
     if (.not.sd_adaptive_r) return
     !
@@ -1363,7 +1567,7 @@ module spherical_tdse
       nr = max(nr,int(sd_nradial_scl * sd_nradial,kind=ik))
     end if
     !
-    nr = min(nr,sd_nradial_max)                        ! Make sure we do not exceed the maximum
+    nr = min(nr,sd_nradial_max) ! Make sure we do not exceed the maximum
     if (nr==sd_nradial) return  ! Grid is already of the right size, nothing to do here
     !
     if (verbose>=0) then
@@ -1371,8 +1575,10 @@ module spherical_tdse
       call flush_wrapper(out)
     end if
     !
-    call wt_resize(wfn_l,nr)
-    call wt_resize(wfn_r,nr)
+    resize_loop: do ie=1,ensemble_size
+      call wt_resize(wfns_l(ie),nr)
+      call wt_resize(wfns_r(ie),nr)
+    end do resize_loop
     sd_nradial = nr
     call sd_initialize(repeat=.true.)
     call pt_reset_caches
@@ -1452,8 +1658,9 @@ module spherical_tdse
   !
   subroutine start
     !$ use OMP_LIB
-    logical :: have_openmp
-    external :: versions
+    logical     :: have_openmp
+    external    :: versions
+    integer(ik) :: ie
     !
 !   call memory_trace
     !
@@ -1517,7 +1724,7 @@ module spherical_tdse
     !
     call math_init
     !
-    !  Set up potential can CAP evaluation
+    !  Set up potential and CAP evaluation
     !
     call pt_initialize
     call cap_initialize
@@ -1544,26 +1751,20 @@ module spherical_tdse
     !
     call wt_transition_matrix_elements(cap_name)
     !
-    !  We need a wavefunction to start from
+    !  We need a wavefunction to start from. If running an ensemble simulation,
+    !  prepare_intial_wavefunctions will also read the additional input for all
+    !  ensemble components.
     !
-    call prepare_initial_wavefunction
+    call prepare_initial_wavefunctions
     !
     !  Prepare for a t-SURF calculation
     !
     call sts_initialize_global(dt,sqrt(vp_scale**2+vp_scale_x**2))
     !  Warning: visualize_wavefunctions() depends on sts_initialize_instance() calculating
-    !           the correct value of tsurf%wfn_scale, even though it is not a tSURF routine.
-    call sts_initialize_instance(tsurf,wfn_l,wfn_r)
+    !           the correct value of tsurfs(1)%wfn_scale, even though it is not a tSURF routine.
+    call surf_init_all_instances
     !
-    if (initial_wf_dump_prefix/=' ') then
-      write (out,"(/'Dumping initial wavefunction to disk, prefix = ',a/)") trim(initial_wf_dump_prefix)
-      call flush_wrapper(out)
-      call nt_merge_all(wfn_l)
-      call nt_merge_all(wfn_r)
-      if (nts%this_node==1) then
-        call dump_wavefunctions(initial_wf_dump_prefix)
-      end if
-    end if
+    call dump_all_wavefunctions('initial',ens_initial_wf_dump_prefix)
     !
     call TimerStop('Initialization')
     write (out,"(/'Done with initialization'/)")
@@ -1589,7 +1790,9 @@ module spherical_tdse
         call propagation
       case ('imaginary time')
         write (out,"(/'Imaginary-time propagation, A = ',g24.13/)") vp_scale
-        call imaginary_propagation_test(verbose,wfn_l,wfn_r,apot=vp_scale,dt=dt,nstep=timesteps)
+        call flush_wrapper(out)
+        if (ensemble_size>1) stop 'spherical_tdse: Imaginary-time not supported for ensembles'
+        call imaginary_propagation_test(verbose,wfns_l(1),wfns_r(1),apot=vp_scale,dt=dt,nstep=timesteps)
     end select
     !
     if (pt_mix_solver=='bi-CG') then
@@ -1601,39 +1804,20 @@ module spherical_tdse
       write (out,"( '                    Total number of microsteps ',i0)") timesteps_micro
       write (out,"( '    Average number of microsteps per time step ',f0.3/)") real(timesteps_micro,kind=rk)/timesteps
     end if
-    if (sd_adaptive) then
-      write (out,"()")
-      if (sd_adaptive_l) write (out,"(' Largest left/right Lmax ',2i4/)") wfn_l%lmax_top, wfn_r%lmax_top
-      if (sd_adaptive_l) write (out,"('   Final left/right Lmax ',2i4/)") wfn_l%lmax, wfn_r%lmax
-      if (sd_adaptive_r) write (out,"('Final left/right nradial ',2i8/)") wfn_l%nradial, wfn_r%nradial
-      write (out,"()")
-    end if
+    !
+    call report_adaptive
     !
     call flush_wrapper(out)
     !
-    call sts_report(tsurf,'In TDSE')
+    tsurf_report_loop: do ie=1,ensemble_size
+      call sts_report(tsurfs(ie),'In TDSE')
+    end do tsurf_report_loop
     !
-    if (final_wf_dump_prefix/=' ') then
-      write (out,"(/'Dumping final wavefunction to disk, prefix = ',a/)") trim(final_wf_dump_prefix)
-      call flush_wrapper(out)
-      call nt_merge_all(wfn_l)
-      call nt_merge_all(wfn_r)
-      call flush_wrapper(out)
-      if (nts%this_node==1) then
-        call dump_wavefunctions(final_wf_dump_prefix)
-      end if
-    end if
+    call dump_all_wavefunctions('final',ens_final_wf_dump_prefix)
     !
-    if (reconstruct_left) then
-      write (out,"(/'Reconstructing left wavefunction'/)")
-      call wt_reconstruct_left(verbose,wfn_l,wfn_r)
-    end if
-    write (out,"(/'Analyzing wavefunction composition'/)")
-    call flush_wrapper(out)
-    call ca_analyze(verbose,composition_threshold,composition_max_energy,wfn_l,wfn_r,tsurf)
-    call sts_atend_direct(tsurf,wfn_r)
+    call reconstruct_all_left
     !
-    call sts_report(tsurf,'At end')
+    call analyze_and_surf_all
     !
     call TimerStop('start')
     call TimerReport

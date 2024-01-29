@@ -1,4 +1,4 @@
-Last updated: 2023 December 23
+Last updated: 2024 January 27
 ------------
 
   All input to scid-tdse is provided through the sph_tdse namelist, with one
@@ -188,6 +188,28 @@ Input keywords
     than 1.114 (Jul 10, 2018). The appropriate value of DT_MAX_LA is also 
     sensitive to the grid structure at the origin. Dense grids may require
     smaller DT_MAX_LA values for stable propagation. Also see DT_INTERPOLANT_WIDTH
+
+  ENSEMBLE_INDEX=1 (spherical_tdse.f90)
+    Index of the wavefunction within the ensemble. Indicates which wavefunction
+    within the ensemble is being initialized. The value must be between 1 and
+    ENSEMBLE_SIZE, and each value may only appear once across &sph_tdse and all
+    &sph_multi namelists in an input file.
+
+    Also see ENSEMBLE_SIZE.
+
+  ENSEMBLE_SIZE=1 (spherical_tdse.f90)
+    Number of individual wavefunctions propagated in lock-step. Grid,
+    potential, and field parameters must be the same for all wavefunctions in the
+    ensemble, but the initial state may differ. For the first wavefunction in the
+    ensemble, the initial state is determined by the input in the main namelist
+    (&sph_tdse). For each subsequent wavefunction, changes in the parameters are
+    communicated through an additional namelist &sph_multi. Each &sph_multi must
+    specify at least ENSEMBLE_INDEX, and may specify one or more of the 
+    following parameters, which have the same meaning as in the main input block:
+
+      INITIAL_WFN, INITIAL_WFN_INDEX, INITIAL_WFN_ENERGY, INITIAL_WFN_FILE,
+      DETAIL_OUTPUT, FINAL_WF_DUMP_PREFIX, INITIAL_WF_DUMP_PREFIX,
+      VISUALIZE_PREFIX, CKPT_SAVE_BASENAME
 
   FAKE_LEFT_PROPAGATION=.true. (spherical_tdse.f90)
     Modifies the effect of SKIP_LEFT_PROPAGATION=.TRUE. by approximating the

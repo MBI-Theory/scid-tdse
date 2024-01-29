@@ -92,6 +92,7 @@ module checkpoint_tools
     integer(ik), intent(in)        :: its           ! Current time step
     real(xk), intent(in)           :: t_vpot(0:3)   ! Current values of time and vector-potential (spherical coordinates)
     integer(ik), intent(in)        :: units(:)      ! Curently open output units which need to be flushed.
+                                                    ! Negtative unit numbers will be ignored.
     type(sd_wfn), intent(inout)    :: wfn_l         ! Left wavefunction
     type(sd_wfn), intent(inout)    :: wfn_r         ! Right wavefunction
     type(sts_data), intent(inout)  :: tsurf         ! tSURFF/iSURF state
@@ -311,11 +312,13 @@ module checkpoint_tools
   !
   subroutine ckpt_flush_all(units)
     integer(ik), intent(in)        :: units(:)      ! Curently open output units which need to be flushed.
+                                                    ! Negative unit numbers will be ignored.
     !
     integer(ik) :: i
     logical     :: isopen
     !
     scan_units: do i=1,size(units)
+      if (units(i)<0) cycle scan_units
       inquire (unit=units(i),opened=isopen)
       if (isopen) call flush_wrapper(units(i))
     end do scan_units

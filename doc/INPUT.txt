@@ -1,4 +1,4 @@
-Last updated: 2024 January 27
+Last updated: 2024 February 12
 ------------
 
   All input to scid-tdse is provided through the sph_tdse namelist, with one
@@ -197,6 +197,12 @@ Input keywords
 
     Also see ENSEMBLE_SIZE.
 
+  ENSEMBLE_OUTPUT='ensemble.table' (spherical_tdse.f90)
+    Additional output for ensemble calculations. Contains overlaps, energy,
+    and dipole expectations between ensemble wavefunctions. Blank value
+    suppresses the output. The output is controlled by the DETAIL_FREQUENCY
+    setting. No effect if ENSEMBLE_SIZE<=1
+
   ENSEMBLE_SIZE=1 (spherical_tdse.f90)
     Number of individual wavefunctions propagated in lock-step. Grid,
     potential, and field parameters must be the same for all wavefunctions in the
@@ -209,7 +215,11 @@ Input keywords
 
       INITIAL_WFN, INITIAL_WFN_INDEX, INITIAL_WFN_ENERGY, INITIAL_WFN_FILE,
       DETAIL_OUTPUT, FINAL_WF_DUMP_PREFIX, INITIAL_WF_DUMP_PREFIX,
-      VISUALIZE_PREFIX, CKPT_SAVE_BASENAME
+      VISUALIZE_PREFIX, CKPT_SAVE_BASENAME, CKPT_LOAD_FILENAME, 
+      STS_VOLKOV_OPENDX, STS_VOLKOV_TABLE, STS_COULOMB_WAVES, 
+      STS_COULOMB_TABKE, STS_COULOMB_OPENDX, VISUALIZE_1STSEQ
+
+   Also see ENSEMBLE_OUTPUT.
 
   FAKE_LEFT_PROPAGATION=.true. (spherical_tdse.f90)
     Modifies the effect of SKIP_LEFT_PROPAGATION=.TRUE. by approximating the

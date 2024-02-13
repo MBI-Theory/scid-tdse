@@ -40,7 +40,7 @@ module spherical_tsurf_data
   public sts_data
   public rcsid_spherical_tsurf_data
   !
-  character(len=clen), save :: rcsid_spherical_tsurf_data = "$Id: spherical_tsurf_data.f90,v 1.2 2021/04/26 15:44:44 ps Exp $"
+  character(len=clen), save :: rcsid_spherical_tsurf_data = "$Id: spherical_tsurf_data.f90,v 1.3 2024/02/13 14:22:14 ps Exp $"
   !
   !  Common parameters for all t-SURF instances
   !
@@ -87,11 +87,18 @@ module spherical_tsurf_data
   integer(ik), save           :: sts_dgrid_ntheta  =   15_ik      ! Number of points in the theta grid
   integer(ik), save           :: sts_dgrid_nphi    =   30_ik      ! Number of points in the phi grid
   integer(ik), save           :: sts_dgrid_count                  ! Total number of points in the angular grid
+                                                                  !
+                                                                  ! Please note that the file definitions below are only accessed by
+                                                                  ! sts_init_instance() call. After that point, the members of the
+                                                                  ! sts_data are authoritative.
+                                                                  !
   character(len=clen), save   :: sts_volkov_opendx = 'tsurf.dx'   ! Output file for OpenDX visualization; Use blank (' ') to disable.
   character(len=clen), save   :: sts_volkov_table  = ' '          ! Output file for Volkov state amplitudes; Use blank (' ') for standard out
   character(len=clen), save   :: sts_coulomb_waves = ' '          ! Output file for Coulomb partial-wave amplitudes; Use blank (' ') for standard out
   character(len=clen), save   :: sts_coulomb_table = ' '          ! Output file for Coulomb photoelectron spectrum; Use blank (' ') for standard out
   character(len=clen), save   :: sts_coulomb_opendx= 'coulomb.dx' ! Output file for OpenDX visualization; Use blank (' ') to disable.
+                                                                  !
+                                                                  !
   integer(ik), save           :: sts_atend_block   = 32_ik        ! Maximum number of solutions to process as a single block in 
                                                                   ! fill_stationary_solutions_at_matching_point()
   real(rk), save              :: sts_r2r_scale     = -1._rk       ! Scale factor to go from the right wavefunction to the real-space wavefunction
@@ -138,5 +145,14 @@ module spherical_tsurf_data
                                                ! Last index: angular momentum projection M
     complex(rk), allocatable :: coulamp(:,:)   ! Amplitude of Coulomb planewave for each k at the current time
                                                ! Same indices as vphase
+    !
+    !  Data for reporting. Each t-SURFF result may be potentially reported to
+    !  its own set of files/locations.
+    !
+    character(len=clen) :: volkov_opendx  = 'tsurf.dx'   ! See corresponding sts_* global variables
+    character(len=clen) :: volkov_table   = ' '          ! 
+    character(len=clen) :: coulomb_waves  = ' '          ! 
+    character(len=clen) :: coulomb_table  = ' '          ! 
+    character(len=clen) :: coulomb_opendx = 'coulomb.dx' ! 
   end type sts_data
 end module spherical_tsurf_data

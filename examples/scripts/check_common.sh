@@ -40,6 +40,15 @@ function fix_zero () {
   sed -e 's/[+-]\(0\.0*\)\( \)/\1\2/g' -e 's/[+-]\(0\.0*\)$/\1/g'
   }
 #
+# Some files are just too large!
+#
+function take_100th () {
+  awk 'BEGIN{nr=0}/^#/{next}{nr++}((nr%100)==1){print}' "$1"
+  }
+function take_1000th () {
+  awk 'BEGIN{nr=0}/^#/{next}{nr++}((nr%1000)==1){print}' "$1"
+  }
+#
 #  0. Start with the failure count being zero
 #
 total=0
@@ -60,38 +69,47 @@ fi
 #  Total energy of the initial solution
 #
 total=$((total + 1))
-energyre_ref="$(awk '/^Energy of the atomic solution is/{printf "'${fmt_energy}'\n", $7}' "$ref" | fix_zero)"
-energyim_ref="$(awk '/^Energy of the atomic solution is/{printf "'${fmt_energy}'\n", $8}' "$ref" | fix_zero)"
-energyre_out="$(awk '/^Energy of the atomic solution is/{printf "'${fmt_energy}'\n", $7}' "$out" | fix_zero)"
-energyim_out="$(awk '/^Energy of the atomic solution is/{printf "'${fmt_energy}'\n", $8}' "$out" | fix_zero)"
+energyre_ref="$(awk '/^Energy of the atomic solution is/{printf "'${fmt_energy}' ", $7}' "$ref" | fix_zero)"
+energyim_ref="$(awk '/^Energy of the atomic solution is/{printf "'${fmt_energy}' ", $8}' "$ref" | fix_zero)"
+energyre_out="$(awk '/^Energy of the atomic solution is/{printf "'${fmt_energy}' ", $7}' "$out" | fix_zero)"
+energyim_out="$(awk '/^Energy of the atomic solution is/{printf "'${fmt_energy}' ", $8}' "$out" | fix_zero)"
 if { ! $quiet ; } ; then
-  echo "Test $total: Initial energy ${energyre_out},${energyim_out} (expected ${energyre_ref},${energyim_ref})"
+  echo "Test $total: Initial energy ${energyre_out}, ${energyim_out} (expected ${energyre_ref}, ${energyim_ref})"
 fi
 if [ "${energyre_ref}" != "${energyre_out}" -o "${energyim_ref}" != "${energyim_out}" ] ; then
-  echo "Energy(initial). Ref = ${energyre_ref},${energyim_ref}. Calc = ${energyre_out},${energyim_out}"
+  echo "Energy(initial). Ref = ${energyre_ref}, ${energyim_ref}. Calc = ${energyre_out}, ${energyim_out}"
   failed=$((failed + 1))
 fi
 #
 #  Right to real-space conversion factor
 #
 total=$((total + 1))
-right2real_ref="$(awk '/^ Right to real-space wavefunction conversion factor: /{printf "'${fmt_energy}'\n", $7}' "$ref" | fix_zero)"
-right2real_out="$(awk '/^ Right to real-space wavefunction conversion factor: /{printf "'${fmt_energy}'\n", $7}' "$out" | fix_zero)"
+right2real_ref="$(awk '/^ Right to real-space wavefunction conversion factor: /{printf "'${fmt_energy}' ", $7}' "$ref" | fix_zero)"
+right2real_out="$(awk '/^ Right to real-space wavefunction conversion factor: /{printf "'${fmt_energy}' ", $7}' "$out" | fix_zero)"
 if { ! $quiet ; } ; then
-  echo "Test $total: Right to real-space conversion factort: ${right2real_out} (expected ${right2real_ref})"
+  echo "Test $total: Right to real-space conversion factor: ${right2real_out} (expected ${right2real_ref})"
 fi
 if [ "${right2real_ref}" != "${right2real_out}" ] ; then
   echo "Right-to-real. Ref = ${right2real_ref}. Calc = ${right2real_out}"
   failed=$((failed + 1))
 fi
 #
+#  Extract data from the running output (^@). 
+#
+function fetch_running () {
+  awk '/^@ /{v=sprintf(sprintf("%s ",fmt),$(c))}
+       /^@w=1 /{v="";}
+       /^@w=/  {v=v sprintf(sprintf("%s ",fmt),$(c))}
+       END {printf "%s",v}' c="$1" fmt="$2" "$3" | fix_zero
+  }
+#
 #  Total norm at the end of the simulation
 #
 total=$((total + 1))
-normre_ref="$(awk '/^@/{v=$12}END{printf "'${fmt_population}'\n",v}' "$ref" | fix_zero)"
-normim_ref="$(awk '/^@/{v=$13}END{printf "'${fmt_population}'\n",v}' "$ref" | fix_zero)"
-normre_out="$(awk '/^@/{v=$12}END{printf "'${fmt_population}'\n",v}' "$out" | fix_zero)"
-normim_out="$(awk '/^@/{v=$13}END{printf "'${fmt_population}'\n",v}' "$out" | fix_zero)"
+normre_ref="$(fetch_running 12 "${fmt_population}" "$ref")"
+normim_ref="$(fetch_running 13 "${fmt_population}" "$ref")"
+normre_out="$(fetch_running 12 "${fmt_population}" "$out")"
+normim_out="$(fetch_running 13 "${fmt_population}" "$out")"
 if { ! $quiet ; } ; then
   echo "Test $total: Final total norm ${normre_out},${normim_out} (expected ${normre_ref},${normim_ref})"
 fi
@@ -103,10 +121,10 @@ fi
 #  Total energy at the end of the simulation
 #
 total=$((total + 1))
-finere_ref="$(awk '/^@/{v=$15}END{printf "'${fmt_energy}'\n",v}' "$ref" | fix_zero)"
-fineim_ref="$(awk '/^@/{v=$16}END{printf "'${fmt_energy}'\n",v}' "$ref" | fix_zero)"
-finere_out="$(awk '/^@/{v=$15}END{printf "'${fmt_energy}'\n",v}' "$out" | fix_zero)"
-fineim_out="$(awk '/^@/{v=$16}END{printf "'${fmt_energy}'\n",v}' "$out" | fix_zero)"
+finere_ref="$(fetch_running 15 "${fmt_energy}" "$ref")"
+fineim_ref="$(fetch_running 16 "${fmt_energy}" "$ref")"
+finere_out="$(fetch_running 15 "${fmt_energy}" "$out")"
+fineim_out="$(fetch_running 16 "${fmt_energy}" "$out")"
 if { ! $quiet ; } ; then
   echo "Test $total: Final energy ${finere_out},${fineim_out} (expected ${finere_ref},${fineim_ref})"
 fi
@@ -118,8 +136,8 @@ fi
 #  Dipole modulus at the end of the simulation
 #
 total=$((total + 1))
-findip_ref="$(awk '/^@/{v=$18}END{printf "'${fmt_dipole}'\n",v}' "$ref" | fix_zero)"
-findip_out="$(awk '/^@/{v=$18}END{printf "'${fmt_dipole}'\n",v}' "$out" | fix_zero)"
+findip_ref="$(fetch_running 18 "${fmt_dipole}" "$ref")"
+findip_out="$(fetch_running 18 "${fmt_dipole}" "$out")"
 if { ! $quiet ; } ; then
   echo "Test $total: Final dipole modulus ${findip_out} (expected ${findip_ref})"
 fi
@@ -133,7 +151,7 @@ fi
 function reduce_angular () {
   awk 'BEGIN {infty=1e10;line=infty}
        /^  *Final norm, by total angular momentum/{ line = NR + 4 }
-       (NR>=line)&&(NF!=4) { exit }
+       (NR>=line)&&(NF!=4) {line=infty}
        (NR>=line) { printf " %d %d '${fmt_population}' '${fmt_population}'\n", $1, $2, $3, $4 }' "$1"
   }
 total=$((total + 1))
@@ -152,10 +170,10 @@ fi
 #  Total population, bound states
 #
 total=$((total + 1))
-boundpopre_ref="$(awk '/^  *Bound states: /{printf "'${fmt_population}'\n",$3}' "$ref" | fix_zero)"
-boundpopim_ref="$(awk '/^  *Bound states: /{printf "'${fmt_population}'\n",$4}' "$ref" | fix_zero)"
-boundpopre_out="$(awk '/^  *Bound states: /{printf "'${fmt_population}'\n",$3}' "$out" | fix_zero)"
-boundpopim_out="$(awk '/^  *Bound states: /{printf "'${fmt_population}'\n",$4}' "$out" | fix_zero)"
+boundpopre_ref="$(awk '/^  *Bound states: /{printf "'${fmt_population}' ",$3}' "$ref" | fix_zero)"
+boundpopim_ref="$(awk '/^  *Bound states: /{printf "'${fmt_population}' ",$4}' "$ref" | fix_zero)"
+boundpopre_out="$(awk '/^  *Bound states: /{printf "'${fmt_population}' ",$3}' "$out" | fix_zero)"
+boundpopim_out="$(awk '/^  *Bound states: /{printf "'${fmt_population}' ",$4}' "$out" | fix_zero)"
 if { ! $quiet ; } ; then
   echo "Test $total: Final bound state population ${boundpopre_out},${boundpopim_out} (expected ${boundpopre_ref},${boundpopim_ref})"
 fi
@@ -167,10 +185,10 @@ fi
 #  Total population, continuum states
 #
 total=$((total + 1))
-contpopre_ref="$(awk '/^  *Continuum states: /{printf "'${fmt_population}'\n",$3}' "$ref" | fix_zero)"
-contpopim_ref="$(awk '/^  *Continuum states: /{printf "'${fmt_population}'\n",$4}' "$ref" | fix_zero)"
-contpopre_out="$(awk '/^  *Continuum states: /{printf "'${fmt_population}'\n",$3}' "$out" | fix_zero)"
-contpopim_out="$(awk '/^  *Continuum states: /{printf "'${fmt_population}'\n",$4}' "$out" | fix_zero)"
+contpopre_ref="$(awk '/^  *Continuum states: /{printf "'${fmt_population}' ",$3}' "$ref" | fix_zero)"
+contpopim_ref="$(awk '/^  *Continuum states: /{printf "'${fmt_population}' ",$4}' "$ref" | fix_zero)"
+contpopre_out="$(awk '/^  *Continuum states: /{printf "'${fmt_population}' ",$3}' "$out" | fix_zero)"
+contpopim_out="$(awk '/^  *Continuum states: /{printf "'${fmt_population}' ",$4}' "$out" | fix_zero)"
 if { ! $quiet ; } ; then
   echo "Test $total: Final continuum state population ${contpopre_out},${contpopim_out} (expected ${contpopre_ref},${contpopim_ref})"
 fi
@@ -184,7 +202,7 @@ fi
 function reduce_boundpop () {
   awk 'BEGIN {infty=1e10;line=infty}
        /^  *Final populations, by total angular momentum and angular momentum projection/{ line = NR + 4 }
-       (NR>=line)&&(NF!=8) { exit }
+       (NR>=line)&&(NF!=8) { line=infty }
        (NR>=line) { printf " %d %d '${fmt_population}' '${fmt_population}' '${fmt_population}' '${fmt_population}'\n", $1, $2, $5, $6, $7, $8 }' "$1"
   }
 total=$((total + 1))
@@ -205,7 +223,7 @@ fi
 function reduce_statepop () {
   awk 'BEGIN {infty=1e10;line=infty}
        /^  *Large amplitudes of individual field-free states/{ line = NR + 4 }
-       (NR>=line)&&(NF!=11) { exit }
+       (NR>=line)&&(NF!=11) { line=infty }
        (NR>=line) { printf " %d %d %d '${fmt_eigenenergy}' '${fmt_eigenenergy}' '${fmt_population}' '${fmt_population}'\n", $1, $2, $3, $4, $5, $6, $7 }' "$1" | \
   awk '($6==0.0)&&($7==0.0){next}{print}'
   }
@@ -228,108 +246,155 @@ function reduce_spherical_waves () {
   awk '/^#/{next} (NF<5){next}
        { printf " %d %d '${fmt_energy}' '${fmt_pes}' '${fmt_pes}'\n", $1, $2, $3, $4, $5 ; }' "$1"
   }
-wave_spec_out="$(awk '/^  *Coulomb-wave phases are written to /{print $6}' "${out}")"
-if [ ! -z "${wave_spec_out}" ] ; then
-  wave_spec_ref="${wave_spec_out}${extraext}"
-  if [ ! -r "${wave_spec_ref}" ] ; then
-    echo "WARNING: Reference spectrum ${wave_spec_ref} is not present. Skipping test"
-  else
-    total=$((total + 1))
-    reduce_spherical_waves "${wave_spec_ref}" | fix_zero > "${tmpref}"   
-    reduce_spherical_waves "${wave_spec_out}" | fix_zero > "${tmpout}"   
-    if { ! $quiet ; } ; then
-      echo "Test $total: Spherical-wave PES. First five lines (out vs ref):"
-      diff --side-by-side "${tmpout}" "${tmpref}" | head -5
-    fi
-    if { ! diff -q "${tmpref}" "${tmpout}" > /dev/null ; } ; then
-      echo "Spherical PES (${wave_spec_out}) differ. First 25 lines of the output are:"
-      diff -c "${tmpref}" "${tmpout}" | head -25
-      failed=$((failed + 1))
+for wave_spec_out in $(awk '/^  *Coulomb-wave phases are written to /{print $6}' "${out}") ; do
+  if [ ! -z "${wave_spec_out}" ] ; then
+    wave_spec_ref="${wave_spec_out}${extraext}"
+    if [ ! -r "${wave_spec_ref}" ] ; then
+      echo "WARNING: Reference spectrum ${wave_spec_ref} is not present. Skipping test"
+    else
+      total=$((total + 1))
+      reduce_spherical_waves "${wave_spec_ref}" | fix_zero > "${tmpref}"   
+      reduce_spherical_waves "${wave_spec_out}" | fix_zero > "${tmpout}"   
+      if { ! $quiet ; } ; then
+        echo "Test $total: Spherical-wave PES. First five lines (out vs ref):"
+        diff --side-by-side "${tmpout}" "${tmpref}" | head -5
+      fi
+      if { ! diff -q "${tmpref}" "${tmpout}" > /dev/null ; } ; then
+        echo "Spherical PES (${wave_spec_out}) differ. First 25 lines of the output are:"
+        diff -c "${tmpref}" "${tmpout}" | head -25
+        failed=$((failed + 1))
+      fi
     fi
   fi
-fi
+done
 #
-#  Check for PES spectra in OpenDX files - Volkov first
+#  Check for PES spectra in OpenDX files - Volkov & Coulomb
 #
 function reduce_opendx_pes () {
   awk 'BEGIN {go=0} /^end/{go=1;next} (!go){next}
        { for (i=1;i<=NF;i++) { printf "'${fmt_pes}' ", $(i) } ; printf "\n" ; }' "$1"
   }
-volkovdx_spec_out="$(awk '/^  *Generating OpenDX file for photoelectron spectrum: /{print $7;exit}' "${out}")"
-if [ ! -z "${volkovdx_spec_out}" ] ; then
-  volkovdx_spec_ref="${volkovdx_spec_out}${extraext}"
-  if [ ! -r "${volkovdx_spec_ref}" ] ; then
-    echo "WARNING: Reference spectrum ${volkovdx_spec_ref} is not present. Skipping test"
-  else
-    total=$((total + 1))
-    reduce_opendx_pes "${volkovdx_spec_ref}" | fix_zero > "${tmpref}"   
-    reduce_opendx_pes "${volkovdx_spec_out}" | fix_zero > "${tmpout}"   
-    if { ! $quiet ; } ; then
-      echo "Test $total: Volkov-state PES. First five lines (out vs ref):"
-      diff --side-by-side "${tmpout}" "${tmpref}" | head -5
-    fi
-    if { ! diff -q "${tmpref}" "${tmpout}" > /dev/null ; } ; then
-      echo "Cartesian PES (${volkovdx_spec_out}) differ. First 25 lines of the output are:"
-      diff -c "${tmpref}" "${tmpout}" | head -25
-      failed=$((failed + 1))
-    fi
-  fi
-fi
-#
-#  Check for PES spectra in OpenDX files - Now Coulomb
-#
-coulombdx_spec_out="$(awk '/^  *Generating OpenDX file for photoelectron spectrum: /{if(++c==2){print $7;exit}}' "${out}")"
-if [ ! -z "${coulombdx_spec_out}" ] ; then
-  coulombdx_spec_ref="${coulombdx_spec_out}${extraext}"
-  if [ ! -r "${coulombdx_spec_ref}" ] ; then
-    echo "WARNING: Reference spectrum ${coulombdx_spec_ref} is not present. Skipping test"
-  else
-    total=$((total + 1))
-    reduce_opendx_pes "${coulombdx_spec_ref}" | fix_zero > "${tmpref}"   
-    reduce_opendx_pes "${coulombdx_spec_out}" | fix_zero > "${tmpout}"   
-    if { ! $quiet ; } ; then
-      echo "Test $total: Coulomb-wave PES First five lines (out vs ref):"
-      diff --side-by-side "${tmpout}" "${tmpref}" | head -5
-    fi
-    if { ! diff -q "${tmpref}" "${tmpout}" > /dev/null ; } ; then
-      echo "Cartesian PES (${coulombdx_spec_out}) differ. First 25 lines of the output are:"
-      diff -c "${tmpref}" "${tmpout}" | head -25
-      failed=$((failed + 1))
+for dx_spec_out in $(awk '/^  *Generating OpenDX file for photoelectron spectrum: /{print $7}' "${out}") ; do
+  if [ ! -z "${dx_spec_out}" ] ; then
+    dx_spec_ref="${dx_spec_out}${extraext}"
+    if [ ! -r "${dx_spec_ref}" ] ; then
+      echo "WARNING: Reference spectrum ${dx_spec_ref} is not present. Skipping test"
+    else
+      total=$((total + 1))
+      reduce_opendx_pes "${dx_spec_ref}" | fix_zero > "${tmpref}"   
+      reduce_opendx_pes "${dx_spec_out}" | fix_zero > "${tmpout}"   
+      if { ! $quiet ; } ; then
+        echo "Test $total: OpenDX PES. First five lines (out vs ref):"
+        diff --side-by-side "${tmpout}" "${tmpref}" | head -5
+      fi
+      if { ! diff -q "${tmpref}" "${tmpout}" > /dev/null ; } ; then
+        echo "Cartesian PES (${dx_spec_out}) differ. First 25 lines of the output are:"
+        diff -c "${tmpref}" "${tmpout}" | head -25
+        failed=$((failed + 1))
+      fi
     fi
   fi
-fi
+done
+#
+#  Check PE spectra as tables - Volkov & Coulomb
+#
+function reduce_table_pes () {
+  awk '/^#/{next}{ printf "'${fmt_pes}' '${fmt_pes}'\n", $7, $8 }' "$1"
+  }
+for table_spec_out in $(awk '/^  *Photoelectron spectrum written to /{print $5}' "${out}") ; do
+  if [ ! -z "${table_spec_out}" ] ; then
+    table_spec_ref="${table_spec_out}${extraext}"
+    if [ ! -r "${table_spec_ref}" ] ; then
+      echo "WARNING: Reference spectrum ${table_spec_ref} is not present. Skipping test"
+    else
+      total=$((total + 1))
+      reduce_table_pes "${table_spec_ref}" | fix_zero > "${tmpref}"   
+      reduce_table_pes "${table_spec_out}" | fix_zero > "${tmpout}"   
+      if { ! $quiet ; } ; then
+        echo "Test $total: PES First five lines (out vs ref):"
+        diff --side-by-side "${tmpout}" "${tmpref}" | head -5
+      fi
+      if { ! diff -q "${tmpref}" "${tmpout}" > /dev/null ; } ; then
+        echo "Cartesian PES (${table_spec_out}) differ. First 25 lines of the output are:"
+        diff -c "${tmpref}" "${tmpout}" | head -25
+        failed=$((failed + 1))
+      fi
+    fi
+  fi
+done
+
 #
 #  Check for the dipole, dipole velocity, and dipole acceleration in the detailed output
 #
-function take_1000th () {
-  awk 'BEGIN{nr=0}/^#/{next}{nr++}((nr%1000)==1){print}' "$1"
-  }
 function reduce_detail () {
   awk '/^#/{next}
        function pd(v) { printf "'${fmt_dipole}' ", v }
        {printf "%d ", $1 ; for(i=12;i<=29;i+=2){ pd($(i)) ; } ; printf "\n"}' "$1"
   }
-detail_out="$(awk '/^Saving detailed output to /{print $5}' "${out}")"
-if [ ! -z "${detail_out}" ] ; then
-  detail_ref="${detail_out}_sum${extraext}"
-  if [ ! -r "${detail_ref}" ] ; then
-    echo "WARNING: Reference output ${detail_ref} is not present. Skipping test"
-  else
-    total=$((total + 1))
-    take_1000th   "${detail_out}" > "${detail_out}_sum"
-    reduce_detail "${detail_out}_sum" | fix_zero > "${tmpref}"
-    reduce_detail "${detail_ref}"     | fix_zero > "${tmpout}"
-    if { ! $quiet ; } ; then
-      echo "Test $total: Detailed output first five lines (out vs ref):"
-      diff --side-by-side "${tmpout}" "${tmpref}" | head -5
-    fi
-    if { ! diff -q "${tmpref}" "${tmpout}" > /dev/null ; } ; then
-      echo "Detailed output (${detail_out}) differs. First 25 lines of the output are:"
-      diff -c "${tmpref}" "${tmpout}" | head -25
-      failed=$((failed + 1))
+function detail_list () {
+  awk '/^Saving detailed output to /{print $5}
+       /^Saving detailed output for w.f. /{print $8}' "$1"
+  }
+for detail_out in $(detail_list "${out}") ; do
+  if [ ! -z "${detail_out}" ] ; then
+    detail_ref="${detail_out}_sum${extraext}"
+    if [ ! -r "${detail_ref}" ] ; then
+      echo "WARNING: Reference output ${detail_ref} is not present. Skipping test"
+    else
+      total=$((total + 1))
+      take_1000th   "${detail_out}" > "${detail_out}_sum"
+      reduce_detail "${detail_out}_sum" | fix_zero > "${tmpref}"
+      reduce_detail "${detail_ref}"     | fix_zero > "${tmpout}"
+      if { ! $quiet ; } ; then
+        echo "Test $total: Detailed output first five lines (out vs ref):"
+        diff --side-by-side "${tmpout}" "${tmpref}" | head -5
+      fi
+      if { ! diff -q "${tmpref}" "${tmpout}" > /dev/null ; } ; then
+        echo "Detailed output (${detail_out}) differs. First 25 lines of the output are:"
+        diff -c "${tmpref}" "${tmpout}" | head -25
+        failed=$((failed + 1))
+      fi
     fi
   fi
-fi
+done
+#
+#  Ensemble-output check. We verify the overlap, the energy, and the dipole
+#
+function reduce_ensemble () {
+  awk '/^#/{next}
+       function pd(v) { printf "'${fmt_dipole}' ",     v }
+       function pe(v) { printf "'${fmt_energy}' ",     v }
+       function ps(v) { printf "'${fmt_population}' ", v }
+       {printf "%d %d %d", $1, $2, $3 ; 
+        ps($8) ; ps($9) ; pe($10) ; pe($11) ;
+        for(i=14;i<=31;i+=2){ pd($(i)) ; } ; 
+        printf "\n"}' "$1"
+  }
+function ensemble_list () {
+  awk '/^Saving ensemble output to /{print $5}' "$1"
+  }
+for ensemble_out in $(ensemble_list "${out}") ; do
+  if [ ! -z "${ensemble_out}" ] ; then
+    ensemble_ref="${ensemble_out}_sum${extraext}"
+    if [ ! -r "${ensemble_ref}" ] ; then
+      echo "WARNING: Reference output ${ensemble_ref} is not present. Skipping test"
+    else
+      total=$((total + 1))
+      take_1000th   "${ensemble_out}" > "${ensemble_out}_sum"
+      reduce_ensemble "${ensemble_out}_sum" | fix_zero > "${tmpref}"
+      reduce_ensemble "${ensemble_ref}"     | fix_zero > "${tmpout}"
+      if { ! $quiet ; } ; then
+        echo "Test $total: Detailed output first five lines (out vs ref):"
+        diff --side-by-side "${tmpout}" "${tmpref}" | head -5
+      fi
+      if { ! diff -q "${tmpref}" "${tmpout}" > /dev/null ; } ; then
+        echo "Detailed output (${ensemble_out}) differs. First 25 lines of the output are:"
+        diff -c "${tmpref}" "${tmpout}" | head -25
+        failed=$((failed + 1))
+      fi
+    fi
+  fi
+done
 #
 #  Check transition dipole calculation (separate file)
 #

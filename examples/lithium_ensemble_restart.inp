@@ -1,0 +1,67 @@
+ &sph_tdse
+   comment                 = "Ensemble TDSE, 0.25 TW/cm^2, Li atom, 2P0, 3D0, and 2S states (rotated restart)"
+   ensemble_size           = 3
+   ensemble_index          = 1
+   verbose                 = 1
+   omp_num_threads         = 6
+   initial_wfn             = 'single'
+   initial_wfn_index       = 1, 0, 1
+   initial_wfn_energy      = (-0.130,0.0)
+   sd_nradial              =1400
+   sd_lmax                 =  10
+   sd_mmin                 =   0
+   sd_mmax                 =   0
+   field_unwrap            = .false.
+   rotation_mode           = 'none'
+   sd_rgrid                = 'uniform'
+   sd_rgrid_zeta           = 3.0
+   sd_rgrid_dr             = 0.100
+   pot_name                = '[SFG99] Li'
+   task                    = 'real time'
+   dt                      = 0.0100
+   dt_subdivision          = 'off'
+   timesteps               = 50000
+   vp_shape                = 'z Gaussian'
+   vp_scale                = 0.046862
+   vp_param(1:4)           = 0.05695, 0.000000, 250.000,  200.0
+   vp_param(11:12)         = 170.0, 245.0
+   skip_tests              = .T.
+   output_each             = 20
+   composition_threshold   = 1e-4
+   initial_wf_dump_prefix  = ' '
+   final_wf_dump_prefix    = ' '
+   field_preview           = ' '
+   wt_atomic_cache_prefix  = ' '
+   detail_frequency        =  50
+   detail_output           = ' '
+   ensemble_output         = 'lithium_ensemble_restart_cross.table'
+   wt_enable_memory_caches = .T., .F.
+   sts_verbose             = 0
+   sts_step_frequency      = 8
+   sts_dgrid               = 'read'
+   sts_dgrid_count         = 2
+   sts_dgrid_file          = 'lithium_ensemble.kgrid'
+   sts_kgrid_max           = 1.0
+   sts_kgrid_count         =1000
+   sts_volkov              = .true.
+   sts_volkov_atend        = .true.
+   sts_volkov_table        = 'lithium_ensemble_restart_e2_volkov.table'
+   ckpt_load_filename      = 'lithium_ensemble_e2_ckpt-25499.ckpt'
+ /
+ &sph_multi
+   ensemble_index          = 2
+   initial_wfn             = 'single'
+   initial_wfn_index       = 2, 0, 1
+   initial_wfn_energy      = (-0.0557,0.0)
+   detail_output           = ' '
+   sts_volkov_table        = 'lithium_ensemble_restart_e3_volkov.table'
+   ckpt_load_filename      = 'lithium_ensemble_e3_ckpt-25499.ckpt'
+ /
+ &sph_multi
+   ensemble_index          = 3
+   initial_wfn             = 'single'
+   initial_wfn_index       = 0, 0, 1
+   initial_wfn_energy      = (-0.197,0.0)
+   sts_volkov_table        = 'lithium_ensemble_restart_e1_volkov.table'
+   ckpt_load_filename      = 'lithium_ensemble_e1_ckpt-25499.ckpt'
+ /

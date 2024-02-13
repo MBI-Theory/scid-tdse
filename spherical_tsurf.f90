@@ -53,13 +53,11 @@ module spherical_tsurf
   public sts_report
   public rcsid_spherical_tsurf
   !
-  character(len=clen), save :: rcsid_spherical_tsurf = "$Id: spherical_tsurf.f90,v 1.38 2023/06/09 14:10:24 ps Exp $"
+  character(len=clen), save :: rcsid_spherical_tsurf = "$Id: spherical_tsurf.f90,v 1.39 2024/02/13 14:22:14 ps Exp $"
   !
   !  Private data, not visible outside the module
   !
   logical, parameter          :: detail_timer      = .false.
-  integer, parameter          :: iu_odx            = 30
-  integer, parameter          :: iu_temp           = 31
   !
   real(rk), allocatable, save :: sts_ktab(:)      ! Grid of radial k values; 1:sts_kgrid_count
   real(rk), allocatable, save :: sts_dtab(:,:)    ! Grid of k directions (laboratory frame). 
@@ -167,7 +165,7 @@ module spherical_tsurf
   end subroutine initialize_global_rmatch
   !
   subroutine initialize_global_kgrid
-    integer(ik) :: alloc, ikp, lv
+    integer(ik) :: alloc, ikp, lv, iu_temp
     !
     !  Initialize radial grid for k
     !
@@ -205,7 +203,7 @@ module spherical_tsurf
           sts_ktab(ikp) = sts_kgrid_min + (ikp*(sts_kgrid_max-sts_kgrid_min))/sts_kgrid_count
         end do fill_uniform_kgrid
       case ('read')
-        open (iu_temp,form='formatted',action='read',position='rewind',status='old',file=trim(sts_kgrid_file))
+        open (newunit=iu_temp,form='formatted',action='read',position='rewind',status='old',file=trim(sts_kgrid_file))
         read (iu_temp,*) sts_ktab
         close (iu_temp)
         if (any(sts_ktab<=0)) then
@@ -234,7 +232,7 @@ module spherical_tsurf
   end subroutine initialize_global_kgrid
   !
   subroutine initialize_global_dgrid
-    integer(ik) :: alloc, ith, iph, idp
+    integer(ik) :: alloc, ith, iph, idp, iu_temp
     real(rk)    :: th, ph
     !
     !  Fill direction grid for the final K vector
@@ -287,7 +285,7 @@ module spherical_tsurf
         end do fill_direction_theta
         !$omp end parallel do
       case ('read')
-        open (iu_temp,form='formatted',action='read',position='rewind',status='old',file=trim(sts_dgrid_file))
+        open (newunit=iu_temp,form='formatted',action='read',position='rewind',status='old',file=trim(sts_dgrid_file))
         read (iu_temp,*) sts_dtab
         close (iu_temp)
         normalize_direction_grid: do idp=1,sts_dgrid_count
@@ -309,10 +307,16 @@ module spherical_tsurf
     end if
   end subroutine initialize_global_dgrid
   !
-  subroutine sts_initialize_instance(sdt,wfn_l,wfn_r)
-    type(sts_data), intent(inout) :: sdt
-    type(sd_wfn), intent(in)      :: wfn_l     ! Left wavefunction
-    type(sd_wfn), intent(in)      :: wfn_r     ! Right wavefunction
+  subroutine sts_initialize_instance(sdt,wfn_l,wfn_r,volkov_opendx,volkov_table, &
+                                     coulomb_waves,coulomb_table,coulomb_opendx)
+    type(sts_data), intent(inout)          :: sdt
+    type(sd_wfn), intent(in)               :: wfn_l          ! Left wavefunction
+    type(sd_wfn), intent(in)               :: wfn_r          ! Right wavefunction
+    character(len=*), intent(in), optional :: volkov_opendx  ! See corresponding sts_* global variables
+    character(len=*), intent(in), optional :: volkov_table   ! 
+    character(len=*), intent(in), optional :: coulomb_waves  ! 
+    character(len=*), intent(in), optional :: coulomb_table  ! 
+    character(len=*), intent(in), optional :: coulomb_opendx ! 
     !
     integer(ik) :: alloc1, alloc2
     !
@@ -347,6 +351,11 @@ module spherical_tsurf
     if (sts_verbose>=0) then
       write (out,"(/' Right to real-space wavefunction conversion factor: ',g32.24/)") sdt%wfn_scale
     end if
+    sdt%volkov_opendx  = sts_volkov_opendx  ; if (present(volkov_opendx))  sdt%volkov_opendx  = volkov_opendx
+    sdt%volkov_table   = sts_volkov_table   ; if (present(volkov_table ))  sdt%volkov_table   = volkov_table
+    sdt%coulomb_waves  = sts_coulomb_waves  ; if (present(coulomb_waves))  sdt%coulomb_waves  = coulomb_waves
+    sdt%coulomb_table  = sts_coulomb_table  ; if (present(coulomb_table))  sdt%coulomb_table  = coulomb_table
+    sdt%coulomb_opendx = sts_coulomb_opendx ; if (present(coulomb_opendx)) sdt%coulomb_opendx = coulomb_opendx
   end subroutine sts_initialize_instance
   !
   subroutine sts_destroy_instance(sdt)
@@ -1412,8 +1421,8 @@ module spherical_tsurf
         if (sts_volkov .and. .not. sts_volkov_atend) then
           write (out,"(/t5,'Projection on Volkov states is calculated from boundary flux up to now (t-SURF)')")
           write (out,"( t5,'Photoelectrons still within the simulation volume will not be included in the spectrum'/)")
-          call table_report(sts_volkov_table,sdt%amplitude,sdt%vphase)
-          call opendx_report(sts_volkov_opendx,sdt%amplitude)
+          call table_report(sdt%volkov_table,sdt%amplitude,sdt%vphase)
+          call opendx_report(sdt%volkov_opendx,sdt%amplitude)
         end if
       case ('At end')
         if (sts_volkov_atend) then
@@ -1423,16 +1432,16 @@ module spherical_tsurf
             write (out,"(/t5,'Projection on Volkov states is calculated from boundary flux from now until infinite time')")
             write (out,"( t5,'Photoelectrons reaching the boundary up to now will not be included in the spectrum'/)")
           end if
-          call table_report(sts_volkov_table,sdt%amplitude,sdt%vphase)
-          call opendx_report(sts_volkov_opendx,sdt%amplitude)
+          call table_report(sdt%volkov_table,sdt%amplitude,sdt%vphase)
+          call opendx_report(sdt%volkov_opendx,sdt%amplitude)
         end if
         if (sts_coulomb_atend) then
           write (out,"(/t5,'Projection on Coulomb states is calculated from boundary flux from now until infinite time')")
           write (out,"( t5,'Photoelectrons reaching the boundary up to now will not be included in the spectrum'/)")
-          call phase_report(sts_coulomb_waves,sdt%fcamp)
+          call phase_report(sdt%coulomb_waves,sdt%fcamp)
           call convert_coulomb_phase_to_spectrum(sdt)
-          call table_report(sts_coulomb_table,sdt%coulamp)
-          call opendx_report(sts_coulomb_opendx,sdt%coulamp)
+          call table_report(sdt%coulomb_table,sdt%coulamp)
+          call opendx_report(sdt%coulomb_opendx,sdt%coulamp)
         end if
     end select
     !
@@ -1528,8 +1537,7 @@ module spherical_tsurf
     if (file==' ') then
       iu_out = out
     else
-      iu_out = iu_temp
-      open (iu_out,form='formatted',status='replace',file=trim(file))
+      open (newunit=iu_out,form='formatted',status='replace',file=trim(file))
     end if
     !
     write (iu_out,"('#')")
@@ -1566,7 +1574,7 @@ module spherical_tsurf
     complex(rk), intent(in)      :: amp(:,:) ! Amplitudes
     !
     integer(ik) :: ikm, ikd, ith, iph, ith_eff, iph_eff
-    integer(ik) :: icol
+    integer(ik) :: icol, iu_odx
     !
     if (file==' ') return
     if (sts_dgrid/='product') then
@@ -1577,7 +1585,7 @@ module spherical_tsurf
     call TimerStart('t-SURF: Report: OpenDX')
     !
     write (out,"(t5,'Generating OpenDX file for photoelectron spectrum: ',a)") trim(file)
-    open (iu_odx,form='formatted',status='replace',file=trim(file))
+    open (newunit=iu_odx,form='formatted',status='replace',file=trim(file))
     !
     !  Prepare OpenDX header describing our grid.
     !
@@ -1676,8 +1684,7 @@ module spherical_tsurf
     if (file==' ') then
       iu_out = out
     else
-      iu_out = iu_temp
-      open (iu_out,form='formatted',status='replace',file=trim(file))
+      open (newunit=iu_out,form='formatted',status='replace',file=trim(file))
     end if
     !
     write (iu_out,"('#')")

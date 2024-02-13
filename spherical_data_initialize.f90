@@ -40,14 +40,12 @@ module spherical_data_initialize
   public rcsid_spherical_data_initialize
   !
   character(len=clen), save :: rcsid_spherical_data_initialize = &
-     "$Id: spherical_data_initialize.f90,v 1.5 2021/04/26 15:44:44 ps Exp $"
+     "$Id: spherical_data_initialize.f90,v 1.6 2024/02/13 14:22:14 ps Exp $"
   !
   interface sd_expand_implicit_operator
     module procedure sd_expand_implicit_operator_r
     module procedure sd_expand_implicit_operator_c
   end interface sd_expand_implicit_operator
-  !
-  integer, parameter          :: iu_temp        = 23         ! An arbitrary unit number, which can be used here
   !
   contains
   !
@@ -217,7 +215,7 @@ module spherical_data_initialize
   !
   subroutine initialize_radial_grid
     integer(ik)         :: ipt, npt_log
-    integer             :: ios
+    integer(ik)         :: ios, iu_temp
     !
     write (out,"()")
     if (sd_rgrid_rmin<0) sd_rgrid_rmin = 0 ! Guard agains stupid user input, which can lead to mysterious errors
@@ -303,7 +301,7 @@ module spherical_data_initialize
                sd_nradial-npt_log-sd_rgrid_npad, sd_rtab(npt_log+sd_rgrid_npad+1), sd_rtab(sd_nradial)
       case ('read')
         write (out,"('Reading user-defined from ',a)") trim(sd_rgrid_file)
-        open (iu_temp,form='formatted',action='read',position='rewind',status='old',file=trim(sd_rgrid_file))
+        open (newunit=iu_temp,form='formatted',action='read',position='rewind',status='old',file=trim(sd_rgrid_file))
         fill_user_grid: do ipt=1,sd_nradial+1
           read (iu_temp,*,iostat=ios) sd_rtab(ipt)
           if (ios/=0) then
@@ -518,7 +516,7 @@ module spherical_data_initialize
   !
   subroutine initialize_channel_potentials(repeat)
     logical, intent(in) :: repeat
-    integer(ik)         :: lval, ipt
+    integer(ik)         :: lval, ipt, iu_temp
     real(rk)            :: rdelta, rup, rdown, fup, fdown, fuplp, fdownlp
     !
     !  Potential itself, including the centrifugal term
@@ -568,7 +566,7 @@ module spherical_data_initialize
     end if
     !
     if (sd_rgrid_report/=' ' .and. .not.repeat) then
-      open(iu_temp,form='formatted',action='write',position='rewind',status='replace',file=trim(sd_rgrid_report))
+      open(newunit=iu_temp,form='formatted',action='write',position='rewind',status='replace',file=trim(sd_rgrid_report))
       write (iu_temp,"(('#',1x,a7,5(1x,a24)))") &
         ' IPT ',  ' R, Bohr ', ' V(L=0), Hartree ', ' dV/dR, Hartree/Bohr ', ' Re[Vcap] ', ' Im[Vcap] ', &
         '-----',  '---------', '-----------------', '---------------------', '----------', '----------'

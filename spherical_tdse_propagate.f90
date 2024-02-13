@@ -25,7 +25,8 @@ module spherical_tdse_propagate
   public rcsid_spherical_tdse_propagate
   public propagation
   !
-  character(len=clen), save :: rcsid_spherical_tdse_propagate = "$Id: spherical_tdse_propagate.f90,v 1.1 2024/02/13 14:22:14 ps Exp $"
+  character(len=clen), save :: rcsid_spherical_tdse_propagate = &
+       "$Id: spherical_tdse_propagate.f90,v 1.2 2024/02/13 16:10:04 ps Exp $"
   !
   contains
   !

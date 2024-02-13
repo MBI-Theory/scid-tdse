@@ -25,7 +25,8 @@ module spherical_tdse_initialwf
   public rcsid_spherical_tdse_initialwf
   public prepare_one_initial_wavefunction
   !
-  character(len=clen), save :: rcsid_spherical_tdse_initialwf = "$Id: spherical_tdse_initialwf.f90,v 1.1 2024/02/13 14:22:14 ps Exp $"
+  character(len=clen), save :: rcsid_spherical_tdse_initialwf = &
+      "$Id: spherical_tdse_initialwf.f90,v 1.2 2024/02/13 16:10:04 ps Exp $"
   !
   contains
   !

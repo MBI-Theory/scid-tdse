@@ -26,7 +26,7 @@ module spherical_tdse_io
   public dump_all_wavefunctions
   public fetch_wavefunction
   !
-  character(len=clen), save :: rcsid_spherical_tdse_io = "$Id: spherical_tdse_io.f90,v 1.1 2024/02/13 14:22:14 ps Exp $"
+  character(len=clen), save :: rcsid_spherical_tdse_io = "$Id: spherical_tdse_io.f90,v 1.2 2024/02/13 16:10:04 ps Exp $"
   !
   contains
   !
@@ -147,7 +147,8 @@ module spherical_tdse_io
         else
           write (filename,"(a,'-L',i0.3,'-M-',i0.4)") trim(prefix), lval, -mval
         end if
-        open(newunit=iu_temp,form='formatted',recl=256,action='write',position='rewind',status='replace',file=trim(filename),iostat=ios)
+        open(newunit=iu_temp,form='formatted',recl=256,action='write',position='rewind', &
+             status='replace',file=trim(filename),iostat=ios)
         if (ios/=0) then
           write (out,"('WARNING: File ',a,' cannot be opened for writing. Code = ',i0)") trim(filename), ios
           cycle dump_m_channels

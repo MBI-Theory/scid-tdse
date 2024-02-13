@@ -95,7 +95,7 @@ for inp in helium_1S_adiabatic.inp argon_3P1_cooper.inp argon_3P1_offcooper.inp 
            argon_3P1m_circ_l.inp argon_3P1m_circ_r.inp hydrogen_1S_hhg_linear.inp \
            hydrogen_2P0_sfi_tsurf.inp argon_3P1m_ell_ckpt_mpi.inp argon_3P1m_ell_rstrt_mpi.inp \
            hydrogen_1S_hhg_spline.inp argon_circ-hhg_full.inp argon_circ-hhg_fakeleft2.inp \
-           hydrogen_static.inp \
+           hydrogen_static.inp lithium_ensemble.inp lithium_ensemble_restart.inp \
            ; do
   run_test $inp
 done

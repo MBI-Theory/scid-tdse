@@ -1,8 +1,17 @@
-Last updated: 2023 December 23
+Last updated: 2024 February 12
 ------------
 
 Change log
 ----------
+
+2024 Feb 12
+
+ - Added support for ensemble calculations, where multiple initial
+   states are propagated under the action of the same Hamiltonian.
+   Optionally, matrix elements between ensemble members can be
+   evaluated.
+ - Refactored the spherical_tdse.f90 module into several, logically
+   related modules.
 
 2023 Dec 23
 

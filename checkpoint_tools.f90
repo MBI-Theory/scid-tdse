@@ -41,7 +41,7 @@ module checkpoint_tools
   implicit none
   private
   ! Entry points
-  public ckpt_do_checkpoint
+  public ckpt_initialize, ckpt_do_checkpoint
   ! Exposed global data
   public rcsid_checkpoint_tools
   public ckpt_data
@@ -54,17 +54,27 @@ module checkpoint_tools
                                                                 !  102 = added support for adaptive angular momentum
                                                                 !  103 = added support for adaptive radial grid
                                                                 !  104 = full support for adaptive radial grid
-  integer, parameter        :: iu_temp              = 32        ! Some unique unit number to use here.
   character(len=clen), save :: ckpt_save_basename   = ' '       ! Base name for checkpoints. Timestep index and extension '.ckpt'
                                                                 ! will be appended. Blank disables checkpoints.
   character(len=clen), save :: ckpt_load_filename   = ' '       ! Name of a checkpoint to restart from. Blank means no restart.
   integer(ik), save         :: ckpt_max_checkpoints = 3_ik      ! Maximum number of checkpoints to keep.
   integer(ik), save         :: ckpt_interval        = 10000_ik  ! Number of timesteps between checkpoints.
   !
-  character(len=clen), save :: rcsid_checkpoint_tools = "$Id: checkpoint_tools.f90,v 1.17 2022/10/08 17:24:26 ps Exp $"
+  character(len=clen), save :: rcsid_checkpoint_tools = "$Id: checkpoint_tools.f90,v 1.18 2024/02/13 14:22:14 ps Exp $"
   !
   type ckpt_data
-    private                                                         ! This data is not for exterrrnal consumption
+    private                                                         ! This data is not for external consumption
+    !
+    !  To support multiple, concurrent checkpoints, we need to use local filenames.
+    !  In this case, it is necessary to explicitly call ckpt_initialize. Otherwise,
+    !  initialization is optional.
+    !
+    logical                          :: have_files       = .false.  ! Are per-instance filenames filled out already?
+    character(len=clen)              :: save_basename               ! Local copy of ckpt_save_basename
+    character(len=clen)              :: load_filename               ! Local copy of ckpt_load_filename
+    !
+    !  The rest of the checkpoint logic needs filenames to be filled out
+    !
     logical                          :: initialized      = .false.  ! .true. if we've been here before
     integer(ik)                      :: checkpoint_count            ! Number of checkpoints in the checkpoint_list()
     character(len=clen), allocatable :: checkpoint_list(:)          ! List of files containing checkpoint data. We'll
@@ -82,6 +92,22 @@ module checkpoint_tools
   !
   contains
   !
+  !  Save per-checkpoint variables in the state structure
+  !
+  subroutine ckpt_initialize(ck,save_basename,load_filename)
+    type(ckpt_data), intent(inout)            :: ck            ! Checkpointer state. All global state goes here
+    character(len=clen), intent(in), optional :: save_basename ! Overrides ckpt_save_basename
+    character(len=clen), intent(in), optional :: load_filename ! Overrides ckpt_load_filename
+    !
+    if (ck%have_files) return
+    !
+    ck%have_files    = .true.
+    ck%save_basename = ckpt_save_basename
+    ck%load_filename = ckpt_load_filename
+    if (present(save_basename)) ck%save_basename = save_basename
+    if (present(load_filename)) ck%load_filename = load_filename
+  end subroutine ckpt_initialize
+  !
   !  This routine is called once per time step. Both checkpoints and restarts are its responsibility.
   !
   subroutine ckpt_do_checkpoint(ck,checkpoint_go,its,t_vpot,units,wfn_l,wfn_r,tsurf)
@@ -92,13 +118,16 @@ module checkpoint_tools
     integer(ik), intent(in)        :: its           ! Current time step
     real(xk), intent(in)           :: t_vpot(0:3)   ! Current values of time and vector-potential (spherical coordinates)
     integer(ik), intent(in)        :: units(:)      ! Curently open output units which need to be flushed.
+                                                    ! Negtative unit numbers will be ignored.
     type(sd_wfn), intent(inout)    :: wfn_l         ! Left wavefunction
     type(sd_wfn), intent(inout)    :: wfn_r         ! Right wavefunction
     type(sts_data), intent(inout)  :: tsurf         ! tSURFF/iSURF state
     !
+    call ckpt_initialize(ck)
+    !
     !  Early return if checkpoints/restarts are not desired.
     !
-    if (ckpt_save_basename==' ' .and. ckpt_load_filename==' ') then
+    if (ck%save_basename==' ' .and. ck%load_filename==' ') then
       checkpoint_go = .true.
       return
     end if
@@ -108,8 +137,8 @@ module checkpoint_tools
       !
       !  This is the first time we are called. Initialize state and optionally load checkpointed data
       !
-      call ckpt_initialize(ck)
-      if (ckpt_load_filename/=' ') then
+      call ckpt_init_internal(ck)
+      if (ck%load_filename/=' ') then
         ck%do_restart = .true.
         if (nts%this_node==1) then
           call ckpt_load_checkpoint(ck,wfn_l,wfn_r,tsurf)
@@ -132,7 +161,7 @@ module checkpoint_tools
         call nt_broadcast(tsurf)
         call nt_rebalance(max(wfn_l%lmax,wfn_r%lmax))
       end if
-      if (ckpt_save_basename/=' ') then
+      if (ck%save_basename/=' ') then
         ck%do_checkpoint = .true.
       end if
     end if
@@ -190,21 +219,21 @@ module checkpoint_tools
   !
   !  Internal routines below this point
   ! 
-  subroutine ckpt_initialize(ck)
+  subroutine ckpt_init_internal(ck)
     type(ckpt_data), intent(inout) :: ck   ! Checkpointer state
     !
     integer(ik) :: alloc
     !
     allocate (ck%checkpoint_list(ckpt_max_checkpoints+1),stat=alloc)
     if (alloc/=0) then
-      write (out,"('checkpoint_tools%ckpt_initialize - allocation failed with code ',i0)") alloc
-      stop 'checkpoint_tools%ckpt_initialize - allocation failed'
+      write (out,"('checkpoint_tools%ckpt_init_internal - allocation failed with code ',i0)") alloc
+      stop 'checkpoint_tools%ckpt_init_internal - allocation failed'
     end if
     ck%initialized      = .true.
     ck%checkpoint_count = 0
     ck%do_checkpoint    = .false.
     ck%do_restart       = .false.
-  end subroutine ckpt_initialize
+  end subroutine ckpt_init_internal
   !
   subroutine ckpt_load_checkpoint(ck,wfn_l,wfn_r,tsurf)
     type(ckpt_data), intent(inout) :: ck            ! Checkpointer state. All global state goes here
@@ -213,6 +242,7 @@ module checkpoint_tools
     type(sts_data), intent(inout)  :: tsurf         ! tSURFF/iSURF state
     !
     character(len=clen) :: action
+    integer(ik)         :: iu_temp
     integer(ik)         :: ios
     logical             :: options (2) ! Optionally present data
     character(len=9)    :: tag
@@ -230,7 +260,7 @@ module checkpoint_tools
     !
     error_block: do
       action = 'opening'
-      open (iu_temp,file=trim(ckpt_load_filename),form='unformatted',action='read',status='old',iostat=ios)
+      open (newunit=iu_temp,file=trim(ck%load_filename),form='unformatted',action='read',status='old',iostat=ios)
       if (ios/=0) exit error_block
       action = 'reading header'
       read (iu_temp,iostat=ios) tag, version, options2, ck%its, ck%t_vpot, nr
@@ -301,21 +331,23 @@ module checkpoint_tools
         write (out,"('WARNING: Restating adaptive-R checkpoint. Adaptive Nradial reset to sd_nradial')")
       end if
       !
-      write (out,"('State at the beginning of time step ',i0,' restored from ',a)") ck%its, trim(ckpt_load_filename)
+      write (out,"('State at the beginning of time step ',i0,' restored from ',a)") ck%its, trim(ck%load_filename)
       return
     end do error_block
-    write (out,"('FATAL: Encountered error ',i0,' while ',a,' checkpoint file ',a)") ios, trim(action), trim(ckpt_load_filename)
+    write (out,"('FATAL: Encountered error ',i0,' while ',a,' checkpoint file ',a)") ios, trim(action), trim(ck%load_filename)
     call flush_wrapper(out)
     stop 'checkpoint_tools%ckpt_load_checkpoint'
   end subroutine ckpt_load_checkpoint
   !
   subroutine ckpt_flush_all(units)
     integer(ik), intent(in)        :: units(:)      ! Curently open output units which need to be flushed.
+                                                    ! Negative unit numbers will be ignored.
     !
     integer(ik) :: i
     logical     :: isopen
     !
     scan_units: do i=1,size(units)
+      if (units(i)<0) cycle scan_units
       inquire (unit=units(i),opened=isopen)
       if (isopen) call flush_wrapper(units(i))
     end do scan_units
@@ -331,10 +363,11 @@ module checkpoint_tools
     !
     character(len=clen) :: fname
     character(len=clen) :: action
+    integer(ik)         :: iu_temp
     integer(ik)         :: ios
     logical             :: options(2) ! Optionally present data
     !
-    write (fname,"(a,'-',i0,'.ckpt')") trim(ckpt_save_basename), its
+    write (fname,"(a,'-',i0,'.ckpt')") trim(ck%save_basename), its
     !
     !  Which optional items do we have?
     !
@@ -345,7 +378,7 @@ module checkpoint_tools
     !
     error_block: do
       action = 'creating'
-      open (iu_temp,file=trim(fname),form='unformatted',action='write',status='new',iostat=ios)
+      open (newunit=iu_temp,file=trim(fname),form='unformatted',action='write',status='new',iostat=ios)
       if (ios/=0) exit error_block
       action = 'writing header'
       write (iu_temp,iostat=ios) 'SCID CKPT', ckpt_version, options, its, t_vpot, sd_nradial
@@ -385,11 +418,12 @@ module checkpoint_tools
   subroutine ckpt_cleanup_checkpoints(ck)
     type(ckpt_data), intent(inout) :: ck            ! Checkpointer state. All global state goes here
     !
+    integer(ik) :: iu_temp
     integer(ik) :: ios
     !
     if (ck%checkpoint_count<=ckpt_max_checkpoints) return
     !
-    open (iu_temp,file=trim(ck%checkpoint_list(1)),status='old',iostat=ios)
+    open (newunit=iu_temp,file=trim(ck%checkpoint_list(1)),status='old',iostat=ios)
     if (ios==0) close (iu_temp,status='delete',iostat=ios)
     if (ios==0) then
       write (out,"('Deleted old checkpoint file ',a)") trim(ck%checkpoint_list(1))

@@ -1,0 +1,178 @@
+cycle=2*pi/0.05695
+set x2label "Time (cycles)"
+set xlabel "Time (au)"
+set link x2 via x/cycle inverse x*cycle
+set x2tics 0.0, 0.50, 4.5
+set key left top
+#
+set terminal x11 0
+set ylabel "Electric field"
+plot \
+     "< awk '!/^#/&&($2==1)&&($3==1)' lithium_ensemble_cross.table"         u 4:34 ti "1" w l lw 3, \
+     "< awk '!/^#/&&($2==1)&&($3==1)' lithium_ensemble_restart_cross.table" u 4:34 ti "2" w l lw 1, \
+     1/0 noti
+#
+set terminal x11 1
+set ylabel "Boundary loss"
+set logscale y
+set yrange [1e-12:*]
+plot \
+     "< awk '!/^#/&&($2==1)&&($3==1)' lithium_ensemble_cross.table"         u 4:(1-$8) ti "1 e1" w l lw 3, \
+     "< awk '!/^#/&&($2==2)&&($3==2)' lithium_ensemble_cross.table"         u 4:(1-$8) ti "1 e2" w l lw 3, \
+     "< awk '!/^#/&&($2==3)&&($3==3)' lithium_ensemble_cross.table"         u 4:(1-$8) ti "1 e3" w l lw 3, \
+     "< awk '!/^#/&&($2==1)&&($3==1)' lithium_ensemble_restart_cross.table" u 4:(1-$8) ti "2 e1" w l lw 1, \
+     "< awk '!/^#/&&($2==2)&&($3==2)' lithium_ensemble_restart_cross.table" u 4:(1-$8) ti "2 e2" w l lw 1, \
+     "< awk '!/^#/&&($2==3)&&($3==3)' lithium_ensemble_restart_cross.table" u 4:(1-$8) ti "2 e3" w l lw 1, \
+     1/0 noti
+unset yrange
+unset logscale y
+#
+set terminal x11 2
+set ylabel "Overlap (Re)"
+plot \
+     "< awk '!/^#/&&($2==1)&&($3==2)' lithium_ensemble_cross.table"         u 4:8 ti "1 e1-e2" w l ls 1 lw 3, \
+     "< awk '!/^#/&&($2==2)&&($3==1)' lithium_ensemble_cross.table"         u 4:8 ti "1 e2-e1" w l ls 1 lw 4 lt ".  .", \
+     "< awk '!/^#/&&($2==1)&&($3==3)' lithium_ensemble_cross.table"         u 4:8 ti "1 e1-e3" w l ls 2 lw 3, \
+     "< awk '!/^#/&&($2==3)&&($3==1)' lithium_ensemble_cross.table"         u 4:8 ti "1 e3-e1" w l ls 2 lw 4 lt ".  .", \
+     "< awk '!/^#/&&($2==2)&&($3==3)' lithium_ensemble_cross.table"         u 4:8 ti "1 e2-e3" w l ls 3 lw 3, \
+     "< awk '!/^#/&&($2==3)&&($3==2)' lithium_ensemble_cross.table"         u 4:8 ti "1 e3-e2" w l ls 3 lw 4 lt ".  .", \
+     "< awk '!/^#/&&($2==1)&&($3==2)' lithium_ensemble_restart_cross.table" u 4:8 ti "2 e1-e2" w l ls 4 lw 1, \
+     "< awk '!/^#/&&($2==2)&&($3==1)' lithium_ensemble_restart_cross.table" u 4:8 ti "2 e2-e1" w l ls 4 lw 2 lt " .. ", \
+     "< awk '!/^#/&&($2==1)&&($3==3)' lithium_ensemble_restart_cross.table" u 4:8 ti "2 e1-e3" w l ls 5 lw 1, \
+     "< awk '!/^#/&&($2==3)&&($3==1)' lithium_ensemble_restart_cross.table" u 4:8 ti "2 e3-e1" w l ls 5 lw 2 lt " .. ", \
+     "< awk '!/^#/&&($2==2)&&($3==3)' lithium_ensemble_restart_cross.table" u 4:8 ti "2 e2-e3" w l ls 6 lw 1, \
+     "< awk '!/^#/&&($2==3)&&($3==2)' lithium_ensemble_restart_cross.table" u 4:8 ti "2 e3-e2" w l ls 6 lw 2 lt " .. ", \
+     1/0 noti
+#
+set terminal x11 3
+set ylabel "Overlap (Im)"
+plot \
+     "< awk '!/^#/&&($2==1)&&($3==2)' lithium_ensemble_cross.table"         u 4:9 ti "1 e1-e2" w l ls 1 lw 3, \
+     "< awk '!/^#/&&($2==2)&&($3==1)' lithium_ensemble_cross.table"         u 4:9 ti "1 e2-e1" w l ls 1 lw 4 lt ".  .", \
+     "< awk '!/^#/&&($2==1)&&($3==3)' lithium_ensemble_cross.table"         u 4:9 ti "1 e1-e3" w l ls 2 lw 3, \
+     "< awk '!/^#/&&($2==3)&&($3==1)' lithium_ensemble_cross.table"         u 4:9 ti "1 e3-e1" w l ls 2 lw 4 lt ".  .", \
+     "< awk '!/^#/&&($2==2)&&($3==3)' lithium_ensemble_cross.table"         u 4:9 ti "1 e2-e3" w l ls 3 lw 3, \
+     "< awk '!/^#/&&($2==3)&&($3==2)' lithium_ensemble_cross.table"         u 4:9 ti "1 e3-e2" w l ls 3 lw 4 lt ".  .", \
+     "< awk '!/^#/&&($2==1)&&($3==2)' lithium_ensemble_restart_cross.table" u 4:9 ti "2 e1-e2" w l ls 4 lw 1, \
+     "< awk '!/^#/&&($2==2)&&($3==1)' lithium_ensemble_restart_cross.table" u 4:9 ti "2 e2-e1" w l ls 4 lw 2 lt " .. ", \
+     "< awk '!/^#/&&($2==1)&&($3==3)' lithium_ensemble_restart_cross.table" u 4:9 ti "2 e1-e3" w l ls 5 lw 1, \
+     "< awk '!/^#/&&($2==3)&&($3==1)' lithium_ensemble_restart_cross.table" u 4:9 ti "2 e3-e1" w l ls 5 lw 2 lt " .. ", \
+     "< awk '!/^#/&&($2==2)&&($3==3)' lithium_ensemble_restart_cross.table" u 4:9 ti "2 e2-e3" w l ls 6 lw 1, \
+     "< awk '!/^#/&&($2==3)&&($3==2)' lithium_ensemble_restart_cross.table" u 4:9 ti "2 e3-e2" w l ls 6 lw 2 lt " .. ", \
+     1/0 noti
+#
+set terminal x11 4
+set ylabel "Re <l|H|r>"
+plot \
+     "< awk '!/^#/&&($2==1)&&($3==1)' lithium_ensemble_cross.table"         u 4:10 ti "1 e1-e1" w l ls  1 lw 3, \
+     "< awk '!/^#/&&($2==2)&&($3==2)' lithium_ensemble_cross.table"         u 4:10 ti "1 e2-e2" w l ls  2 lw 3, \
+     "< awk '!/^#/&&($2==3)&&($3==3)' lithium_ensemble_cross.table"         u 4:10 ti "1 e3-e3" w l ls  3 lw 3, \
+     "< awk '!/^#/&&($2==1)&&($3==2)' lithium_ensemble_cross.table"         u 4:10 ti "1 e1-e2" w l ls  4 lw 3, \
+     "< awk '!/^#/&&($2==2)&&($3==1)' lithium_ensemble_cross.table"         u 4:10 ti "1 e2-e1" w l ls  4 lw 4 lt ".  .", \
+     "< awk '!/^#/&&($2==1)&&($3==3)' lithium_ensemble_cross.table"         u 4:10 ti "1 e1-e3" w l ls  5 lw 3, \
+     "< awk '!/^#/&&($2==3)&&($3==1)' lithium_ensemble_cross.table"         u 4:10 ti "1 e3-e1" w l ls  5 lw 4 lt ".  .", \
+     "< awk '!/^#/&&($2==2)&&($3==3)' lithium_ensemble_cross.table"         u 4:10 ti "1 e2-e3" w l ls  6 lw 3, \
+     "< awk '!/^#/&&($2==3)&&($3==2)' lithium_ensemble_cross.table"         u 4:10 ti "1 e3-e2" w l ls  6 lw 4 lt ".  .", \
+     "< awk '!/^#/&&($2==1)&&($3==1)' lithium_ensemble_restart_cross.table" u 4:10 ti "2 e1-e1" w l ls  7 lw 1, \
+     "< awk '!/^#/&&($2==2)&&($3==2)' lithium_ensemble_restart_cross.table" u 4:10 ti "2 e2-e2" w l ls  8 lw 1, \
+     "< awk '!/^#/&&($2==3)&&($3==3)' lithium_ensemble_restart_cross.table" u 4:10 ti "2 e3-e3" w l ls  9 lw 1, \
+     "< awk '!/^#/&&($2==1)&&($3==2)' lithium_ensemble_restart_cross.table" u 4:10 ti "2 e1-e2" w l ls 10 lw 1, \
+     "< awk '!/^#/&&($2==2)&&($3==1)' lithium_ensemble_restart_cross.table" u 4:10 ti "2 e2-e1" w l ls 10 lw 2 lt " .. ", \
+     "< awk '!/^#/&&($2==1)&&($3==3)' lithium_ensemble_restart_cross.table" u 4:10 ti "2 e1-e3" w l ls 11 lw 1, \
+     "< awk '!/^#/&&($2==3)&&($3==1)' lithium_ensemble_restart_cross.table" u 4:10 ti "2 e3-e1" w l ls 11 lw 2 lt " .. ", \
+     "< awk '!/^#/&&($2==2)&&($3==3)' lithium_ensemble_restart_cross.table" u 4:10 ti "2 e2-e3" w l ls 12 lw 1, \
+     "< awk '!/^#/&&($2==3)&&($3==2)' lithium_ensemble_restart_cross.table" u 4:10 ti "1 e3-e2" w l ls 12 lw 2 lt " .. ", \
+     1/0 noti
+#
+set terminal x11 5
+set ylabel "Im <l|H|r>"
+plot \
+     "< awk '!/^#/&&($2==1)&&($3==1)' lithium_ensemble_cross.table"         u 4:11 ti "1 e1-e1" w l ls  1 lw 3, \
+     "< awk '!/^#/&&($2==2)&&($3==2)' lithium_ensemble_cross.table"         u 4:11 ti "1 e2-e2" w l ls  2 lw 3, \
+     "< awk '!/^#/&&($2==3)&&($3==3)' lithium_ensemble_cross.table"         u 4:11 ti "1 e3-e3" w l ls  3 lw 3, \
+     "< awk '!/^#/&&($2==1)&&($3==2)' lithium_ensemble_cross.table"         u 4:11 ti "1 e1-e2" w l ls  4 lw 3, \
+     "< awk '!/^#/&&($2==2)&&($3==1)' lithium_ensemble_cross.table"         u 4:11 ti "1 e2-e1" w l ls  4 lw 4 lt ".  .", \
+     "< awk '!/^#/&&($2==1)&&($3==3)' lithium_ensemble_cross.table"         u 4:11 ti "1 e1-e3" w l ls  5 lw 3, \
+     "< awk '!/^#/&&($2==3)&&($3==1)' lithium_ensemble_cross.table"         u 4:11 ti "1 e3-e1" w l ls  5 lw 4 lt ".  .", \
+     "< awk '!/^#/&&($2==2)&&($3==3)' lithium_ensemble_cross.table"         u 4:11 ti "1 e2-e3" w l ls  6 lw 3, \
+     "< awk '!/^#/&&($2==3)&&($3==2)' lithium_ensemble_cross.table"         u 4:11 ti "1 e3-e2" w l ls  6 lw 4 lt ".  .", \
+     "< awk '!/^#/&&($2==1)&&($3==1)' lithium_ensemble_restart_cross.table" u 4:11 ti "2 e1-e1" w l ls  7 lw 1, \
+     "< awk '!/^#/&&($2==2)&&($3==2)' lithium_ensemble_restart_cross.table" u 4:11 ti "2 e2-e2" w l ls  8 lw 1, \
+     "< awk '!/^#/&&($2==3)&&($3==3)' lithium_ensemble_restart_cross.table" u 4:11 ti "2 e3-e3" w l ls  9 lw 1, \
+     "< awk '!/^#/&&($2==1)&&($3==2)' lithium_ensemble_restart_cross.table" u 4:11 ti "2 e1-e2" w l ls 10 lw 1, \
+     "< awk '!/^#/&&($2==2)&&($3==1)' lithium_ensemble_restart_cross.table" u 4:11 ti "2 e2-e1" w l ls 10 lw 2 lt " .. ", \
+     "< awk '!/^#/&&($2==1)&&($3==3)' lithium_ensemble_restart_cross.table" u 4:11 ti "2 e1-e3" w l ls 11 lw 1, \
+     "< awk '!/^#/&&($2==3)&&($3==1)' lithium_ensemble_restart_cross.table" u 4:11 ti "2 e3-e1" w l ls 11 lw 2 lt " .. ", \
+     "< awk '!/^#/&&($2==2)&&($3==3)' lithium_ensemble_restart_cross.table" u 4:11 ti "2 e2-e3" w l ls 12 lw 1, \
+     "< awk '!/^#/&&($2==3)&&($3==2)' lithium_ensemble_restart_cross.table" u 4:11 ti "1 e3-e2" w l ls 12 lw 2 lt " .. ", \
+     1/0 noti
+#
+set terminal x11 6
+set ylabel "Re <l|z|r>"
+plot \
+     "< awk '!/^#/&&($2==1)&&($3==1)' lithium_ensemble_cross.table"         u 4:18 ti "1 e1-e1" w l ls  1 lw 3, \
+     "< awk '!/^#/&&($2==2)&&($3==2)' lithium_ensemble_cross.table"         u 4:18 ti "1 e2-e2" w l ls  2 lw 3, \
+     "< awk '!/^#/&&($2==3)&&($3==3)' lithium_ensemble_cross.table"         u 4:18 ti "1 e3-e3" w l ls  3 lw 3, \
+     "< awk '!/^#/&&($2==1)&&($3==2)' lithium_ensemble_cross.table"         u 4:18 ti "1 e1-e2" w l ls  4 lw 3, \
+     "< awk '!/^#/&&($2==2)&&($3==1)' lithium_ensemble_cross.table"         u 4:18 ti "1 e2-e1" w l ls  4 lw 4 lt ".  .", \
+     "< awk '!/^#/&&($2==1)&&($3==3)' lithium_ensemble_cross.table"         u 4:18 ti "1 e1-e3" w l ls  5 lw 3, \
+     "< awk '!/^#/&&($2==3)&&($3==1)' lithium_ensemble_cross.table"         u 4:18 ti "1 e3-e1" w l ls  5 lw 4 lt ".  .", \
+     "< awk '!/^#/&&($2==2)&&($3==3)' lithium_ensemble_cross.table"         u 4:18 ti "1 e2-e3" w l ls  6 lw 3, \
+     "< awk '!/^#/&&($2==3)&&($3==2)' lithium_ensemble_cross.table"         u 4:18 ti "1 e3-e2" w l ls  6 lw 4 lt ".  .", \
+     "< awk '!/^#/&&($2==1)&&($3==1)' lithium_ensemble_restart_cross.table" u 4:18 ti "2 e1-e1" w l ls  7 lw 1, \
+     "< awk '!/^#/&&($2==2)&&($3==2)' lithium_ensemble_restart_cross.table" u 4:18 ti "2 e2-e2" w l ls  8 lw 1, \
+     "< awk '!/^#/&&($2==3)&&($3==3)' lithium_ensemble_restart_cross.table" u 4:18 ti "2 e3-e3" w l ls  9 lw 1, \
+     "< awk '!/^#/&&($2==1)&&($3==2)' lithium_ensemble_restart_cross.table" u 4:18 ti "2 e1-e2" w l ls 10 lw 1, \
+     "< awk '!/^#/&&($2==2)&&($3==1)' lithium_ensemble_restart_cross.table" u 4:18 ti "2 e2-e1" w l ls 10 lw 2 lt " .. ", \
+     "< awk '!/^#/&&($2==1)&&($3==3)' lithium_ensemble_restart_cross.table" u 4:18 ti "2 e1-e3" w l ls 11 lw 1, \
+     "< awk '!/^#/&&($2==3)&&($3==1)' lithium_ensemble_restart_cross.table" u 4:18 ti "2 e3-e1" w l ls 11 lw 2 lt " .. ", \
+     "< awk '!/^#/&&($2==2)&&($3==3)' lithium_ensemble_restart_cross.table" u 4:18 ti "2 e2-e3" w l ls 12 lw 1, \
+     "< awk '!/^#/&&($2==3)&&($3==2)' lithium_ensemble_restart_cross.table" u 4:18 ti "1 e3-e2" w l ls 12 lw 2 lt " .. ", \
+     1/0 noti
+#
+set terminal x11 7
+set ylabel "Im <l|z|r>"
+plot \
+     "< awk '!/^#/&&($2==1)&&($3==1)' lithium_ensemble_cross.table"         u 4:19 ti "1 e1-e1" w l ls  1 lw 3, \
+     "< awk '!/^#/&&($2==2)&&($3==2)' lithium_ensemble_cross.table"         u 4:19 ti "1 e2-e2" w l ls  2 lw 3, \
+     "< awk '!/^#/&&($2==3)&&($3==3)' lithium_ensemble_cross.table"         u 4:19 ti "1 e3-e3" w l ls  3 lw 3, \
+     "< awk '!/^#/&&($2==1)&&($3==2)' lithium_ensemble_cross.table"         u 4:19 ti "1 e1-e2" w l ls  4 lw 3, \
+     "< awk '!/^#/&&($2==2)&&($3==1)' lithium_ensemble_cross.table"         u 4:19 ti "1 e2-e1" w l ls  4 lw 4 lt ".  .", \
+     "< awk '!/^#/&&($2==1)&&($3==3)' lithium_ensemble_cross.table"         u 4:19 ti "1 e1-e3" w l ls  5 lw 3, \
+     "< awk '!/^#/&&($2==3)&&($3==1)' lithium_ensemble_cross.table"         u 4:19 ti "1 e3-e1" w l ls  5 lw 4 lt ".  .", \
+     "< awk '!/^#/&&($2==2)&&($3==3)' lithium_ensemble_cross.table"         u 4:19 ti "1 e2-e3" w l ls  6 lw 3, \
+     "< awk '!/^#/&&($2==3)&&($3==2)' lithium_ensemble_cross.table"         u 4:19 ti "1 e3-e2" w l ls  6 lw 4 lt ".  .", \
+     "< awk '!/^#/&&($2==1)&&($3==1)' lithium_ensemble_restart_cross.table" u 4:19 ti "2 e1-e1" w l ls  7 lw 1, \
+     "< awk '!/^#/&&($2==2)&&($3==2)' lithium_ensemble_restart_cross.table" u 4:19 ti "2 e2-e2" w l ls  8 lw 1, \
+     "< awk '!/^#/&&($2==3)&&($3==3)' lithium_ensemble_restart_cross.table" u 4:19 ti "2 e3-e3" w l ls  9 lw 1, \
+     "< awk '!/^#/&&($2==1)&&($3==2)' lithium_ensemble_restart_cross.table" u 4:19 ti "2 e1-e2" w l ls 10 lw 1, \
+     "< awk '!/^#/&&($2==2)&&($3==1)' lithium_ensemble_restart_cross.table" u 4:19 ti "2 e2-e1" w l ls 10 lw 2 lt " .. ", \
+     "< awk '!/^#/&&($2==1)&&($3==3)' lithium_ensemble_restart_cross.table" u 4:19 ti "2 e1-e3" w l ls 11 lw 1, \
+     "< awk '!/^#/&&($2==3)&&($3==1)' lithium_ensemble_restart_cross.table" u 4:19 ti "2 e3-e1" w l ls 11 lw 2 lt " .. ", \
+     "< awk '!/^#/&&($2==2)&&($3==3)' lithium_ensemble_restart_cross.table" u 4:19 ti "2 e2-e3" w l ls 12 lw 1, \
+     "< awk '!/^#/&&($2==3)&&($3==2)' lithium_ensemble_restart_cross.table" u 4:19 ti "1 e3-e2" w l ls 12 lw 2 lt " .. ", \
+     1/0 noti
+#
+set terminal x11 8
+set ylabel "|<l|z|r>|^2"
+plot \
+     "< awk '!/^#/&&($2==1)&&($3==1)' lithium_ensemble_cross.table"         u 4:($18**2+$19**2) ti "1 e1-e1" w l ls  1 lw 3, \
+     "< awk '!/^#/&&($2==2)&&($3==2)' lithium_ensemble_cross.table"         u 4:($18**2+$19**2) ti "1 e2-e2" w l ls  2 lw 3, \
+     "< awk '!/^#/&&($2==3)&&($3==3)' lithium_ensemble_cross.table"         u 4:($18**2+$19**2) ti "1 e3-e3" w l ls  3 lw 3, \
+     "< awk '!/^#/&&($2==1)&&($3==2)' lithium_ensemble_cross.table"         u 4:($18**2+$19**2) ti "1 e1-e2" w l ls  4 lw 3, \
+     "< awk '!/^#/&&($2==2)&&($3==1)' lithium_ensemble_cross.table"         u 4:($18**2+$19**2) ti "1 e2-e1" w l ls  4 lw 4 lt ".  .", \
+     "< awk '!/^#/&&($2==1)&&($3==3)' lithium_ensemble_cross.table"         u 4:($18**2+$19**2) ti "1 e1-e3" w l ls  5 lw 3, \
+     "< awk '!/^#/&&($2==3)&&($3==1)' lithium_ensemble_cross.table"         u 4:($18**2+$19**2) ti "1 e3-e1" w l ls  5 lw 4 lt ".  .", \
+     "< awk '!/^#/&&($2==2)&&($3==3)' lithium_ensemble_cross.table"         u 4:($18**2+$19**2) ti "1 e2-e3" w l ls  6 lw 3, \
+     "< awk '!/^#/&&($2==3)&&($3==2)' lithium_ensemble_cross.table"         u 4:($18**2+$19**2) ti "1 e3-e2" w l ls  6 lw 4 lt ".  .", \
+     "< awk '!/^#/&&($2==1)&&($3==1)' lithium_ensemble_restart_cross.table" u 4:($18**2+$19**2) ti "2 e1-e1" w l ls  7 lw 1, \
+     "< awk '!/^#/&&($2==2)&&($3==2)' lithium_ensemble_restart_cross.table" u 4:($18**2+$19**2) ti "2 e2-e2" w l ls  8 lw 1, \
+     "< awk '!/^#/&&($2==3)&&($3==3)' lithium_ensemble_restart_cross.table" u 4:($18**2+$19**2) ti "2 e3-e3" w l ls  9 lw 1, \
+     "< awk '!/^#/&&($2==1)&&($3==2)' lithium_ensemble_restart_cross.table" u 4:($18**2+$19**2) ti "2 e1-e2" w l ls 10 lw 1, \
+     "< awk '!/^#/&&($2==2)&&($3==1)' lithium_ensemble_restart_cross.table" u 4:($18**2+$19**2) ti "2 e2-e1" w l ls 10 lw 2 lt " .. ", \
+     "< awk '!/^#/&&($2==1)&&($3==3)' lithium_ensemble_restart_cross.table" u 4:($18**2+$19**2) ti "2 e1-e3" w l ls 11 lw 1, \
+     "< awk '!/^#/&&($2==3)&&($3==1)' lithium_ensemble_restart_cross.table" u 4:($18**2+$19**2) ti "2 e3-e1" w l ls 11 lw 2 lt " .. ", \
+     "< awk '!/^#/&&($2==2)&&($3==3)' lithium_ensemble_restart_cross.table" u 4:($18**2+$19**2) ti "2 e2-e3" w l ls 12 lw 1, \
+     "< awk '!/^#/&&($2==3)&&($3==2)' lithium_ensemble_restart_cross.table" u 4:($18**2+$19**2) ti "1 e3-e2" w l ls 12 lw 2 lt " .. ", \
+     1/0 noti
+#

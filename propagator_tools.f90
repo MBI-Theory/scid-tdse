@@ -1196,7 +1196,7 @@ module propagator_tools
   ! complex(rk) :: xl(sd_nradial), xp(sd_nradial)
     !
     if (aimag(dt)==0._xk) then
-      fac_br = real(dt*a*(electron_charge/electron_mass)*(lval+1)*sd_laser_clm(lval+1,mval),kind=rk)
+      fac_br = real(dt*a*(electron_charge/electron_mass)*(lval+1_ik)*sd_laser_clm(lval+1_ik,mval),kind=rk)
       c3r(:nr) = 1._rk/(sd_rtab(:nr)**2 + fac_br**2)
       c1r(:nr) = c3r(:nr)*(sd_rtab(:nr)**2 - fac_br**2)
       c2r(:nr) = c3r(:nr)*2._rk*fac_br*sd_rtab(:nr)
@@ -1204,7 +1204,7 @@ module propagator_tools
       xl(:nr) = c1r(:nr)*psi_l(:nr) + c2r(:nr)*psi_p(:nr)
       xp(:nr) = c1r(:nr)*psi_p(:nr) - c2r(:nr)*psi_l(:nr)
     else
-      fac_bc = cmplx(dt*a*(electron_charge/electron_mass)*(lval+1)*sd_laser_clm(lval+1,mval),kind=rk)
+      fac_bc = cmplx(dt*a*(electron_charge/electron_mass)*(lval+1_ik)*sd_laser_clm(lval+1_ik,mval),kind=rk)
       c3c(:nr) = 1._rk/(sd_rtab(:nr)**2 + fac_bc**2)
       c1c(:nr) = c3c(:nr)*(sd_rtab(:nr)**2 - fac_bc**2)
       c2c(:nr) = c3c(:nr)*2._rk*fac_bc*sd_rtab(:nr)
@@ -1275,7 +1275,7 @@ module propagator_tools
     !
     complex(rk) :: fac_b
     !
-    fac_b = cmplx(dt*(electron_charge/electron_mass)*a*sd_laser_clm(lval+1,mval),kind=rk)
+    fac_b = cmplx(dt*(electron_charge/electron_mass)*a*sd_laser_clm(lval+1_ik,mval),kind=rk)
     !
     !  The brute force version does not rely on gradient operator blocks being the same.
     !  This version should work for all L, but is too expensive to use generally.
@@ -1522,7 +1522,7 @@ module propagator_tools
     !
     !  Changing sign of dt makes time run backwards for the left eigenfunction
     !
-    fac_b = cmplx(-dt*(electron_charge/electron_mass)*a*sd_laser_clm(lval+1,mval),kind=rk)
+    fac_b = cmplx(-dt*(electron_charge/electron_mass)*a*sd_laser_clm(lval+1_ik,mval),kind=rk)
     !
     !  The brute force version does not rely on gradient operator blocks being the same.
     !  This version should work for all L, but is too expensive to use generally.

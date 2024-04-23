@@ -314,7 +314,7 @@ module potential_tools
         write (out,"('Effective potential for Z=',i0,' N=',i0,' from Garvey, Jackman, and Green, PRA 12, 1144 (1975)')") &
                nint(pot_param(1:2))
         write (out,"('WARNING: GJG75 parameters are not designed for describing atomic excited states or ionization!'/)")
-        call select_gjg(nint(pot_param(1)),nint(pot_param(2)))
+        call select_gjg(nint(pot_param(1),kind=ik),nint(pot_param(2),kind=ik))
         call report_gjg
       case ('[SFG99] Li')
         write (out,"('""Lithium"" from W Schweizer, P. Fassbinder, and R. Gonzalez-Ferez, " // &

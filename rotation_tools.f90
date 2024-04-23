@@ -437,7 +437,7 @@ module rotation_tools
     !$omp do
     process_l: do lval=my_lmax,0,-1
       if (nts%dist(lval)>0) cycle process_l ! Hook for distributed-memory parallelization
-      call rt_finite_rotation_matrix(from,to,2*lval+1,rm(-lval:lval,-lval:lval))
+      call rt_finite_rotation_matrix(from,to,2_ik*lval+1_ik,rm(-lval:lval,-lval:lval))
       mmin = max(sd_mmin,-lval)
       mmax = min(sd_mmax, lval)
       process_radial: do ir1=1,sd_nradial,rt_blocksize

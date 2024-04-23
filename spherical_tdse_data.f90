@@ -45,7 +45,7 @@ module spherical_tdse_data
   character(len=clen), save :: rcsid_spherical_tdse_data = "$Id: spherical_tdse_data.f90,v 1.1 2024/02/13 14:22:14 ps Exp $"
   !
   integer(ik)              :: verbose               = 2_ik         ! How verbose do we need to be?
-  integer(ik)              :: omp_num_threads       = 0_ik         ! Non-zero value will cause number of OpenMP threads
+  integer                  :: omp_num_threads       = 0            ! Non-zero value will cause number of OpenMP threads
                                                                    ! to be set explicitly. It looks like some libraries
                                                                    ! mess with the environment variables, and stop
                                                                    ! OMP_NUM_THREADS from working.

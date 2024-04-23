@@ -214,7 +214,7 @@ module spherical_tsurf
     end select
     !$omp parallel do default(none) shared(sts_kgrid_count,sd_lmax,sts_rmatch,sts_ktab,sts_btab) private(ikp)
     fill_bessel_table: do ikp=1,sts_kgrid_count
-      call besselj_table(sd_lmax+1,sts_rmatch*sts_ktab(ikp),sts_btab(:,ikp))
+      call besselj_table(sd_lmax+1_ik,sts_rmatch*sts_ktab(ikp),sts_btab(:,ikp))
     end do fill_bessel_table
     !$omp end parallel do
     !
@@ -469,7 +469,7 @@ module spherical_tsurf
         write (out,"(/'Direction ',i6,' Lab: ',3(1x,f12.9),' Local: ',3(1x,f12.9))") ikd, sts_dtab(:,ikd), kd_loc
       end if
       if (detail_timer) call TimerStart('t-SURF: Time step: YLM')
-      call MathAllYLM2(my_lmax+1,my_mmin,my_mmax,kd_loc,ylm(my_mmin:my_mmax,0:my_lmax+1),phase='Arfken')
+      call MathAllYLM2(my_lmax+1_ik,my_mmin,my_mmax,kd_loc,ylm(my_mmin:my_mmax,0:my_lmax+1),phase='Arfken')
       if (detail_timer) call TimerStop('t-SURF: Time step: YLM')
       if (sts_verbose>=3) then
         write (out,"(/t5,'Spherical harmonics'/)")
@@ -766,7 +766,7 @@ module spherical_tsurf
       !
       accu = 0
       plus_1: do mv=mmin,mmax
-        accu = accu + clm(lv+1,mv)*ylm(mv,lv+1)*psilm(1,lv,mv)
+        accu = accu + clm(lv+1_ik,mv)*ylm(mv,lv+1_ik)*psilm(1,lv,mv)
       end do plus_1
       sylm(4,lv) = -electron_charge * az * accu
       !

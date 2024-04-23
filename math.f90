@@ -120,7 +120,7 @@ module math
       minus = .false.
     end if
     !
-    v = MathLogFactorial(aa+n-1)-MathLogFactorial(aa-1)
+    v = MathLogFactorial(aa+n-1_ik)-MathLogFactorial(aa-1_ik)
     v = exp(v)
     if (minus) v = -v
   end function MathPochhammer
@@ -328,17 +328,17 @@ module math
     expa2 = exp(cmplx(0._rk,0.5_rk*a,kind=rk))
     expg2 = exp(cmplx(0._rk,0.5_rk*g,kind=rk))
     !
-    j2  = mult - 1
+    j2  = mult - 1_ik
     mp2 = -j2
-    row_mp: do imp=1,mult
+    row_mp: do imp=1_ik,mult
       m2 = -j2
-      column_m: do im=1,mult
+      column_m: do im=1_ik,mult
         mat(imp,im) = sqrt(hf(j2+mp2)*hf(j2-mp2)/(hf(j2+m2)*hf(j2-m2))) &
-                    * modJacobiPn((j2-mp2)/2,(mp2-m2)/2,(mp2+m2)/2,sinb2,cosb2) &
+                    * modJacobiPn((j2-mp2)/2_ik,(mp2-m2)/2_ik,(mp2+m2)/2_ik,sinb2,cosb2) &
                     * expa2**m2 * expg2**mp2
-        m2 = m2 + 2
+        m2 = m2 + 2_ik
       end do column_m
-      mp2 = mp2 + 2
+      mp2 = mp2 + 2_ik
     end do row_mp
     !
     contains
@@ -349,8 +349,8 @@ module math
       integer(ik), intent(in) :: n ! Must be even
       real(rk)               :: f
       !
-      if (mod(n,2)/=0) stop 'math%MathYJMRotationMatrix%hf - domain error'
-      f = MathFactorial(n/2)
+      if (mod(n,2_ik)/=0_ik) stop 'math%MathYJMRotationMatrix%hf - domain error'
+      f = MathFactorial(n/2_ik)
     end function hf
     !
     !  Specialized derivative of Jacobi P polynomial:
@@ -375,20 +375,20 @@ module math
         !
         !  Small y, expand JacobiP around z=+1
         !
-        jp = 0
-        expand_plus1: do k=max(0,-a),n
-          jp = jp + MathPochhammer(a+k+1,n-k) * MathPochhammer(-n,k) * MathPochhammer(a+b+n+1,k) &
-                  * y**(2*k+a) / MathFactorial(k)
+        jp = 0_ik
+        expand_plus1: do k=max(0_ik,-a),n
+          jp = jp + MathPochhammer(a+k+1_ik,n-k) * MathPochhammer(-n,k) * MathPochhammer(a+b+n+1_ik,k) &
+                  * y**(2_ik*k+a) / MathFactorial(k)
         end do expand_plus1
         jp = x**b * jp / MathFactorial(n)
       else 
         !
         !  Small x, expand JacobiP around z=-1
         !
-        jp = 0
-        expand_minus1: do k=max(0,-b),n
-          jp = jp + MathPochhammer(b+k+1,n-k) * MathPochhammer(-n,k) * MathPochhammer(a+b+n+1,k) &
-                  * x**(2*k+b) / MathFactorial(k)
+        jp = 0_ik
+        expand_minus1: do k=max(0_ik,-b),n
+          jp = jp + MathPochhammer(b+k+1_ik,n-k) * MathPochhammer(-n,k) * MathPochhammer(a+b+n+1_ik,k) &
+                  * x**(2_ik*k+b) / MathFactorial(k)
         end do expand_minus1
         jp = y**a * jp / MathFactorial(n)
         if (mod(n,2)==1) jp = -jp

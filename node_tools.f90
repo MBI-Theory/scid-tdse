@@ -810,8 +810,8 @@ module node_tools
         call report_distribution
         stop 'node_tools%nt_rebalance - work allocation failed (1)'
       end if
-      work_cur_l1 = block_cost(l_val+1,l_top)
-      work_cur_l0 = block_cost(l_val+0,l_top)
+      work_cur_l1 = block_cost(l_val+1_ik,l_top)
+      work_cur_l0 = block_cost(l_val+0_ik,l_top)
       find_l_bottom: do while (abs(work_cur_l0-work_chunk)<=abs(work_cur_l1-work_chunk)) 
         l_val = l_val - 1
         if (l_val<0) then

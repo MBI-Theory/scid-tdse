@@ -1092,11 +1092,11 @@ module wavefunction_tools
         ap_energy = 0
         if (lval>abs(mval)) then ! We can couple down
           ap_energy = ap_energy &
-                    + real(sd_laser_clm(lval,  mval),kind=rk)*sum(wfn_l%wfn(:nr,1,lval-1,mval)*(hpsi(:nr)+(lval  )*tmp(:nr)))
+                    + real(sd_laser_clm(lval,     mval),kind=rk)*sum(wfn_l%wfn(:nr,1,lval-1,mval)*(hpsi(:nr)+(lval     )*tmp(:nr)))
         endif
         if (lval<my_lmax) then ! We can couple up
           ap_energy = ap_energy &
-                    + real(sd_laser_clm(lval+1,mval),kind=rk)*sum(wfn_l%wfn(:nr,1,lval+1,mval)*(hpsi(:nr)-(lval+1)*tmp(:nr)))
+                    + real(sd_laser_clm(lval+1_ik,mval),kind=rk)*sum(wfn_l%wfn(:nr,1,lval+1,mval)*(hpsi(:nr)-(lval+1_ik)*tmp(:nr)))
         end if
         energy(:) = energy(:) + (0._rk,1._rk)*a_factor*ap_energy
       end do sense_loop_l
@@ -1213,12 +1213,12 @@ module wavefunction_tools
             acc_sph(m_op) = acc_sph(m_op) - electron_charge*wgt_ang*wgt_acc/electron_mass
             !  Accumulating velocity terms is a bit ugly ...
             wgt_vel = wgt_vel * (0._rk,-1._rk) * electron_charge/electron_mass
-            if ( (l_left==l_right+1) .and. (m_left==m_right  ) ) vel_sph( 0) = vel_sph( 0) + wgt_vel * vel_c(l_right+1, m_right  )
-            if ( (l_left==l_right-1) .and. (m_left==m_right  ) ) vel_sph( 0) = vel_sph( 0) + wgt_vel * vel_c(l_right,   m_right  )
-            if ( (l_left==l_right+1) .and. (m_left==m_right+1) ) vel_sph( 1) = vel_sph( 1) + wgt_vel * vel_d(l_right+1, m_right  )
-            if ( (l_left==l_right-1) .and. (m_left==m_right+1) ) vel_sph( 1) = vel_sph( 1) - wgt_vel * vel_d(l_right,  -m_right-1)
-            if ( (l_left==l_right+1) .and. (m_left==m_right-1) ) vel_sph(-1) = vel_sph(-1) + wgt_vel * vel_d(l_right+1,-m_right  )
-            if ( (l_left==l_right-1) .and. (m_left==m_right-1) ) vel_sph(-1) = vel_sph(-1) - wgt_vel * vel_d(l_right,   m_right-1)
+            if ((l_left==l_right+1).and.(m_left==m_right     )) vel_sph( 0) = vel_sph( 0)+wgt_vel*vel_c(l_right+1_ik, m_right     )
+            if ((l_left==l_right-1).and.(m_left==m_right     )) vel_sph( 0) = vel_sph( 0)+wgt_vel*vel_c(l_right,      m_right     )
+            if ((l_left==l_right+1).and.(m_left==m_right+1_ik)) vel_sph( 1) = vel_sph( 1)+wgt_vel*vel_d(l_right+1_ik, m_right     )
+            if ((l_left==l_right-1).and.(m_left==m_right+1_ik)) vel_sph( 1) = vel_sph( 1)-wgt_vel*vel_d(l_right,     -m_right-1_ik)
+            if ((l_left==l_right+1).and.(m_left==m_right-1_ik)) vel_sph(-1) = vel_sph(-1)+wgt_vel*vel_d(l_right+1_ik,-m_right     )
+            if ((l_left==l_right-1).and.(m_left==m_right-1_ik)) vel_sph(-1) = vel_sph(-1)-wgt_vel*vel_d(l_right,      m_right-1_ik)
           end do loop_l_left
         end do loop_m_left
       end do loop_l_right

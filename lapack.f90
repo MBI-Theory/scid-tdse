@@ -42,16 +42,23 @@ module lapack
     complex(srk), allocatable :: work(:), vl(:,:)
     real(srk), allocatable    :: rwork(:)
     !
-    integer      :: info     ! Error code; must be of default integer kind
-    integer      :: lwork    ! Optimal work size; must be of default integer kind
-    
-    allocate (vl(nh,nh),work(1),rwork(2*nh),stat=info)
+    integer(lik) :: lnh      ! Lapack-type version of nh
+    integer(lik) :: info     ! Error code; must be of default integer kind
+    integer(lik) :: lwork    ! Optimal work size; must be of default integer kind
+    external     :: cgeev
+   
+    lnh = nh
+    if (int(lnh,kind=ik)/=nh) then
+      write (out,"('lapack_cgeev2: Bad integer conversion: nh = ',i0,' -> ',i0,' -> ',i0)") nh, lnh, int(lnh,kind=ik)
+      stop 'lapack%lapack_cgeev2 - Bad conversion to LAPACK integer type'
+    end if
+    allocate (vl(lnh,lnh),work(1),rwork(2*lnh),stat=info)
     if (info/=0) then
       write (out,"('lapack_cgeev2: allocate failed (1) with code ',i0)") info
       stop 'lapack_cgeev2 - allocate failed (1)'
     end if
 
-    call cgeev('V','V',nh,h(:,:,1),nh,e,vl,nh,h(:,:,2),nh,work,-1,rwork,info)
+    call cgeev('V','V',lnh,h(:,:,1),lnh,e,vl,lnh,h(:,:,2),lnh,work,-1,rwork,info)
     if (info/=0) then
       write (out,"(' cgeev (1) returned ',i0)") info
       stop 'lapack_cgeev2 - cgeev failed (1)'
@@ -65,7 +72,7 @@ module lapack
       stop 'lapack_cgeev2 - allocate failed (2)'
     end if
 
-    call cgeev('V','V',nh,h(:,:,1),nh,e,vl,nh,h(:,:,2),nh,work,lwork,rwork,info)
+    call cgeev('V','V',lnh,h(:,:,1),lnh,e,vl,lnh,h(:,:,2),lnh,work,lwork,rwork,info)
     if (info/=0) then
       write (out,"(' cgeev (2) returned ',i0)") info
       stop 'lapack_cgeev2 - cgeev failed (2)'
@@ -86,16 +93,23 @@ module lapack
     complex(drk), allocatable :: work(:), vl(:,:)
     real(drk), allocatable    :: rwork(:)
     !
-    integer      :: info     ! Error code; must be of default integer kind
-    integer      :: lwork    ! Optimal work size; must be of default integer kind
+    integer(lik) :: lnh      ! Lapack-type version of nh
+    integer(lik) :: info     ! Error code; must be of default integer kind
+    integer(lik) :: lwork    ! Optimal work size; must be of default integer kind
+    external     :: zgeev
     
-    allocate (vl(nh,nh),work(1),rwork(2*nh),stat=info)
+    lnh = nh
+    if (int(lnh,kind=ik)/=nh) then
+      write (out,"('lapack_zgeev2: Bad integer conversion: nh = ',i0,' -> ',i0,' -> ',i0)") nh, lnh, int(lnh,kind=ik)
+      stop 'lapack%lapack_cgeev2 - Bad conversion to LAPACK integer type'
+    end if
+    allocate (vl(lnh,lnh),work(1),rwork(2*lnh),stat=info)
     if (info/=0) then
       write (out,"('lapack_zgeev2: allocate failed (1) with code ',i0)") info
       stop 'lapack_zgeev2 - allocate failed (1)'
     end if
 
-    call zgeev('V','V',nh,h(:,:,1),nh,e,vl,nh,h(:,:,2),nh,work,-1,rwork,info)
+    call zgeev('V','V',lnh,h(:,:,1),lnh,e,vl,lnh,h(:,:,2),lnh,work,-1,rwork,info)
     if (info/=0) then
       write (out,"(' zgeev (1) returned ',i0)") info
       stop 'lapack_zgeev2 - zgeev failed (1)'
@@ -109,7 +123,7 @@ module lapack
       stop 'lapack_zgeev2 - allocate failed (2)'
     end if
 
-    call zgeev('V','V',nh,h(:,:,1),nh,e,vl,nh,h(:,:,2),nh,work,lwork,rwork,info)
+    call zgeev('V','V',lnh,h(:,:,1),lnh,e,vl,lnh,h(:,:,2),lnh,work,lwork,rwork,info)
     if (info/=0) then
       write (out,"(' zgeev (2) returned ',i0)") info
       stop 'lapack_zgeev2 - zgeev failed (2)'
@@ -120,7 +134,7 @@ module lapack
     deallocate (vl,work,rwork)
   end subroutine lapack_zgeev2
 
-!*lq  subroutine lapack_zuad_zgeev2(nh,h,e)
+!*lq  subroutine lapack_quad_zgeev2(nh,h,e)
 !*lq    integer(ik), intent(in)     :: nh         ! Dimensions of the arrays; needed to avoid temporaries
 !*lq    complex(qrk), intent(inout) :: h(nh,nh,2) ! In:  h(:,:,1) = General matrix to be diagonalized
 !*lq                                              ! Out: h(:,:,1) = Left eigenvectors
@@ -130,38 +144,45 @@ module lapack
 !*lq    complex(qrk), allocatable :: work(:), vl(:,:)
 !*lq    real(qrk), allocatable    :: rwork(:)
 !*lq    !
+!*lq    integer(lik) :: lnh      ! Lapack-type version of nh
 !*lq    integer      :: info     ! Error code; must be of default integer kind
 !*lq    integer      :: lwork    ! Optimal work size; must be of default integer kind
+!*lq    external     :: lapack_quad_zgeev2
 !*lq    
-!*lq    allocate (vl(nh,nh),work(1),rwork(2*nh),stat=info)
+!*lq    lnh = nh
+!*lq    if (int(lnh,kind=ik)/=nh) then
+!*lq      write (out,"('lapack_quad_cgeev2: Bad integer conversion: nh = ',i0,' -> ',i0,' -> ',i0)") nh, lnh, int(lnh,kind=ik)
+!*lq      stop 'lapack%lapack_quad_cgeev2 - Bad conversion to LAPACK integer type'
+!*lq    end if
+!*lq    allocate (vl(lnh,lnh),work(1),rwork(2*lnh),stat=info)
 !*lq    if (info/=0) then
-!*lq      write (out,"('lapack_zuad_zgeev2: allocate failed (1) with code ',i0)") info
-!*lq      stop 'lapack_zuad_zgeev2 - allocate failed (1)'
+!*lq      write (out,"('lapack_quad_zgeev2: allocate failed (1) with code ',i0)") info
+!*lq      stop 'lapack_quad_zgeev2 - allocate failed (1)'
 !*lq    end if
 !*lq
-!*lq    call zuad_zgeev('V','V',nh,h(:,:,1),nh,e,vl,nh,h(:,:,2),nh,work,-1,rwork,info)
+!*lq    call quad_zgeev('V','V',lnh,h(:,:,1),lnh,e,vl,lnh,h(:,:,2),lnh,work,-1,rwork,info)
 !*lq    if (info/=0) then
-!*lq      write (out,"(' zuad_zgeev (1) returned ',i0)") info
-!*lq      stop 'lapack_zuad_zgeev2 - zuad_zgeev failed (1)'
+!*lq      write (out,"(' quad_zgeev (1) returned ',i0)") info
+!*lq      stop 'lapack_quad_zgeev2 - quad_zgeev failed (1)'
 !*lq    end if
 !*lq
 !*lq    lwork = int(work(1))
 !*lq    deallocate (work)
 !*lq    allocate (work(lwork),stat=info)
 !*lq    if (info/=0) then
-!*lq      write (out,"('lapack_zuad_zgeev2: allocate failed (2) with code ',i0)") info
-!*lq      stop 'lapack_zuad_zgeev2 - allocate failed (2)'
+!*lq      write (out,"('lapack_quad_zgeev2: allocate failed (2) with code ',i0)") info
+!*lq      stop 'lapack_quad_zgeev2 - allocate failed (2)'
 !*lq    end if
 !*lq
-!*lq    call zuad_zgeev('V','V',nh,h(:,:,1),nh,e,vl,nh,h(:,:,2),nh,work,lwork,rwork,info)
+!*lq    call quad_zgeev('V','V',lnh,h(:,:,1),lnh,e,vl,lnh,h(:,:,2),lnh,work,lwork,rwork,info)
 !*lq    if (info/=0) then
-!*lq      write (out,"(' zuad_zgeev (2) returned ',i0)") info
-!*lq      stop 'lapack_zuad_zgeev2 - zuad_zgeev failed (2)'
+!*lq      write (out,"(' quad_zgeev (2) returned ',i0)") info
+!*lq      stop 'lapack_quad_zgeev2 - quad_zgeev failed (2)'
 !*lq    end if
 !*lq
 !*lq    h(:,:,1) = vl
 !*lq
 !*lq    deallocate (vl,work,rwork)
-!*lq  end subroutine lapack_zuad_zgeev2
+!*lq  end subroutine lapack_quad_zgeev2
 
 end module lapack

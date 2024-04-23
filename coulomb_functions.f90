@@ -394,8 +394,8 @@
      end if
      x      = 2*Z*r/n
      ! This naive expression may have problems for large n and l values !
-     rad =   sqrt((2*Z/n)**3 * MathFactorial(n-l-1) / (2*n*MathFactorial(n+l))) &
-          * exp(-0.5_rk * x) * x**l * l2g(n-l-1,2*l+1,x)
+     rad =   sqrt((2*Z/n)**3 * MathFactorial(n-l-1_ik) / (2_ik*n*MathFactorial(n+l))) &
+          * exp(-0.5_rk * x) * x**l * l2g(n-l-1_ik,2_ik*l+1_ik,x)
      contains
      !
      !  Assocuated Laguerre polynomial, special case for hydrogenic wavefunctions
@@ -407,10 +407,10 @@
        integer(ik) :: n
        real(rk)    :: m1, m2
        !
-       l2g = 1 ; m1 = 0
+       l2g = 1_ik ; m1 = 0_ik
        recurse: do n=1,a
          m2  = m1 ; m1 = l2g
-         l2g = (b+2*n-1-z)*m1/n - (n+b-1)*m2/n
+         l2g = (b+2_ik*n-1_ik-z)*m1/n - (n+b-1_ik)*m2/n
        end do recurse
      end function l2g
    end function coulombBound

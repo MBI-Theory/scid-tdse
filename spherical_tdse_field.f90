@@ -67,7 +67,7 @@ module spherical_tdse_field
     !
     !  Issue a warning if vpot_table at its=-1,0 and 2*timesteps is not zero
     !
-    if (any(vpot_table(1:3,(/-1,0,2*timesteps,2*timesteps+1/))/=0._rk)) then
+    if (any(vpot_table(1:3,(/-1_ik,0_ik,2_ik*timesteps,2_ik*timesteps+1_ik/))/=0._rk)) then
       write (out,"(/'WARNING: Vector potential at time steps <= 0 and/or the end of the simulation is not zero')")
       if (.not. vp_as_is) then
         write (out,"( 'WARNING: Resetting vector-potential to zero, and initial/final orientation to lab.'/)")
@@ -80,7 +80,7 @@ module spherical_tdse_field
     !  Force local coordinate system at these time steps to be the laboratory system
     !
     if (.not. vp_as_is) then
-      vpot_table(1:3,(/-1,0,2*timesteps,2*timesteps+1/)) = 0._rk
+      vpot_table(1:3,(/-1_ik,0_ik,2_ik*timesteps,2_ik*timesteps+1_ik/)) = 0._rk
     end if
     !
     call TimerStop('Prepare VP table')
@@ -251,7 +251,7 @@ module spherical_tdse_field
     differentiate_vpot: do its=0,2*timesteps
       il = max(its-2,-1)
       ih = min(its+2,2*timesteps+1)
-      efield_table(:,its) = - poly_gradient(vpot_table(0,il:ih),vpot_xyz(:,il:ih),its-il+1)
+      efield_table(:,its) = - poly_gradient(vpot_table(0,il:ih),vpot_xyz(:,il:ih),its-il+1_ik)
     end do differentiate_vpot
     !
     deallocate (vpot_xyz)

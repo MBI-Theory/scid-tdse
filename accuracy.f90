@@ -26,7 +26,7 @@ module accuracy
   public ik, rk, xk
   public input, out
   public clen
-  public srk, drk, lrk
+  public srk, drk, lrk, lik
 !*nq  public qrk
 !*qd  public qrk
   public rk_bytes, ik_bytes, xk_bytes
@@ -50,9 +50,9 @@ module accuracy
                                                             ! than the range and accuracy of double-precision type
                                                             ! This real kind should never appear on time-critical
                                                             ! path.
-  integer, parameter :: input  = 5                          ! Standard input I/O channel
-  integer, parameter :: out    = 6                          ! Output I/O channel
-  integer, parameter :: clen   = 255                        ! Standard character length; enough for most
+  integer(ik), parameter :: input  = 5                      ! Standard input I/O channel
+  integer(ik), parameter :: out    = 6                      ! Output I/O channel
+  integer, parameter     :: clen   = 255                    ! Standard character length; enough for most
                                                             ! keywords and file names
   !
   character(len=clen), save :: rcsid_accuracy = "$Id: accuracy.f90,v 1.46 2023/06/09 14:10:24 ps Exp $"
@@ -69,6 +69,8 @@ module accuracy
   !
   integer, parameter :: lrk    = selected_real_kind(min(precision(1._rk),precision(1._drk)),min(range(1._rk),range(1._drk)))
 ! integer, parameter :: lrk    = qrk                        ! Use quad precision for LAPACK
+  integer, parameter :: lik    = kind(1)                    ! Use default integer kind for LAPACK
+! integer, parameter :: lik    = selected_int_kind(15)      ! Use "long" integer kind for LAPACK
   !
   interface isnan_wrapper
     module procedure isnan_real
@@ -90,7 +92,7 @@ module accuracy
   end function ik_bytes
 
   integer(ik) function int_bytes(radix,digits)
-    integer(ik), intent(in) :: radix, digits
+    integer, intent(in) :: radix, digits
     !
     real(rk) :: bits
     !
@@ -99,7 +101,7 @@ module accuracy
   end function int_bytes
 
   integer(ik) function real_bytes(radix,digits,exp_range)
-    integer(ik), intent(in) :: radix, digits, exp_range
+    integer, intent(in) :: radix, digits, exp_range
     !
     real(rk) :: exp_bits, mant_bits
     !
@@ -109,7 +111,7 @@ module accuracy
   end function real_bytes
 
   subroutine flush_wrapper(unit)
-    integer, intent(in) :: unit
+    integer(ik), intent(in) :: unit
     !
     flush (unit)  ! Fortran-2003 form
     ! intrinsic flush

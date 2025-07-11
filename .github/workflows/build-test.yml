@@ -13,6 +13,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - name: install blas and lapack
+      run: sudo apt install -y blas lapack
     - name: build
       run: make clean ; make
     - name: tests

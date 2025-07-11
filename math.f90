@@ -36,7 +36,7 @@ module math
   public MathInterpolate
   public rcsid_math
 !
-  character(len=clen), save :: rcsid_math = "$Id: math.f90,v 1.15 2023/06/09 14:10:24 ps Exp $"
+  character(len=clen), save :: rcsid_math = "$Id: math.f90,v 1.16 2024/04/23 14:31:38 ps Exp $"
 !
 !
   integer(ik), parameter       :: factorial_slack = 5         ! Extra factorials to produce while filling the cache

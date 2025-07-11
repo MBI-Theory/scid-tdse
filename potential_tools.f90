@@ -33,7 +33,7 @@ module potential_tools
   public pt_evaluate_potential
   public rcsid_potential_tools
   !
-  character(len=clen), save :: rcsid_potential_tools = "$Id: potential_tools.f90,v 1.21 2023/06/09 14:10:24 ps Exp $"
+  character(len=clen), save :: rcsid_potential_tools = "$Id: potential_tools.f90,v 1.22 2024/04/23 14:32:08 ps Exp $"
   !
   !  We recognize
   !

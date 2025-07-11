@@ -55,7 +55,7 @@ module accuracy
   integer, parameter     :: clen   = 255                    ! Standard character length; enough for most
                                                             ! keywords and file names
   !
-  character(len=clen), save :: rcsid_accuracy = "$Id: accuracy.f90,v 1.46 2023/06/09 14:10:24 ps Exp $"
+  character(len=clen), save :: rcsid_accuracy = "$Id: accuracy.f90,v 1.47 2024/04/23 14:29:50 ps Exp $"
   !
   !  System kinds; should only be used where we interface to external libraries
   !

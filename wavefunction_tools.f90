@@ -50,7 +50,7 @@ module wavefunction_tools
   public wt_reconstruct_left
   public rcsid_wavefunction_tools
   !
-  character(len=clen), save :: rcsid_wavefunction_tools = "$Id: wavefunction_tools.f90,v 1.65 2023/12/23 11:09:20 ps Exp $"
+  character(len=clen), save :: rcsid_wavefunction_tools = "$Id: wavefunction_tools.f90,v 1.67 2025/07/11 15:08:35 ps Exp $"
   !
   integer, parameter        :: wt_adaptive_r_buffer   = 8   ! Maximum number of points to examine for adaptive nradial determination
   character(len=clen), save :: wt_atomic_cache_prefix = ' ' ! Atomic solution for each L will be cached
@@ -1092,7 +1092,7 @@ module wavefunction_tools
         ap_energy = 0
         if (lval>abs(mval)) then ! We can couple down
           ap_energy = ap_energy &
-                    + real(sd_laser_clm(lval,     mval),kind=rk)*sum(wfn_l%wfn(:nr,1,lval-1,mval)*(hpsi(:nr)+(lval     )*tmp(:nr)))
+                    + real(sd_laser_clm(lval,  mval),kind=rk)*sum(wfn_l%wfn(:nr,1,lval-1,mval)*(hpsi(:nr)+(lval  )*tmp(:nr)))
         endif
         if (lval<my_lmax) then ! We can couple up
           ap_energy = ap_energy &
@@ -1283,7 +1283,7 @@ module wavefunction_tools
     character(len=clen), intent(in) :: cap_name
     !
     integer(ik) :: iu_temp
-    integer(ik) :: l_left, m_left, l_right, m_right, m_op, nr, i_left, i_right, istate
+    integer(ik) :: l_left, m_left, l_right, m_right, m_op, nr, i_left, i_right
     complex(rk) :: en_left, en_right
     complex(rk) :: dip_sph(-1:1),  wgt_dip, wgt_ang
     complex(rk) :: tme(3) !  <L_ground|q r|R_excited> electric dipole transitions (x,y,z)
@@ -1324,7 +1324,7 @@ module wavefunction_tools
               loop_i_right_p: do i_right = 1,nr ! Loop over all states
                 en_right = cache_eval(i_right,l_right)
                 if (real(en_right,kind=rk)>0._rk) cycle ! Ignore states with positive energy
-                !
+            !
                 ! Radial part depends only on l and i of l and r, but not on m_op
                 !
                 wgt_dip = sum(cache_evec(1:nr,i_left,2,l_left) * cache_evec(1:nr,i_right,1,l_right) * sd_rtab(1:nr))

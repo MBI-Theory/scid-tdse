@@ -37,7 +37,7 @@ module rotation_tools
   public rt_rotate_bruteforce
   public rcsid_rotation_tools
   !
-  character(len=clen), save :: rcsid_rotation_tools = "$Id: rotation_tools.f90,v 1.36 2023/06/09 14:10:24 ps Exp $"
+  character(len=clen), save :: rcsid_rotation_tools = "$Id: rotation_tools.f90,v 1.37 2024/04/23 14:32:48 ps Exp $"
   !
   real(rk), save    :: rt_max_rot   = 1e-3_rk  ! Maximum allowed rotation angle, in Radian
                                                ! The actual rotation threshold will be (rt_max_rot/(sd_lmax+1))

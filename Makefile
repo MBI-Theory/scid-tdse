@@ -28,8 +28,10 @@ ACT2 = -e 's/^!\*nm/    /' # Disable MPI statements
 # include configs/zen-gfortran-13_opt.mak
 # include configs/zen-gfortran-13_dbg.mak
 # include configs/zen-oneapi_opt.mak
+# include configs/zen-oneapi-ifx_opt.mak
 # include configs/zen-oneapi-i8_opt.mak
 # include configs/zen-oneapi_opt_mpi.mak
+# include configs/zen-oneapi-ifx_opt_mpi.mak
 # include configs/zen-aocc-1.1_opt.mak      # VERY SLOW CODE. DO NOT USE.
 # include configs/oink-gfortran_opt.mak
 # include configs/macos_m1-gfortran_opt.mak

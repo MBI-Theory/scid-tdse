@@ -53,7 +53,7 @@ module spherical_tsurf
   public sts_report
   public rcsid_spherical_tsurf
   !
-  character(len=clen), save :: rcsid_spherical_tsurf = "$Id: spherical_tsurf.f90,v 1.39 2024/02/13 14:22:14 ps Exp $"
+  character(len=clen), save :: rcsid_spherical_tsurf = "$Id: spherical_tsurf.f90,v 1.41 2025/07/11 15:08:35 ps Exp $"
   !
   !  Private data, not visible outside the module
   !
@@ -374,8 +374,8 @@ module spherical_tsurf
   !  The interface below is a bit eclectic, but it uses the quantities which are readily
   !  available during the time propagation - so I guess there is no harm done ...
   !
-  subroutine sts_timestep(wfn_l,wfn_r,sdt,dt1,dt2,vp,efield)
-    type(sd_wfn), intent(in)      :: wfn_l     ! Left wavefunction; not used
+  subroutine sts_timestep(wfn_r,sdt,dt1,dt2,vp,efield)
+  ! type(sd_wfn), intent(in)      :: wfn_l     ! Left wavefunction; not used
     type(sd_wfn), intent(in)      :: wfn_r     ! Right wavefunction
     type(sts_data), intent(inout) :: sdt       ! t-SURF data to update
     real(xk), intent(in)          :: dt1       ! Time step from the beginning of the interval to the time
@@ -757,9 +757,16 @@ module spherical_tsurf
       !  3 = e Az Sum C_{LM} Y_{L-1,M} Psi_{LM}(R)
       !
       accu = 0
-      minus_1: do mv=max(mmin,-(lv-1)),min(mmax,lv-1)
-        accu = accu + clm(lv,mv)*ylm(mv,lv-1)*psilm(1,lv,mv) ! Spurious gfortran warning here
-      end do minus_1
+      if (lv>0) then
+        !
+        !  The conditional above (lv>0) is not needed: for lv=0, the loop
+        !  bounds are such, that the loop will never run (ok, provided that
+        !  mmin<=mmax). However, some compiler issue a spurious warning otherwise.
+        !
+        minus_1: do mv=max(mmin,-(lv-1)),min(mmax,lv-1)
+          accu = accu + clm(lv,mv)*ylm(mv,lv-1)*psilm(1,lv,mv) ! Spurious gfortran warning for (lv-1)=-1<0
+        end do minus_1
+      end if
       sylm(3,lv) = electron_charge * az * accu
       !
       !  4 = -e Az Sum C_{L+1,M} Y_{L+1,M} Y_{LM} Psi_{LM}(R)
@@ -860,10 +867,10 @@ module spherical_tsurf
     call TimerStop('t-SURF: At end: Init: Coulomb')
   end subroutine sts_atend_prepare_coulomb
   !
-  subroutine sts_atend_prepare(sdt,wfn_l,wfn_r)
+  subroutine sts_atend_prepare(sdt)
     type(sts_data), intent(inout) :: sdt    ! t-SURF data structure. 
-    type(sd_wfn), intent(in)      :: wfn_l  ! Left wavefunction
-    type(sd_wfn), intent(in)      :: wfn_r  ! Right wavefunction
+  ! type(sd_wfn), intent(in)      :: wfn_l  ! Left wavefunction  - Not required at this point
+  ! type(sd_wfn), intent(in)      :: wfn_r  ! Right wavefunction
     !
     if (.not.sts_active_atend) return
     !

@@ -26,7 +26,7 @@ module spherical_tdse_propagate
   public propagation
   !
   character(len=clen), save :: rcsid_spherical_tdse_propagate = &
-       "$Id: spherical_tdse_propagate.f90,v 1.2 2024/02/13 16:10:04 ps Exp $"
+       "$Id: spherical_tdse_propagate.f90,v 1.3 2025/07/11 15:08:35 ps Exp $"
   !
   contains
   !
@@ -578,7 +578,11 @@ module spherical_tdse_propagate
          rdt  = vpot_table(0,2*its+2)-vpot_table(0,its_from)  ! Time step to the expansion point
          rdt2 = vpot_table(0,its_to) -vpot_table(0,2*its+2)   ! Time step to the end of the interval
          surf_loop: do ie=1,ensemble_size
-           call sts_timestep(wfns_l(ie),wfns_r(ie),tsurfs(ie),rdt,rdt2, &
+           !
+           ! t-SURFF operates only with the physical (right) wavefunction. The left wavefunction
+           ! is not needed.
+           !
+           call sts_timestep(wfns_r(ie),tsurfs(ie),rdt,rdt2, &
                              vpot_table(1:3,2*its+2),efield_table(1:3,2*its+2))
          end do surf_loop
       end if

@@ -60,7 +60,7 @@ module vectorpotential_tools
   public vp_apot
   public rcsid_vectorpotential_tools
   !
-  character(len=clen), save :: rcsid_vectorpotential_tools = "$Id: vectorpotential_tools.f90,v 1.23 2023/08/11 16:02:04 ps Exp $"
+  character(len=clen), save :: rcsid_vectorpotential_tools = "$Id: vectorpotential_tools.f90,v 1.24 2025/07/11 15:08:35 ps Exp $"
   !
   !  List of vector-potential names. These are used in a couple different places; 
   !  I would prefer any typos to cause a compile-time error!
@@ -201,22 +201,22 @@ module vectorpotential_tools
         th   = 0._xk
         ph   = 0._xk
       case (vpn_zGaussian)
-        apot = vp_scale * GaussianVP(t,omega,phase,origin,width,gau_toff1,gau_toff2,gau_alpha)
+        apot = vp_scale * GaussianVP(t,omega,phase,origin,gau_toff1,gau_toff2,gau_alpha)
         th   = 0._xk
         ph   = 0._xk
       case (vpn_xGaussian)
-        apot = vp_scale * GaussianVP(t,omega,phase,origin,width,gau_toff1,gau_toff2,gau_alpha)
+        apot = vp_scale * GaussianVP(t,omega,phase,origin,gau_toff1,gau_toff2,gau_alpha)
         th   = 0.5_xk * pi_xk
         ph   = 0._xk
       case (vpn_zzGaussian)
-        apot = vp_scale   * GaussianVP(t,  omega,  phase,  origin,  width,  gau_toff1,  gau_toff2,  gau_alpha) &
-             + vp_scale_x * GaussianVP(t,x_omega,x_phase,x_origin,x_width,x_gau_toff1,x_gau_toff2,x_gau_alpha)
+        apot = vp_scale   * GaussianVP(t,  omega,  phase,  origin,gau_toff1,  gau_toff2,  gau_alpha) &
+             + vp_scale_x * GaussianVP(t,x_omega,x_phase,x_origin,x_gau_toff1,x_gau_toff2,x_gau_alpha)
         th   = 0._xk
         ph   = 0._xk
       case (vpn_zzzGaussian)
-        apot = vp_scale    * GaussianVP(t,   omega,   phase,   origin,   width,   gau_toff1,   gau_toff2,   gau_alpha) &
-             + vp_scale_x  * GaussianVP(t, x_omega, x_phase, x_origin, x_width, x_gau_toff1, x_gau_toff2, x_gau_alpha) &
-             + vp_scale_x2 * GaussianVP(t,x2_omega,x2_phase,x2_origin,x2_width,x2_gau_toff1,x2_gau_toff2,x2_gau_alpha)
+        apot = vp_scale    * GaussianVP(t,   omega,   phase,   origin,   gau_toff1,   gau_toff2,   gau_alpha) &
+             + vp_scale_x  * GaussianVP(t, x_omega, x_phase, x_origin, x_gau_toff1, x_gau_toff2, x_gau_alpha) &
+             + vp_scale_x2 * GaussianVP(t,x2_omega,x2_phase,x2_origin,x2_gau_toff1,x2_gau_toff2,x2_gau_alpha)
         th   = 0._xk
         ph   = 0._xk
       case (vpn_zSin2)
@@ -237,8 +237,8 @@ module vectorpotential_tools
         th   = 0._xk
         ph   = 0._xk
       case (vpn_zxGaussian)
-        az = vp_scale   * GaussianVP(t,  omega,  phase,  origin,  width,  gau_toff1,  gau_toff2,  gau_alpha)
-        ay = vp_scale_x * GaussianVP(t,x_omega,x_phase,x_origin,x_width,x_gau_toff1,x_gau_toff2,x_gau_alpha)
+        az = vp_scale   * GaussianVP(t,  omega,  phase,  origin,  gau_toff1,  gau_toff2,  gau_alpha)
+        ay = vp_scale_x * GaussianVP(t,x_omega,x_phase,x_origin,x_gau_toff1,x_gau_toff2,x_gau_alpha)
         apot = sqrt(az**2+ay**2)
         if (apot>0) then
           th = acos(az/apot)
@@ -251,8 +251,8 @@ module vectorpotential_tools
           ph   = pi_xk
         end if
       case (vpn_xyGaussian)
-        ax = vp_scale   * GaussianVP(t,  omega,  phase,  origin,  width,  gau_toff1,  gau_toff2,  gau_alpha)
-        ay = vp_scale_x * GaussianVP(t,x_omega,x_phase,x_origin,x_width,x_gau_toff1,x_gau_toff2,x_gau_alpha)
+        ax = vp_scale   * GaussianVP(t,  omega,  phase,  origin,  gau_toff1,  gau_toff2,  gau_alpha)
+        ay = vp_scale_x * GaussianVP(t,x_omega,x_phase,x_origin,x_gau_toff1,x_gau_toff2,x_gau_alpha)
         apot = sqrt(ax**2+ay**2)
         if (apot>0) then
           th = 0.5_xk*pi_xk
@@ -358,10 +358,10 @@ module vectorpotential_tools
   !
   !  Implementation of truncated-Gaussian vector-potential
   !
-  function GaussianVP(time,omega,phase,origin,width,gau_toff1,gau_toff2,gau_alpha)
+  function GaussianVP(time,omega,phase,origin,gau_toff1,gau_toff2,gau_alpha)
     real(xk), intent(in) :: time        ! Time
     real(xk)             :: GaussianVP  ! Vector-potential
-    real(xk), intent(in) :: omega, phase, origin, width, gau_toff1, gau_toff2, gau_alpha
+    real(xk), intent(in) :: omega, phase, origin, gau_toff1, gau_toff2, gau_alpha
     !
     real(xk)             :: t_carrier   ! Time used for the carrier part
     real(xk)             :: t_envelope  ! Time used for the envelope part

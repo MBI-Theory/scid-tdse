@@ -37,7 +37,7 @@ module composition_analysis
   public ca_maxram
   public rcsid_composition_analysis
   !
-  character(len=clen) :: rcsid_composition_analysis = "$Id: composition_analysis.f90,v 1.19 2023/06/17 13:45:36 ps Exp $"
+  character(len=clen) :: rcsid_composition_analysis = "$Id: composition_analysis.f90,v 1.20 2025/07/11 15:08:35 ps Exp $"
   !
   real(rk), save :: ca_maxram           = 0._rk       ! Maximum amount of memory which can be used during the analysis step
                                                       ! This limit does NOT include the memory needed to compute atomic 
@@ -127,7 +127,7 @@ module composition_analysis
     end if
     write (out,"(/t5,'Analyzing the final wavefunction in terms of field-free eigenstates'/)")
     !
-    call sts_atend_prepare(tsurf,wfn_l,wfn_r)
+    call sts_atend_prepare(tsurf)
     !
     ram_global = ((2._rk)*rk_bytes()/1024._rk**2) * sd_nradial*(sd_lmax+1)*(1+2*sd_nspin*(sd_mmax-sd_mmin+1))
     ram_thread = ((2._rk)*rk_bytes()/1024._rk**2) * 2*real(sd_nradial,kind=rk)**2

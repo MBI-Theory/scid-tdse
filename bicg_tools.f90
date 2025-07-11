@@ -34,7 +34,7 @@ module bicg_tools
   public bicg_failure_count
   public rcsid_bicg_tools
   !
-  character(len=clen) :: rcsid_bicg_tools = "$Id: bicg_tools.f90,v 1.11 2021/04/26 15:44:44 ps Exp $"
+  character(len=clen) :: rcsid_bicg_tools = "$Id: bicg_tools.f90,v 1.12 2025/07/11 15:08:35 ps Exp $"
   !
   logical, save      :: bicg_failtrace     = .true. ! Produce a verbose report when solution fails; 
                                                     ! May increase the runtime if vectors are traced
@@ -196,21 +196,21 @@ module bicg_tools
       !$omp end critical
     end if
     !
-    contains
-    subroutine ft_dump_vectors(tag,vec)
-      character(len=*), intent(in) :: tag
-      complex(rk), intent(in)      :: vec(:,:,:) ! Trace of a vector to dump
-      !
-      integer(ik) :: irest, iter
-      !
-      write (out,"(/t5,a/)") trim(tag)
-      ftdv_restarts: do irest=1,bicg_maxiter
-        ftdv_iterations: do iter=1,trace_niter(irest)
-          write (out,"(1x,i3,1x,i3,(t10,5(g14.7,1x,g14.7,2x)))") irest, iter, vec(:,iter,irest)
-        end do ftdv_iterations 
-      end do ftdv_restarts
-      write (out,"()")
-    end subroutine ft_dump_vectors
+    ! contains
+    ! subroutine ft_dump_vectors(tag,vec)
+    !   character(len=*), intent(in) :: tag
+    !   complex(rk), intent(in)      :: vec(:,:,:) ! Trace of a vector to dump
+    !   !
+    !   integer(ik) :: irest, iter
+    !   !
+    !   write (out,"(/t5,a/)") trim(tag)
+    !   ftdv_restarts: do irest=1,bicg_maxiter
+    !     ftdv_iterations: do iter=1,trace_niter(irest)
+    !       write (out,"(1x,i3,1x,i3,(t10,5(g14.7,1x,g14.7,2x)))") irest, iter, vec(:,iter,irest)
+    !     end do ftdv_iterations 
+    !   end do ftdv_restarts
+    !   write (out,"()")
+    ! end subroutine ft_dump_vectors
   end subroutine bicg_solve
   !
 end module bicg_tools

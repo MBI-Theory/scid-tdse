@@ -75,7 +75,7 @@ module node_tools
   public nt_rebalance, nt_rebalance_needed, nt_finalize
   public nt_force_stdin
   !
-  character(len=clen), save :: rcsid_node_tools = "$Id: node_tools.f90,v 1.11 2023/06/09 14:10:24 ps Exp $"
+  character(len=clen), save :: rcsid_node_tools = "$Id: node_tools.f90,v 1.13 2025/07/11 15:08:35 ps Exp $"
   !
   !  All local state must be assembled in the nt_state structure, to potentiallly 
   !  allow multiple simultaneous instances of the solver at some far away future time
@@ -168,6 +168,11 @@ module node_tools
     module procedure nt_max_real
     module procedure nt_max_real_array
   end interface nt_max
+  !
+  !  There's a bit of an embuggerance here: Some MPI implementations/compilers want 
+  !  the external declation below. And some consider it to be an error.
+  !
+  !  external MPI_IBcast, MPI_Bcast, MPI_ISend, MPI_IRecv, MPI_IGather, MPI_AllGather, MPI_WaitAll
   !
   contains
   !
@@ -316,6 +321,10 @@ module node_tools
         write (out,"('MPI complex(rk) size is ',i0,' bytes')") mpi_complexsize
       end if
     else ! nts%n_nodes == 1
+      if (nts%mpi_active) then
+        write (out,"(/'WARNING: Running with a single MPI node. MPI capability will not be used.')")
+        write (out,"( 'WARNING: If this is not the desired result, please check MPI process startup.'/)")
+      end if
       !
       !  Special case: We are running on a single node; regardless of whether MPI was
       !  initialized or not, we won't be using it. All remaining nt_calls become no-ops.
@@ -363,11 +372,15 @@ module node_tools
     !  There is an MPI-native way of sending the structure - but it is much more
     !  verbose, and looks uglier. We won't bother!
     !
-    if (nts%this_node==1) then
+    !  The only values which matter are on the process root (this_node==1), but
+    !  there is no harm in initializing the array on all nodes - and this turns
+    !  off a gfortran warning, too.
+    !
+    ! if (nts%this_node==1) then
       buf(1) = wfn%lmax
       buf(2) = wfn%nradial
       buf(3) = wfn%lmax_top
-    end if
+    ! end if
     count = size(buf) * mpi_integersize
     slot  = mpq_get_slot()
 !*mp call MPI_IBcast(buf,count,MPI_BYTE,0,MPI_COMM_WORLD,nts%mpi_req(slot),ierror)
@@ -403,9 +416,9 @@ module node_tools
     !
     call hack_store(buf)  ! Necessary to prevent caching of the values in buf()
     !
-    wfn%lmax     = buf(1) ! Spurious gfortran warning here
-    wfn%nradial  = buf(2) ! Spurious gfortran warning here
-    wfn%lmax_top = buf(3) ! Spurious gfortran warning here
+    wfn%lmax     = buf(1)
+    wfn%nradial  = buf(2)
+    wfn%lmax_top = buf(3)
     !
     if (nt_verbose>=3) then
       write (out,"('nt_broadcast_wavefunction: node = ',i0,' lmax = ',i0,' nradial = ',i0)") &
@@ -929,14 +942,14 @@ module node_tools
   subroutine nt_add_real(val)
     real(rk), intent(inout) :: val
     !
-    real(rk)  :: buf(nts%n_nodes)
-    integer   :: count
+!*mp real(rk)  :: buf(nts%n_nodes)
+!*mp integer   :: count
 !*mp  integer :: ierror
     !
     if (nts%n_nodes==1) return
     !
     call TimerStart('Node add real')
-    count = mpi_realsize
+!*mp count = mpi_realsize
 !*mp call MPI_AllGather(val,count,MPI_BYTE,buf,count,MPI_BYTE,MPI_COMM_WORLD,ierror)
 !*mp if (ierror/=MPI_SUCCESS) then
 !*mp   write (out,"('nt_add_real: MPI_AllGather failed with code ',i0)") ierror
@@ -953,14 +966,14 @@ module node_tools
   subroutine nt_add_complex(val)
     complex(rk), intent(inout) :: val
     !
-    complex(rk) :: buf(nts%n_nodes)
-    integer     :: count
-!*mp  integer   :: ierror
+!*mp complex(rk) :: buf(nts%n_nodes)
+!*mp integer     :: count
+!*mp integer   :: ierror
     !
     if (nts%n_nodes==1) return
     !
     call TimerStart('Node add complex')
-    count = mpi_complexsize
+!*mp count = mpi_complexsize
 !*mp call MPI_AllGather(val,count,MPI_BYTE,buf,count,MPI_BYTE,MPI_COMM_WORLD,ierror)
 !*mp if (ierror/=MPI_SUCCESS) then
 !*mp   write (out,"('nt_add_complex: MPI_AllGather failed with code ',i0)") ierror
@@ -977,14 +990,14 @@ module node_tools
   subroutine nt_add_complex_array(val)
     complex(rk), intent(inout) :: val(:)
     !
-    complex(rk) :: buf(size(val),nts%n_nodes)
-    integer     :: count
-!*mp  integer   :: ierror
+!*mp complex(rk) :: buf(size(val),nts%n_nodes)
+!*mp integer     :: count
+!*mp integer   :: ierror
     !
     if (nts%n_nodes==1) return
     !
     call TimerStart('Node add complex array')
-    count = size(val) * mpi_complexsize
+!*mp count = size(val) * mpi_complexsize
 !*mp call MPI_AllGather(val,count,MPI_BYTE,buf,count,MPI_BYTE,MPI_COMM_WORLD,ierror)
 !*mp if (ierror/=MPI_SUCCESS) then
 !*mp   write (out,"('nt_add_complex_array: MPI_AllGather failed with code ',i0)") ierror
@@ -1002,14 +1015,14 @@ module node_tools
   subroutine nt_add_complex_array2(val)
     complex(rk), intent(inout) :: val(:,:)
     !
-    complex(rk) :: buf(size(val,dim=1),size(val,dim=2),nts%n_nodes)
-    integer     :: count
-!*mp  integer   :: ierror
+!*mp complex(rk) :: buf(size(val,dim=1),size(val,dim=2),nts%n_nodes)
+!*mp integer     :: count
+!*mp integer     :: ierror
     !
     if (nts%n_nodes==1) return
     !
     call TimerStart('Node add complex array2')
-    count = size(val) * mpi_complexsize
+!*mp count = size(val) * mpi_complexsize
 !*mp call MPI_AllGather(val,count,MPI_BYTE,buf,count,MPI_BYTE,MPI_COMM_WORLD,ierror)
 !*mp if (ierror/=MPI_SUCCESS) then
 !*mp   write (out,"('nt_add_complex2: MPI_AllGather failed with code ',i0)") ierror

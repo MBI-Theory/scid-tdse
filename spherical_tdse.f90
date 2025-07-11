@@ -46,12 +46,13 @@ module spherical_tdse
   public start
   public rcsid_spherical_tdse
   !
-  character(len=clen), save :: rcsid_spherical_tdse = "$Id: spherical_tdse.f90,v 1.138 2024/02/13 14:22:14 ps Exp $"
+  character(len=clen), save :: rcsid_spherical_tdse = "$Id: spherical_tdse.f90,v 1.142 2025/07/11 15:08:35 ps Exp $"
   !
   contains
   !
   subroutine version_header
     use ISO_FORTRAN_ENV
+    external :: versions
     if (verbose<0) return
     !
     write (out,"(t5,a)") trim(rcsid_spherical_tdse)
@@ -59,7 +60,7 @@ module spherical_tdse
     write (out,"(t5,a)") trim(rcsid_spherical_tdse_field)
     write (out,"(t5,a)") trim(rcsid_spherical_tdse_initialwf)
     write (out,"(t5,a)") trim(rcsid_spherical_tdse_io)
-    call versions
+    call versions  ! Expect gfortran warning
     write (out,"()")
     write (out,"('Compiler: ',a)") compiler_version()
     write (out,"('Build flags: ',a)") compiler_options()
@@ -124,7 +125,7 @@ module spherical_tdse
     end do prepare_ensemble
     if (.not.all(scoreboard)) then
       write (out,"('ERROR: Some wavefunctions are not initialized')")
-      write (out,"('scoreboard: ',(t14(25(l1,1x))))") scoreboard
+      write (out,"('scoreboard: ',(t14,(25(l1,1x))))") scoreboard
       stop 'spherical_tdse%prepare_initial_wavefunctions - Missing ensemble index'
     end if
     !
@@ -277,9 +278,9 @@ module spherical_tdse
   !
   subroutine start
     !$ use OMP_LIB
-    logical     :: have_openmp
-    external    :: versions
-    integer(ik) :: ie, ios
+    logical             :: have_openmp
+    integer(ik)         :: ie, ios
+    character(len=clen) :: iom
     !
 !   call memory_trace  ! this module
     !
@@ -298,7 +299,7 @@ module spherical_tdse
     !  The sequence below is a little awkward. We can't complete initialization of a multi-node
     !  run until we've red in the input parameters.
     !
-    read (input,nml=sph_tdse,iostat=ios)
+    read (input,nml=sph_tdse,iostat=ios,iomsg=iom)
     !
     call nt_initialize
     !
@@ -309,6 +310,7 @@ module spherical_tdse
     write (out,"(' ====== end simulation parameters ====== ')")
     if (ios/=0) then
       write (out,"('ERROR: Reading of the input namelist &sph_tdse failed with error code ',i0)") ios
+      write (out,"('ERROR: ',a)") trim(iom)
       call flush_wrapper(out)
       stop 'spherical_tdse%start - Bad input namelist'
     end if

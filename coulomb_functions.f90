@@ -72,7 +72,7 @@
    public coulombFG, coulombF, coulombBound
    public rcsid_coulomb_functions
    !
-   character(len=clen), save :: rcsid_coulomb_functions = "$Id: coulomb_functions.f90,v 1.15 2023/06/09 14:10:24 ps Exp $"
+   character(len=clen), save :: rcsid_coulomb_functions = "$Id: coulomb_functions.f90,v 1.16 2024/04/23 14:30:15 ps Exp $"
    !
  ! integer, parameter      :: out         = 6
  ! integer, parameter      :: ik          = selected_int_kind(15)

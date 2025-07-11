@@ -9,6 +9,9 @@ clean:
 single:
 	./run-all.sh single hydrogen_1S_2P0_uniform.inp
 
+mpi:
+	./run-all.sh mpi
+
 cheap:
 	./run-all.sh cheap
 

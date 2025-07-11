@@ -42,7 +42,7 @@ module spherical_tdse_data
   public
   public rcsid_spherical_tdse_data
   !
-  character(len=clen), save :: rcsid_spherical_tdse_data = "$Id: spherical_tdse_data.f90,v 1.1 2024/02/13 14:22:14 ps Exp $"
+  character(len=clen), save :: rcsid_spherical_tdse_data = "$Id: spherical_tdse_data.f90,v 1.2 2024/04/23 14:33:00 ps Exp $"
   !
   integer(ik)              :: verbose               = 2_ik         ! How verbose do we need to be?
   integer                  :: omp_num_threads       = 0            ! Non-zero value will cause number of OpenMP threads

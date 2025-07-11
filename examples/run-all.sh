@@ -46,9 +46,9 @@ function run_test () {
     # Intel MPI
     # mpirun -genvall -np 2 -s all $(pwd)/../spherical_tdse.x < "${inp}" > "${out}" 2>&1
     # OpenMPI
+    #       -mca mpi_show_mca_params all  <- Using this option causes OpenMPI4 to segfault. Classy.
     # /usr/lib64/mpi/gcc/openmpi/bin/mpirun \
     #       -mca btl ^tcp \
-    #       -mca mpi_show_mca_params all \
     #       -bind-to none -np 2 $(pwd)/../spherical_tdse.x --scid-stdin "${inp}" > "${out}" 2>&1
   fi
   chk="$(echo "${inp}" | sed -e 's/\.inp/.chk/')"
@@ -74,6 +74,13 @@ function summary () {
 if [ "$mode" == "single" ] ; then
   run_test "$test"
   summary "Singe-test run"
+  exit 0
+fi
+#
+if [ "$mode" == "mpi" ] ; then
+  run_test "argon_3P1m_ell_ckpt_mpi.inp"
+  run_test "argon_3P1m_ell_rstrt_mpi.inp"
+  summary "Minimal MPI tests"
   exit 0
 fi
 #

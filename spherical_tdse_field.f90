@@ -25,7 +25,7 @@ module spherical_tdse_field
   public rcsid_spherical_tdse_field
   public initialize_field
   !
-  character(len=clen), save :: rcsid_spherical_tdse_field = "$Id: spherical_tdse_field.f90,v 1.1 2024/02/13 14:22:14 ps Exp $"
+  character(len=clen), save :: rcsid_spherical_tdse_field = "$Id: spherical_tdse_field.f90,v 1.2 2024/04/23 14:33:21 ps Exp $"
   !
   contains
   !

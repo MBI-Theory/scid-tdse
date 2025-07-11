@@ -29,7 +29,7 @@
    public besselj_table
    public rcsid_spherical_bessel
    !
-   character(len=clen), save :: rcsid_spherical_bessel = "$Id: spherical_bessel.f90,v 1.7 2023/06/09 14:10:24 ps Exp $"
+   character(len=clen), save :: rcsid_spherical_bessel = "$Id: spherical_bessel.f90,v 1.8 2025/07/11 15:08:35 ps Exp $"
    !
    ! integer, parameter :: ik = selected_int_kind(15)
    ! integer, parameter :: rk = selected_real_kind(28,50)
@@ -83,7 +83,8 @@
      real(rk), intent(in)    :: z
      integer(ik)             :: nmax
      !
-     real(rk) :: euler_e, eps, err
+     real(rk)               :: euler_e, eps, err
+     integer(ik), parameter :: max_order = nint(real(huge(1_ik),kind=rk)/3._rk,kind=ik)
      !
      !  Go for something better than machine precision; the result should then be good to
      !  machine precision.
@@ -103,7 +104,7 @@
        ! write (*,*) ' nmax = ', nmax
        err = (0.5_rk*euler_e*z/real(nmax,kind=rk))**(nmax-lmax)
        if (err<eps) exit grow_n
-       if (nmax>=huge(1_ik)/3_ik) stop 'spherical_bessel%starting_besselj_order - starting order too large'
+       if (nmax>=max_order) stop 'spherical_bessel%starting_besselj_order - starting order too large'
        nmax = nint(1.05_rk*real(nmax,kind=rk)+1._rk)
      end do grow_n
      ! write (*,*) ' nmax = ', nmax

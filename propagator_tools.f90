@@ -62,7 +62,7 @@ module propagator_tools
   public pt_reset_caches
   public rcsid_propagator_tools
   !
-  character(len=clen), save :: rcsid_propagator_tools = "$Id: propagator_tools.f90,v 1.45 2022/10/08 17:24:26 ps Exp $"
+  character(len=clen), save :: rcsid_propagator_tools = "$Id: propagator_tools.f90,v 1.47 2025/07/11 15:08:35 ps Exp $"
   !
   character(len=20), save :: pt_mix_solver  = 'default' ! Solver to use for L=0 Hmix inverse. Can be:
                                                         ! 'default' - will use the fastest solver
@@ -1524,8 +1524,10 @@ module propagator_tools
     !
     fac_b = cmplx(-dt*(electron_charge/electron_mass)*a*sd_laser_clm(lval+1_ik,mval),kind=rk)
     !
-    !  The brute force version does not rely on gradient operator blocks being the same.
-    !  This version should work for all L, but is too expensive to use generally.
+    !  For the L=0/L=1 block, which only differ in a couple of entries, we use 
+    !  the Sherman-Morrison formula, allowing us to stay sparse. We used to have
+    !  the brute-force LAPACK call here, but it is simply too expensive to be of
+    !  any practical use.
     !
     if (lval==0) then
       select case (pt_mix_solver)
@@ -1533,7 +1535,7 @@ module propagator_tools
           write (out,"('propagator_tools%op_lmix_t: pt_mix_solver=',a,' is not recognized.')") trim(pt_mix_solver)
           stop 'propagator_tools%op_lmix_t - bad pt_mix_solver'
         case ('SM','default')
-          call op_lmix_sherman_morrison_t(nr,lval,fac_b,psi_l,psi_p, &
+          call op_lmix_sherman_morrison_t(lval,fac_b,psi_l,psi_p, &
                                           zp,zm,xp,xm,leqp_c,leqpf_c,leqm_c,leqmf_c,leqmp,leqpp,scr_c)
       end select
     else
@@ -1547,9 +1549,9 @@ module propagator_tools
   !  "hgm-revised-non-iterative-mixing-term.pdf" or the section 2.3.3 in the
   !  reference paper.
   !
-  subroutine op_lmix_sherman_morrison_t(nr,lval,fac_b,psi_l,psi_p, &
+  subroutine op_lmix_sherman_morrison_t(lval,fac_b,psi_l,psi_p, &
                                         zp,zm,xp,xm,mpd,mpd_f,mmd,mmd_f,mpd_p,mmd_p,scr_c)
-    integer(ik), intent(in)    :: nr       ! Maxumum extent of the radial wavefunction
+  ! integer(ik), intent(in)    :: nr       ! Maxumum extent of the radial wavefunction - no longer needed.
     integer(ik), intent(in)    :: lval     ! L value of the first sub-block; second sub-block is L+1
     complex(rk), intent(in)    :: fac_b    ! Amplitude for the coupling operator in the propagator
     complex(rk), intent(inout) :: psi_l(:) ! Radial part of the L block of the wavefunction

@@ -1,8 +1,13 @@
-Last updated: 2024 February 12
+Last updated: 2026 January 26
 ------------
 
 Change log
 ----------
+
+2026 Jan 26
+
+ - Added field input defined by a sequence of arbitrarily-polarized Gaussian
+   pulses ("n Gaussian").
 
 2024 Feb 12
 

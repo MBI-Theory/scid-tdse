@@ -42,12 +42,12 @@ function run_test () {
     export I_MPI_OFI_PROVIDER=shm
     # ulimit -s 32768
     ulimit -s 3072
-    ${wrapper} ../spherical_tdse.x < "${inp}" > "${out}" 2>&1 
+      ${wrapper} ../spherical_tdse.x < "${inp}" > "${out}" 2>&1 
     # Intel MPI
     # mpirun -genvall -np 2 -s all $(pwd)/../spherical_tdse.x < "${inp}" > "${out}" 2>&1
     # OpenMPI
     #       -mca mpi_show_mca_params all  <- Using this option causes OpenMPI4 to segfault. Classy.
-    # /usr/lib64/mpi/gcc/openmpi/bin/mpirun \
+    # /usr/lib64/mpi/gcc/openmpi4/bin/mpirun \
     #       -mca btl ^tcp \
     #       -bind-to none -np 2 $(pwd)/../spherical_tdse.x --scid-stdin "${inp}" > "${out}" 2>&1
   fi
@@ -103,6 +103,7 @@ for inp in helium_1S_adiabatic.inp argon_3P1_cooper.inp argon_3P1_offcooper.inp 
            hydrogen_2P0_sfi_tsurf.inp argon_3P1m_ell_ckpt_mpi.inp argon_3P1m_ell_rstrt_mpi.inp \
            hydrogen_1S_hhg_spline.inp argon_circ-hhg_full.inp argon_circ-hhg_fakeleft2.inp \
            hydrogen_static.inp lithium_ensemble.inp lithium_ensemble_restart.inp \
+           heliumish_raman_circ.inp \
            ; do
   run_test $inp
 done

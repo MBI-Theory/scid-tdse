@@ -1,4 +1,4 @@
-Last updated: 2024 February 12
+Last updated: 2026 January 26
 ------------
 
   All input to scid-tdse is provided through the sph_tdse namelist, with one
@@ -1047,6 +1047,12 @@ Input keywords
                       Vector-potential along lab Z from VP_SCALE/VP_PARAM
                       Vector-potential along lab X from VP_SCALE_X/VP_PARAM_X
       'xy Gaussian' - Similar to 'zy Gaussian', but in the XY plane
+      'n Gaussian'  - General sequence of Gaussian pulses of arbitrary 
+                      polarization, defined by VP_SCALE_N and VP_PARAM_N.
+                      Sequences of circularly-polarized pulses can be
+                      symthesized using a pair of orthogonal linearly-polarized
+                      pulses with a pi/2 CEP phase shift. All "Gaussian" pulse
+                      sequences above can be synthesized using this form.
       'zx CW'       - Circularly polarized CW field in the ZX plane.
                       VP_SCALE gives the magnitude, VP_PARAM(1) is the
                       (circular) frequency
@@ -1101,6 +1107,16 @@ Input keywords
                      origin [atomic units]
       VP_PARAM(12) - End of the envelope hard turn-off, relative to the 
                      origin [atomic units]. VP_PARAM(12)>VP_PARAM(11).
+    "n Gaussian" pulses above use the same parameters, supplied in the
+    VP_SCALE_N(I) and VP_PARAM_N(:,I) arrays. Additionally, the laboratory-
+    frame Cartesian polarization direction of each pulse should be specified
+    in VP_PARAM(13:15,I). The direction does not need to be normalized; if
+    not specified (or specified as three zeros), Z polarization will be used.
+    If all pulses are Z-polarized, setting ROTATION_MODE='none' is strongly
+    recomended.
+      VP_PARAM(1:4,I)
+      VP_PARAM(11:12,I) - As in "Gaussian" above
+      VP_PARAM(13:15,I) - Cartesian polarization direction
     "Sin2" pulses depend on the following parameters:
       VP_SCALE     - overall vector potential magnitude
       VP_PARAM(1)  - Carrier circular frequency [atomic units]

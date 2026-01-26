@@ -1,0 +1,45 @@
+ &sph_tdse
+   comment                = "Alternative Helium potential, Raman excitation via continuum with circular polarization"
+   verbose                = 1,
+   omp_num_threads        = 0,
+   initial_wfn            = 'single',
+   initial_wfn_index      = 0, 0, 1,
+   initial_wfn_energy     = (-0.900,0.0)
+   sd_nradial             = 900,
+   sd_lmax                =   5,
+   sd_mmin                =  -5,
+   sd_mmax                =  +5,
+   sd_rgrid               = 'uniform',
+   sd_rgrid_dr            = 0.10,
+   sd_rgrid_report        = ' '
+   pot_name               = 'input',
+   pot_input(0:12,0)      = 1.0, -1.0, -0.6731, 4.0000,
+                                 -1.0, -0.3269, 0.4000,
+                                  1.0,  0.1056, 0.6618
+   sd_rgrid_zeta          = 2.0,
+   task                   = 'real time',
+   dt                     = 0.02
+   dt_subdivision         = 'off'
+   timesteps              = 127150
+   vp_shape               = 'n Gaussian'
+   field_unwrap           = .true.
+   rotation_mode          = 'auto',
+   vp_scale_n(1)          = 0.03262079
+   vp_scale_n(2)          = 0.03262079
+   vp_param_n(1:4,1)      = 2.07821094, 0.00000000000000000000, 1240.2412, 413.4137
+   vp_param_n(11:15,1)    = 826.8275, 1240.2412,   1.0, 0.0, 0.0
+   vp_param_n(1:4,2)      = 2.07821094, 1.57079632679489661924, 1240.2412, 413.4137
+   vp_param_n(11:15,2)    = 826.8275, 1240.2412,   0.0, 1.0, 0.0
+   vp_scale_n(5)          = 0.04052557
+   vp_scale_n(6)          = 0.04052557
+   vp_param_n(1:4,5)      = 1.32249787, 0.00000000000000000000, 1302.7411, 413.4137
+   vp_param_n(11:15,5)    = 826.8275, 1240.2412,   1.0, 0.0, 0.0
+   vp_param_n(1:4,6)      = 1.32249787, 1.57079632679489661924, 1302.7411, 413.4137
+   vp_param_n(11:15,6)    = 826.8275, 1240.2412,   0.0, 1.0, 0.0
+   skip_tests             = .T.
+   output_each            = 100,
+   composition_threshold  = 1e-6, ! -1 to disable
+   field_preview          = ' ', ! 'heliumish_raman_circ_field.table'
+   wt_atomic_cache_prefix = ' ',
+   detail_output          = ' ',
+ /

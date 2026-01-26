@@ -15,6 +15,7 @@
 !   You should have received a copy of the GNU General Public License
 !   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 !
+!  Note: This module has grown a little messy, and could do with some refactoring.
 !
 !  Vector-potential shape.
 !  This module is never on the critical path. 
@@ -57,10 +58,11 @@ module vectorpotential_tools
   private
   public vp_scale, vp_shape, vp_param, vp_param_x, vp_scale_x, vp_table
   public vp_param_x2, vp_scale_x2
+  public vp_param_n, vp_scale_n
   public vp_apot
   public rcsid_vectorpotential_tools
   !
-  character(len=clen), save :: rcsid_vectorpotential_tools = "$Id: vectorpotential_tools.f90,v 1.24 2025/07/11 15:08:35 ps Exp $"
+  character(len=clen), save :: rcsid_vectorpotential_tools = "$Id: vectorpotential_tools.f90,v 1.25 2026/01/26 15:29:25 ps Exp $"
   !
   !  List of vector-potential names. These are used in a couple different places; 
   !  I would prefer any typos to cause a compile-time error!
@@ -77,11 +79,14 @@ module vectorpotential_tools
   character(len=*), parameter :: vpn_zFlatSin2  = 'z Flat-Sin2'
   character(len=*), parameter :: vpn_zxGaussian = 'zx Gaussian'
   character(len=*), parameter :: vpn_xyGaussian = 'xy Gaussian'
+  character(len=*), parameter :: vpn_nGaussian  = 'n Gaussian'
   character(len=*), parameter :: vpn_zxSin2     = 'zx Sin2'
   character(len=*), parameter :: vpn_xySin2     = 'xy Sin2'
   character(len=*), parameter :: vpn_zxCW       = 'zx CW'
   character(len=*), parameter :: vpn_spline     = 'spline'
   character(len=*), parameter :: vpn_altspline  = 'alt spline'
+  !
+  integer(ik), parameter    :: max_gauss  = 10_ik       ! Maximum number of components in the vpn_nGaussian pulse
   !
   real(xk), save            :: vp_scale   = 0.00_xk     ! Overall magnitude of the vector potential
   character(len=clen), save :: vp_shape   = ' '         ! Shape of the vector-potential. See vp_apot()
@@ -99,6 +104,8 @@ module vectorpotential_tools
                                                         ! polarizations. ("x" stands for "extra", not the X axis!)
   real(xk), save            :: vp_param_x2(20)          ! Same as vp_param, for pulse shapes defined by two orthogonal
                                                         ! polarizations. ("x" stands for "extra", not the X axis!)
+  real(xk), save            :: vp_param_n(20,max_gauss) ! Parameters for a multi-Gaussian pulse sequence
+  real(xk), save            :: vp_scale_n   (max_gauss)
   character(len=clen), save :: vp_table   = 'vp.table'  ! Relevant if vp_shape='table' or vp_shape='spline'
                                                         !
                                                         ! For vp_shape='table', the contents of the vpot_table() array
@@ -139,7 +146,7 @@ module vectorpotential_tools
   real(xk), save            :: x2_origin   = 0._xk      ! vp_param_x2(3) : Pulse origin [atomic units]
   real(xk), save            :: x2_width    = 0._xk      ! vp_param_x2(4) : Pulse width; meaning and units differ
   !
-  !  Values relevant for vp_shape=='Gaussian':
+  !  Values relevant for vp_shape=='Gaussian' and friends:
   !
   !  (width) corresponds to full width at half maximum of power, in atomic units of time
   !
@@ -155,6 +162,15 @@ module vectorpotential_tools
   real(xk), save            :: x2_gau_toff2  = 0._xk    ! vp_param_x2(12) : End of the hard turn-off, relative to origin
                                                         !                   gau_toff2 must be greater than gau_toff1
   real(xk), save            :: x2_gau_alpha  = 0._xk    ! Pulse width parameter; derived from width
+  !
+  real(rk), save            :: n_omega      (max_gauss) ! Derived pulse parameters for the vpn_nGaussian pulse shape.
+  real(rk), save            :: n_phase      (max_gauss)
+  real(rk), save            :: n_origin     (max_gauss)
+  real(rk), save            :: n_width      (max_gauss)
+  real(rk), save            :: n_pol      (3,max_gauss) ! Polarization direction: X/Y/Z
+  real(rk), save            :: n_gau_toff1  (max_gauss)
+  real(rk), save            :: n_gau_toff2  (max_gauss)
+  real(rk), save            :: n_gau_alpha  (max_gauss)
   !
   !  Values relevant for vp_shape='Flat-Sin2'
   !
@@ -180,8 +196,10 @@ module vectorpotential_tools
     real(xk), intent(out), optional :: theta ! Polar angles
     real(xk), intent(out), optional :: phi   ! 
     !
-    real(xk) :: th, ph  ! Local copies of theta and phi to simplify code logic
-    real(xk) :: az, ay, ax
+    integer(ik) :: ip          ! Pulse component
+    real(xk)    :: th, ph      ! Local copies of theta and phi to simplify code logic
+    real(xk)    :: az, ay, ax
+    real(xk)    :: axyz(3)
     !
     call initialize
     select case (vp_shape)
@@ -260,6 +278,20 @@ module vectorpotential_tools
           th = 0._xk
         end if
         ph = atan2(ay,ax)
+      case (vpn_nGaussian)
+        axyz(:) = 0._xk
+        gaussian_pulse_sequence: do ip=1,max_gauss
+          if (vp_scale_n(ip)==0._xk) cycle gaussian_pulse_sequence
+          axyz(:) = axyz(:) + vp_scale_n(ip) * n_pol(:,ip) * &
+                    GaussianVP(t,n_omega(ip),n_phase(ip),n_origin(ip),n_gau_toff1(ip),n_gau_toff2(ip),n_gau_alpha(ip))
+        end do gaussian_pulse_sequence
+        apot = sqrt(sum(axyz**2))
+        if (apot>0) then
+          th = acos(axyz(3)/apot)
+        else
+          th = 0._xk
+        end if
+        ph = atan2(axyz(2),axyz(1))
       case (vpn_zxSin2)
         az = vp_scale   * Sin2VP(t,omega,phase,origin,width)
         ay = vp_scale_x * Sin2VP(t,x_omega,x_phase,x_origin,x_width)
@@ -294,6 +326,9 @@ module vectorpotential_tools
   end function vp_apot
   !
   subroutine initialize
+    integer(ik)         :: ip   ! Pulse index
+    character(len=clen) :: tag  ! Pulse tag
+    real(xk)            :: nrm  ! Norm of the polarization direction
     if (.not.first) return
     !
     !$omp critical
@@ -337,6 +372,21 @@ module vectorpotential_tools
         case (vpn_xyGaussian)
           call init_GaussianVP('along lab X',vp_param,    omega,  phase,  origin,  width,  gau_toff1,  gau_toff2,  gau_alpha)
           call init_GaussianVP('along lab Y',vp_param_x,x_omega,x_phase,x_origin,x_width,x_gau_toff1,x_gau_toff2,x_gau_alpha)
+        case (vpn_nGaussian)
+          gaussian_pulse_sequence: do ip=1,max_gauss
+            if (vp_scale_n(ip)==0._xk) cycle gaussian_pulse_sequence
+            n_pol(:,ip) = vp_param_n(13:15,ip)        ! Extract polarization
+            nrm         = sqrt(sum(n_pol(:,ip)**2))   ! Get the norm
+            if (nrm==0._xk) then
+              n_pol(:,ip) = (/ 0._rk, 0._xk, 1._xk /) ! If missing, assume Z
+            else
+              n_pol(:,ip) = n_pol(:,ip) / nrm         ! Make sure it's normalized
+            end if
+            write (tag,"('Component ',i0,' along ',3(1x,f9.6))") ip, n_pol(:,ip)
+          call init_GaussianVP(trim(tag),vp_param_n(:,ip), &
+                               n_omega(ip),n_phase(ip),n_origin(ip),n_width(ip), &
+                               n_gau_toff1(ip),n_gau_toff2(ip),n_gau_alpha(ip))
+          end do gaussian_pulse_sequence
         case (vpn_zxSin2)
           call init_Sin2VP('along lab Z',vp_param,    omega,  phase,  origin,  width)
           call init_Sin2VP('along lab X',vp_param_x,x_omega,x_phase,x_origin,x_width)

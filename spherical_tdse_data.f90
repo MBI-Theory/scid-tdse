@@ -42,7 +42,7 @@ module spherical_tdse_data
   public
   public rcsid_spherical_tdse_data
   !
-  character(len=clen), save :: rcsid_spherical_tdse_data = "$Id: spherical_tdse_data.f90,v 1.2 2024/04/23 14:33:00 ps Exp $"
+  character(len=clen), save :: rcsid_spherical_tdse_data = "$Id: spherical_tdse_data.f90,v 1.3 2026/01/26 15:29:25 ps Exp $"
   !
   integer(ik)              :: verbose               = 2_ik         ! How verbose do we need to be?
   integer                  :: omp_num_threads       = 0            ! Non-zero value will cause number of OpenMP threads
@@ -217,7 +217,7 @@ module spherical_tdse_data
                       pt_mix_solver, pt_chunk, pt_sense_real, pt_eps_dt, pt_force_par_l, &
                       ! Parameters from vectorpotential_tools
                       vp_scale, vp_scale_x, vp_scale_x2, vp_shape, vp_param, vp_param_x, &
-                      vp_param_x2, vp_table, &
+                      vp_param_x2, vp_scale_n, vp_param_n, vp_table, &
                       ! Parameters from timer
                       timer_disable, &
                       ! Parameters from bicg_tools

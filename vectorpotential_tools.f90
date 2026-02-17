@@ -62,7 +62,7 @@ module vectorpotential_tools
   public vp_apot
   public rcsid_vectorpotential_tools
   !
-  character(len=clen), save :: rcsid_vectorpotential_tools = "$Id: vectorpotential_tools.f90,v 1.25 2026/01/26 15:29:25 ps Exp $"
+  character(len=clen), save :: rcsid_vectorpotential_tools = "$Id: vectorpotential_tools.f90,v 1.26 2026/02/17 17:04:16 ps Exp $"
   !
   !  List of vector-potential names. These are used in a couple different places; 
   !  I would prefer any typos to cause a compile-time error!
@@ -285,13 +285,22 @@ module vectorpotential_tools
           axyz(:) = axyz(:) + vp_scale_n(ip) * n_pol(:,ip) * &
                     GaussianVP(t,n_omega(ip),n_phase(ip),n_origin(ip),n_gau_toff1(ip),n_gau_toff2(ip),n_gau_alpha(ip))
         end do gaussian_pulse_sequence
-        apot = sqrt(sum(axyz**2))
-        if (apot>0) then
-          th = acos(axyz(3)/apot)
-        else
-          th = 0._xk
+        !
+        !  We need to treat pure Z polarization as a special case, or there will be trouble.
+        !
+        if (all(axyz(1:2)==0._xk)) then
+          apot = axyz(3)
+          th   = 0._xk
+          ph   = 0._xk
+        else 
+          apot = sqrt(sum(axyz**2))
+          if (apot>0) then
+            th = acos(axyz(3)/apot)
+          else
+            th = 0._xk
+          end if
+          ph = atan2(axyz(2),axyz(1))
         end if
-        ph = atan2(axyz(2),axyz(1))
       case (vpn_zxSin2)
         az = vp_scale   * Sin2VP(t,omega,phase,origin,width)
         ay = vp_scale_x * Sin2VP(t,x_omega,x_phase,x_origin,x_width)

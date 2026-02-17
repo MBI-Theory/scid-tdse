@@ -25,7 +25,7 @@ module spherical_tdse_field
   public rcsid_spherical_tdse_field
   public initialize_field
   !
-  character(len=clen), save :: rcsid_spherical_tdse_field = "$Id: spherical_tdse_field.f90,v 1.2 2024/04/23 14:33:21 ps Exp $"
+  character(len=clen), save :: rcsid_spherical_tdse_field = "$Id: spherical_tdse_field.f90,v 1.3 2026/02/17 17:04:16 ps Exp $"
   !
   contains
   !
@@ -39,6 +39,9 @@ module spherical_tdse_field
     end if
     if (nts%this_node==1) then
       call preview_laser_field 
+    end if
+    if (rotation_mode=='none') then
+      call vpot_sanity_check_norotation
     end if
   end subroutine initialize_field
   !
@@ -320,4 +323,23 @@ module spherical_tdse_field
     close (iu_temp)
     call TimerStop('Dump VP table')
   end subroutine preview_laser_field
+  !
+  !  If frame rotation is disabled, we absolutely must not have any theta and phi values
+  !  other than zero - or the results are guaranteed to be disastrously wrong.
+  !
+  subroutine vpot_sanity_check_norotation
+    integer(ik) :: its
+    !
+    call TimerStart('VP sanity (norot)')
+    time_steps: do its=0,2*timesteps
+      if (any(vpot_table(2:3,its)/=0)) then
+        write (out,"(/'ERROR: Frame rotation has been disabled, but the vector-potential rotates.')")
+        write (out,"( 'ERROR: The results are guaranteed to be incorrect, aborting the calculation.'/)")
+        write (out,"('Time step ',i0,' A = ',g26.14,' theta = ',g26.14,' phi = ',g26.14)") its, vpot_table(:,its)
+        call flush_wrapper(out)
+        stop 'spherical_tdse_field%vpot_sanity_check_norotation - bad vpot/rotation mode combo'
+      end if
+    end do time_steps
+    call TimerStop('VP sanity (norot)')
+  end subroutine vpot_sanity_check_norotation
 end module spherical_tdse_field

@@ -34,7 +34,7 @@ module test_tools
   public derivatives_test, fieldfree_test, imaginary_propagation_test
   public rcsid_test_tools
   !
-  character(len=clen), save :: rcsid_test_tools = "$Id: test_tools.f90,v 1.30 2022/10/06 17:14:31 ps Exp $"
+  character(len=clen), save :: rcsid_test_tools = "$Id: test_tools.f90,v 1.31 2026/06/08 13:27:23 ps Exp $"
   !
   contains
   !
@@ -175,20 +175,25 @@ module test_tools
     integer(ik), intent(in)            :: verbose        ! Level of the output
     !
     integer(ik) :: lval, iev, nrep
-    complex(rk) :: block_evec(sd_nradial,sd_nradial,2) ! Eigenvectors (used to check for bad grids)
-    complex(rk) :: block_eval(sd_nradial)              ! Eigenvalues
-    complex(rk) :: all_eval  (sd_nradial,0:sd_lmax)    ! All eigenvalues; sorted in increading real part order
+    complex(rk), allocatable :: block_evec(:,:,:)      ! Per-thread (sd_nradial,sd_nradial,2) Eigenvectors (used to check for bad grids)
+    complex(rk), allocatable :: block_eval(:)          ! Per-thread (sd_nradial)              Eigenvalues
+    complex(rk), allocatable :: all_eval  (:,:)        ! Global     (sd_nradial,0:sd_lmax)    All eigenvalues; sorted in increading real part order
     !
     call TimerStart('Field-free solutions')
-    !$omp parallel do schedule(guided) default(none) &
+    allocate (all_eval(sd_nradial,0:sd_lmax))
+    !$omp parallel default(none) &
     !$omp& private(lval,block_evec,block_eval) &
-    !$omp& shared(sd_lmax,all_eval,verbose)
+    !$omp& shared(sd_lmax,all_eval,verbose,sd_nradial)
+    allocate (block_evec(sd_nradial,sd_nradial,2),block_eval(sd_nradial))
+    !$omp do schedule(guided)
     scan_l_channels: do lval=0,sd_lmax
       call wt_atomic_solutions(verbose,lval,block_eval,block_evec)
       all_eval(:,lval) = block_eval(:)
       call check_effective_grid(verbose,lval,block_evec)
     end do scan_l_channels
-    !$omp end parallel do
+    !$omp end do
+    deallocate (block_evec,block_eval)
+    !$omp end parallel
     !
     write (out,"((1x,a4,1x,a4,1x,2(1x,a24)))") &
                ' L= ', '  i ', '  Re(eps)  ', '  Im(eps)  ', &
@@ -205,6 +210,7 @@ module test_tools
     end do report_l_channels
     write (out,"()")
     call flush_wrapper(out)
+    deallocate (all_eval)
     !
     call TimerStop('Field-free solutions')
   end subroutine fieldfree_test

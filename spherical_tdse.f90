@@ -46,7 +46,7 @@ module spherical_tdse
   public start
   public rcsid_spherical_tdse
   !
-  character(len=clen), save :: rcsid_spherical_tdse = "$Id: spherical_tdse.f90,v 1.142 2025/07/11 15:08:35 ps Exp $"
+  character(len=clen), save :: rcsid_spherical_tdse = "$Id: spherical_tdse.f90,v 1.143 2026/06/08 13:27:23 ps Exp $"
   !
   contains
   !
@@ -353,14 +353,16 @@ module spherical_tdse
     !
     if (.not.skip_tests) call derivatives_test(verbose)
     !
-    !  Construct field-free states using direct diagonalization
-    !
-    if (.not.skip_tests) call fieldfree_test(verbose)
-    !
     ! Caches must be initialized before prepare_initial_wavefunction(), 
     ! which may refer to them.
     !
     call wt_init_memory_caches(verbose)
+    !
+    !  Construct field-free states using direct diagonalization.
+    !  This test calls atomic-solutions routine, and thus must be after the solution
+    !  caches have been initialized.
+    !
+    if (.not.skip_tests) call fieldfree_test(verbose)
     !
     ! Calculate transition matrix elements between bound states if asked for
     ! Only makes sense if memory caches for atomic solutions is enabled and cap disabled

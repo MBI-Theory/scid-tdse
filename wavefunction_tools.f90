@@ -50,7 +50,7 @@ module wavefunction_tools
   public wt_reconstruct_left
   public rcsid_wavefunction_tools
   !
-  character(len=clen), save :: rcsid_wavefunction_tools = "$Id: wavefunction_tools.f90,v 1.67 2025/07/11 15:08:35 ps Exp $"
+  character(len=clen), save :: rcsid_wavefunction_tools = "$Id: wavefunction_tools.f90,v 1.68 2026/06/08 13:27:23 ps Exp $"
   !
   integer, parameter        :: wt_adaptive_r_buffer   = 8   ! Maximum number of points to examine for adaptive nradial determination
   character(len=clen), save :: wt_atomic_cache_prefix = ' ' ! Atomic solution for each L will be cached
@@ -1324,7 +1324,7 @@ module wavefunction_tools
               loop_i_right_p: do i_right = 1,nr ! Loop over all states
                 en_right = cache_eval(i_right,l_right)
                 if (real(en_right,kind=rk)>0._rk) cycle ! Ignore states with positive energy
-            !
+                !
                 ! Radial part depends only on l and i of l and r, but not on m_op
                 !
                 wgt_dip = sum(cache_evec(1:nr,i_left,2,l_left) * cache_evec(1:nr,i_right,1,l_right) * sd_rtab(1:nr))

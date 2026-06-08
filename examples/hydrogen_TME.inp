@@ -25,7 +25,7 @@
    vp_param(11:12)         = 70.0, 95.0
    pt_mix_solver           = 'default',
    bicg_epsilon            = 0
-   skip_tests              = .T.
+   skip_tests              = .F.
    output_each             = 20,
    composition_threshold   = 1e-5,
    initial_wf_dump_prefix  = ' ',

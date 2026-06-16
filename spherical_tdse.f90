@@ -46,7 +46,8 @@ module spherical_tdse
   public start
   public rcsid_spherical_tdse
   !
-  character(len=clen), save :: rcsid_spherical_tdse = "$Id: spherical_tdse.f90,v 1.143 2026/06/08 13:27:23 ps Exp $"
+  character(len=clen), save   :: rcsid_spherical_tdse = "$Id: spherical_tdse.f90,v 1.144 2026/06/16 12:58:21 ps Exp ps $"
+  character(len=*), parameter :: defaults_file = "scid-tdse.ini"
   !
   contains
   !
@@ -278,9 +279,9 @@ module spherical_tdse
   !
   subroutine start
     !$ use OMP_LIB
-    logical             :: have_openmp
-    integer(ik)         :: ie, ios
-    character(len=clen) :: iom
+    logical             :: have_openmp, defaults_loaded
+    integer(ik)         :: ie, ios, ios0, iu_def
+    character(len=clen) :: iom, iom0
     !
 !   call memory_trace  ! this module
     !
@@ -297,20 +298,37 @@ module spherical_tdse
     call nt_force_stdin
     !
     !  The sequence below is a little awkward. We can't complete initialization of a multi-node
-    !  run until we've red in the input parameters.
+    !  run until we've red in the input parameters. As the very first step, we will try to initialize
+    !  the defaults from defaults_file (if present).
     !
+    defaults_loaded = .false.
+    open (newunit=iu_def,file=defaults_file,form="formatted",action="read",status="old",iostat=ios0)
+    if (ios0==0) then
+      defaults_loaded = .true.
+      read (iu_def,nml=sph_tdse,iostat=ios0,iomsg=iom0)
+      close (iu_def)
+    else
+      ios0 = 0
+    end if
     read (input,nml=sph_tdse,iostat=ios,iomsg=iom)
     !
     call nt_initialize
     !
     call version_header  ! This module
     !
+    if (defaults_loaded) write (out,"(/'Defaults loaded from ',a/)") defaults_file
     write (out,"(' ===== begin simulation parameters ===== ')")
     write (out,nml=sph_tdse)
     write (out,"(' ====== end simulation parameters ====== ')")
+    if (ios0/=0) then
+      write (out,"('ERROR: Reading defaults from ',a,' failed with error code ',i0)") defaults_file, ios0
+      write (out,"('ERROR: ',a)") trim(iom0)
+    end if
     if (ios/=0) then
       write (out,"('ERROR: Reading of the input namelist &sph_tdse failed with error code ',i0)") ios
       write (out,"('ERROR: ',a)") trim(iom)
+    end if
+    if (ios0/=0 .or. ios/=0) then
       call flush_wrapper(out)
       stop 'spherical_tdse%start - Bad input namelist'
     end if

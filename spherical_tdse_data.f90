@@ -42,7 +42,7 @@ module spherical_tdse_data
   public
   public rcsid_spherical_tdse_data
   !
-  character(len=clen), save :: rcsid_spherical_tdse_data = "$Id: spherical_tdse_data.f90,v 1.3 2026/01/26 15:29:25 ps Exp $"
+  character(len=clen), save :: rcsid_spherical_tdse_data = "$Id: spherical_tdse_data.f90,v 1.4 2026/06/16 12:58:21 ps Exp ps $"
   !
   integer(ik)              :: verbose               = 2_ik         ! How verbose do we need to be?
   integer                  :: omp_num_threads       = 0            ! Non-zero value will cause number of OpenMP threads
@@ -228,6 +228,7 @@ module spherical_tdse_data
                       wt_atomic_cache_prefix, wt_iterative_improvement, &
                       wt_disable_orthogonalization, wt_max_solution_iterations, &
                       wt_enable_memory_caches, wt_tme, wt_tme_file, &
+                      bug_force_single_threaded_lapack, &
                       ! Parameters from cap_tools
                       cap_name, cap_param, &
                       ! Parameters from spherical_tsurf

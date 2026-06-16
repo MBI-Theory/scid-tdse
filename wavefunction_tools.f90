@@ -48,9 +48,10 @@ module wavefunction_tools
   public wt_r2r_scale
   public wt_fake_left
   public wt_reconstruct_left
+  public bug_force_single_threaded_lapack
   public rcsid_wavefunction_tools
   !
-  character(len=clen), save :: rcsid_wavefunction_tools = "$Id: wavefunction_tools.f90,v 1.68 2026/06/08 13:27:23 ps Exp $"
+  character(len=clen), save :: rcsid_wavefunction_tools = "$Id: wavefunction_tools.f90,v 1.69 2026/06/16 12:58:21 ps Exp ps $"
   !
   integer, parameter        :: wt_adaptive_r_buffer   = 8   ! Maximum number of points to examine for adaptive nradial determination
   character(len=clen), save :: wt_atomic_cache_prefix = ' ' ! Atomic solution for each L will be cached
@@ -75,6 +76,9 @@ module wavefunction_tools
                                                             ! Calculate transition matrix elements between all bound states                                                    
   character(len=clen), save :: wt_tme_file                = "tme.dat"
                                                             ! Output file for the transition matrix elements
+  logical, save             :: bug_force_single_threaded_lapack = .false.
+                                                            ! Only call LAPACK from one thread at a time. May be needed to
+                                                            ! work around broken system LAPACK/BLAS.
   !
   !  In-memory caches. These caches can be enormously large; do not activate them
   !  unless you have plenty of RAM!
@@ -304,6 +308,7 @@ module wavefunction_tools
     real(rk), allocatable     :: eval_guess_real(:)
     integer(ik)               :: order(sd_nradial)
     integer(ik)               :: alloc, ipt
+    logical, save, volatile   :: lapack_warning_seen = .false.
     !
     call TimerStart('Atomic solutions: Guess')
     allocate (tmat(sd_nradial,sd_nradial),evec_guess(sd_nradial,sd_nradial,2), &
@@ -335,7 +340,18 @@ module wavefunction_tools
              lval, maxval(abs(evec_guess(:,:,1)-conjg(transpose(evec_guess(:,:,1)))))
     end if
     !
-    call lapack_geev(sd_nradial,evec_guess,eval_guess)
+    if (bug_force_single_threaded_lapack) then
+      !$omp critical
+      if (.not.lapack_warning_seen) then
+        lapack_warning_seen = .true.
+        write (out,"(/'WARNING: Executing LAPACK in a single-threaded mode. Performance may be reduced.'/)")
+      end if
+      call lapack_geev(sd_nradial,evec_guess,eval_guess)
+      !$omp end critical
+    else
+      call lapack_geev(sd_nradial,evec_guess,eval_guess)
+    end if
+    !
     eval_guess_real = real(eval_guess,kind=rk)
     call order_keys(eval_guess_real,order)
     eval = eval_guess(order)

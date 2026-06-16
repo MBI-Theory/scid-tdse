@@ -1,4 +1,4 @@
-Last updated: 2026 January 26
+Last updated: 2026 June 26
 ------------
 
   All input to scid-tdse is provided through the sph_tdse namelist, with one
@@ -7,7 +7,13 @@ Last updated: 2026 January 26
 
     --scid-stdin input.inp
 
-  where "input.inp" is the desired file to be red on the standard input.
+  where "input.inp" is the desired file to be read on the standard input.
+
+  Before this input file is processed, scid-tdse will try to open the file
+  "scid-tdse.ini" and parse the contents as the sph_tdse namelist, allowing
+  defaults for a group of calculations in the same project to be set. Any
+  values set in this initialization file can be overriden with the regular
+  input.
 
 Input keywords
 
@@ -33,6 +39,13 @@ Input keywords
     fail to converge after pt_bicg_maxiter restarts, each with pt_bicg_maxiter 
     iterations, laser propagator will fall back to a (much slower) explicit solver
     in LAPACK (cgesv/zgesv/quad_zgesv, depending on the build precision).
+
+  BUG_FORCE_SINGLE_THREADED_LAPACK=.false. (wavefunction_tools.f90)
+
+    Force a workaround for a broken (not thread-safe) LAPACK library. If this flag 
+    is activated, calls to LAPACK will execute in a critical section. The rest of 
+    the work (including the refinement of the guess solutions returned by LAPACK)
+    will still proceed in parallel.
 
   CA_MAXRAM=0 (composition_analysis.f90)
     Maximum amount of memory in megabytes, which can be used during the composition 

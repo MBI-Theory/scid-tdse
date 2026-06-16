@@ -1,8 +1,13 @@
-Last updated: 2026 January 26
+Last updated: 2026 June 26
 ------------
 
 Change log
 ----------
+
+2026 Jun 26
+
+ - Added a work-around for non-thread-safe LAPACK libraries
+ - Added a per-directory initialization file (scid-tdse.ini)
 
 2026 Jan 26
 
